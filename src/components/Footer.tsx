@@ -1,14 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Facebook,
-  Instagram,
-  MapPin,
-  Mail,
-  Phone,
-  ChevronRight,
-} from "lucide-react";
+import { MapPin, Mail, Phone, ChevronRight } from "lucide-react";
+import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -36,21 +30,34 @@ export default function Footer() {
               </h5>
               <div className="flex gap-3">
                 <Link
-                  href="#"
+                  href="https://www.facebook.com/profile.php?id=61567056315599"
                   className="group bg-zinc-800 hover:bg-primary p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/50"
                   aria-label="Facebook"
+                  target="_blank"
                 >
-                  <Facebook
+                  <FaFacebook
                     size={18}
                     className="group-hover:scale-110 transition-transform"
                   />
                 </Link>
                 <Link
-                  href="#"
+                  href="https://www.instagram.com/pandey.computer/"
+                  target="_blank"
                   className="group bg-zinc-800 hover:bg-primary p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/50"
                   aria-label="Instagram"
                 >
-                  <Instagram
+                  <FaInstagram
+                    size={18}
+                    className="group-hover:scale-110 transition-transform"
+                  />
+                </Link>
+                <Link
+                  href="https://api.whatsapp.com/send?phone=9779802803711"
+                  target="_blank"
+                  className="group bg-zinc-800 hover:bg-primary p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/50"
+                  aria-label="Instagram"
+                >
+                  <FaWhatsapp
                     size={18}
                     className="group-hover:scale-110 transition-transform"
                   />
@@ -158,16 +165,16 @@ export default function Footer() {
                 />
                 <div>
                   <a
-                    href="tel:+97715350040"
+                    href="tel:+977585498"
                     className="text-sm text-zinc-400 hover:text-primary transition-colors block"
                   >
-                    01-5350040
+                    01-585498
                   </a>
                   <a
-                    href="tel:+97715911594"
+                    href="tel:+9779856035498"
                     className="text-sm text-zinc-400 hover:text-primary transition-colors block"
                   >
-                    01-5911594
+                    9856035498
                   </a>
                 </div>
               </div>
@@ -176,14 +183,13 @@ export default function Footer() {
             {/* Map */}
             <div className="w-full h-48 bg-zinc-800 rounded-xl overflow-hidden shadow-lg ring-1 ring-zinc-700/50 hover:ring-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.2345!2d85.3131!3d27.7045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDQyJzE2LjIiTiA4NcKwMTgnNDcuMiJF!5e0!3m2!1sen!2snp!4v1234567890"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4403.733258338522!2d83.98639519999999!3d28.217570600000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595490aeb14c1%3A0x134c7867410d3012!2sPandey%20Computer%20Suppliers!5e1!3m2!1sen!2snp!4v1764773124355!5m2!1sen!2snp"
+                width="600"
+                height="450"
+                // style="border:0;"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Pandey Computer Location"
               />
             </div>
           </div>
