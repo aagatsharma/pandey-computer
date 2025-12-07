@@ -75,9 +75,10 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { href: "/", label: "Home" },
-                { href: "/products", label: "Products" },
-                { href: "/cart", label: "Cart" },
-                { href: "/checkout", label: "Checkout" },
+                { href: "/shop", label: "Shop" },
+                { href: "/about", label: "About Us" },
+                { href: "/contact", label: "Contact Us" },
+                { href: "/blogs", label: "Blogs" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
@@ -98,7 +99,7 @@ export default function Footer() {
           </div>
 
           {/* Categories */}
-          <div>
+          {/* <div>
             <h4 className="text-lg font-semibold mb-6 relative inline-block">
               Categories
               <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-primary rounded-full" />
@@ -126,7 +127,7 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Contact & Map */}
           <div>
@@ -181,6 +182,9 @@ export default function Footer() {
             </div>
 
             {/* Map */}
+          </div>
+
+          <div>
             <div className="w-full h-48 bg-zinc-800 rounded-xl overflow-hidden shadow-lg ring-1 ring-zinc-700/50 hover:ring-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4403.733258338522!2d83.98639519999999!3d28.217570600000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595490aeb14c1%3A0x134c7867410d3012!2sPandey%20Computer%20Suppliers!5e1!3m2!1sen!2snp!4v1764773124355!5m2!1sen!2snp"

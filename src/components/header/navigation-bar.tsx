@@ -183,6 +183,17 @@ export default function NavigationBar() {
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
                 <Link
+                  href="/blogs"
+                  className="group inline-flex h-10 md:h-12 w-max items-center justify-center rounded-md bg-transparent px-3 md:px-5 py-2 text-sm md:text-base lg:text-lg font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                  Blogs
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link
                   href="/about"
                   className="group inline-flex h-10 md:h-12 w-max items-center justify-center rounded-md bg-transparent px-3 md:px-5 py-2 text-sm md:text-base lg:text-lg font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                 >
