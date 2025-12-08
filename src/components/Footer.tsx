@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Mail, Phone, ChevronRight } from "lucide-react";
 import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
@@ -16,9 +17,15 @@ export default function Footer() {
           {/* Company Info */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-3xl font-bold mb-3 bg-linear-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-                Pandey Computer
-              </h3>
+              <div className="bg-white rounded-lg p-3 inline-block mb-4">
+                <Image
+                  src="/logo.png"
+                  alt="Pandey Computer"
+                  width={180}
+                  height={60}
+                  className="h-10 w-auto"
+                />
+              </div>
               <p className="text-sm text-zinc-400 leading-relaxed">
                 Your trusted partner for the latest computer products and
                 technology solutions.
