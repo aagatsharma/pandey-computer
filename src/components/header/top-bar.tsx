@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Search, ShoppingCart, Heart, User } from "lucide-react";
+import { Search, ShoppingCart } from "lucide-react";
 
 export default function TopBar() {
   return (
@@ -32,21 +32,7 @@ export default function TopBar() {
             className="flex flex-col items-center gap-1 text-foreground hover:text-primary transition-colors"
           >
             <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
-            <span className="text-xs md:text-sm">Cart</span>
-          </Link>
-          <Link
-            href="/wishlist"
-            className="flex flex-col items-center gap-1 text-foreground hover:text-primary transition-colors"
-          >
-            <Heart className="h-5 w-5 md:h-6 md:w-6" />
-            <span className="text-xs md:text-sm">Wishlist</span>
-          </Link>
-          <Link
-            href="/profile"
-            className="flex flex-col items-center gap-1 text-foreground hover:text-primary transition-colors"
-          >
-            <User className="h-5 w-5 md:h-6 md:w-6" />
-            <span className="text-xs md:text-sm">Profile</span>
+            {/* <span className="text-xs md:text-sm">Cart</span> */}
           </Link>
         </div>
       </div>

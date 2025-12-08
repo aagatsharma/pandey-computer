@@ -90,41 +90,45 @@ export default async function BlogPage({
 
   return (
     <div className="min-h-screen bg-background">
-      <article className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="max-w-3xl mx-auto">
+      <article>
+        {/* Featured Image - Full Width with Title Overlay */}
+        <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
+          <Image
+            src={blog.image}
+            alt={blog.title}
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Dark overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/40" />
+
+          {/* Title Overlay */}
+          <div className="absolute inset-0 flex items-end">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {blog.title}
+              </h1>
+              <div className="flex items-center gap-3 text-sm text-white/90">
+                <span>{blog.date}</span>
+                <span>•</span>
+                <span>{blog.readTime}</span>
+                <span>•</span>
+                <span>By {blog.author}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Container */}
+        <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 pb-12">
           {/* Back Link */}
-          <Link
+          {/* <Link
             href="/blogs"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
           >
             ← Back to all articles
-          </Link>
-
-          {/* Featured Image */}
-          <div className="relative w-full h-[300px] sm:h-[400px] rounded-lg overflow-hidden mb-8">
-            <Image
-              src={blog.image}
-              alt={blog.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-
-          {/* Article Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              {blog.title}
-            </h1>
-
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span>{blog.date}</span>
-              <span>•</span>
-              <span>{blog.readTime}</span>
-              <span>•</span>
-              <span>By {blog.author}</span>
-            </div>
-          </div>
+          </Link> */}
 
           {/* Article Body */}
           <div className="prose prose-lg dark:prose-invert max-w-none">
