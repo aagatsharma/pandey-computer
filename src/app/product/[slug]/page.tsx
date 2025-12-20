@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
+import { ProductImageGallery } from "@/components/reusable/products/product-image-gallery";
+import { ProductTabs } from "@/components/reusable/products/product-tabs";
+import { RelatedProducts } from "@/components/reusable/products/related-products";
 
 // Mock data for products (same as in shop page)
 const mockProducts = [
@@ -17,6 +21,12 @@ const mockProducts = [
     price: 145999,
     originalPrice: 175999,
     image: "/brands/acer.png",
+    images: [
+      "/brands/acer.png",
+      "/brands/acer.png",
+      "/brands/acer.png",
+      "/brands/acer.png",
+    ],
     category: "Gaming Laptops",
     inStock: true,
     badge: "Best Seller",
@@ -28,6 +38,36 @@ const mockProducts = [
       'Display: 15.6" Full HD 300Hz',
       "OS: Windows 11",
     ],
+    features: [
+      "Advanced cooling system with liquid metal thermal compound",
+      "Per-key RGB backlit keyboard with AURA Sync",
+      "Premium build quality with military-grade durability",
+      "Immersive audio with Dolby Atmos support",
+      "Fast charging - 50% in 30 minutes",
+    ],
+    fullDescription: `The ASUS ROG Strix G15 is a powerhouse gaming laptop designed for serious gamers and content creators. Featuring the AMD Ryzen 9 5900HX processor and NVIDIA GeForce RTX 3070 graphics card, this machine delivers exceptional performance for the latest AAA games and demanding applications.
+
+The 15.6" Full HD display with a blazing-fast 300Hz refresh rate ensures smooth, tear-free gameplay. Combined with adaptive sync technology, you'll experience incredibly fluid visuals that give you a competitive edge.
+
+With 16GB of DDR4 RAM and a spacious 1TB NVMe SSD, you'll have plenty of memory and storage for multitasking and storing your game library. The advanced cooling system with liquid metal thermal compound keeps temperatures in check during intense gaming sessions.`,
+    reviews: [
+      {
+        id: "r1",
+        userName: "Rajesh Kumar",
+        rating: 5,
+        date: "2 weeks ago",
+        comment:
+          "Excellent gaming laptop! The performance is outstanding and the cooling system works great. Highly recommended for serious gamers.",
+      },
+      {
+        id: "r2",
+        userName: "Sita Sharma",
+        rating: 4,
+        date: "1 month ago",
+        comment:
+          "Great laptop for both gaming and work. The 300Hz display is incredibly smooth. Only wish the battery life was a bit longer.",
+      },
+    ],
   },
   {
     id: "2",
@@ -38,6 +78,7 @@ const mockProducts = [
     price: 12999,
     originalPrice: 15999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Gaming Peripherals",
     inStock: true,
     specs: [
@@ -47,6 +88,13 @@ const mockProducts = [
       "Detachable USB cable",
       "Tournament-grade build",
     ],
+    features: [
+      "Customizable RGB lighting with G HUB software",
+      "Compact tenkeyless design saves desk space",
+      "Durable aircraft-grade aluminum alloy",
+    ],
+    fullDescription: `Professional-grade mechanical gaming keyboard trusted by esports athletes worldwide.`,
+    reviews: [],
   },
   {
     id: "3",
@@ -56,6 +104,7 @@ const mockProducts = [
     price: 112999,
     originalPrice: 125999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Graphics Cards",
     inStock: true,
     badge: "Hot Deal",
@@ -66,6 +115,14 @@ const mockProducts = [
       "4K gaming ready",
       "PCIe 4.0 interface",
     ],
+    features: [
+      "Advanced Ada Lovelace architecture",
+      "Real-time ray tracing and AI-powered DLSS 3.0",
+      "Supports 4K gaming at high refresh rates",
+    ],
+    fullDescription:
+      "Experience next-generation gaming with the NVIDIA GeForce RTX 4080.",
+    reviews: [],
   },
   {
     id: "4",
@@ -75,6 +132,7 @@ const mockProducts = [
       "3600MHz, CL18, RGB lighting, optimized for AMD Ryzen and Intel platforms",
     price: 9999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Memory",
     inStock: true,
     specs: [
@@ -84,6 +142,13 @@ const mockProducts = [
       "RGB lighting",
       "Optimized for Ryzen & Intel",
     ],
+    features: [
+      "Dynamic multi-zone RGB lighting",
+      "Custom performance PCB for overclocking",
+      "Heat spreader for reliable performance",
+    ],
+    fullDescription: "High-performance DDR4 memory with stunning RGB lighting.",
+    reviews: [],
   },
   {
     id: "5",
@@ -94,6 +159,7 @@ const mockProducts = [
     price: 16999,
     originalPrice: 19999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Storage",
     inStock: false,
     specs: [
@@ -103,6 +169,14 @@ const mockProducts = [
       "Write Speed: up to 5000 MB/s",
       "Form Factor: M.2 2280",
     ],
+    features: [
+      "Cutting-edge PCIe 4.0 performance",
+      "Advanced thermal control with heat spreader",
+      "5-year limited warranty",
+    ],
+    fullDescription:
+      "Ultra-fast NVMe SSD for next-generation gaming and computing.",
+    reviews: [],
   },
   {
     id: "6",
@@ -112,6 +186,7 @@ const mockProducts = [
       "30K DPI optical sensor, 90-hour battery life, lightweight design",
     price: 11999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Gaming Peripherals",
     inStock: true,
     specs: [
@@ -121,6 +196,14 @@ const mockProducts = [
       "Wireless connectivity",
       "Ergonomic design",
     ],
+    features: [
+      "Focus Pro 30K optical sensor for precision",
+      "HyperSpeed wireless technology",
+      "Ergonomic right-handed design",
+    ],
+    fullDescription:
+      "Professional wireless gaming mouse with unmatched performance.",
+    reviews: [],
   },
   {
     id: "7",
@@ -131,6 +214,7 @@ const mockProducts = [
     price: 24999,
     originalPrice: 29999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Cooling",
     inStock: true,
     specs: [
@@ -140,6 +224,13 @@ const mockProducts = [
       "RGB fans included",
       "Compatible with major sockets",
     ],
+    features: [
+      "Customizable 2.36-inch LCD display",
+      "Superior cooling performance",
+      "RGB lighting synchronized with CAM software",
+    ],
+    fullDescription: "Premium AIO liquid cooler with customizable LCD display.",
+    reviews: [],
   },
   {
     id: "8",
@@ -150,6 +241,7 @@ const mockProducts = [
     price: 45999,
     originalPrice: 54999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Monitors",
     inStock: true,
     badge: "New Arrival",
@@ -161,6 +253,14 @@ const mockProducts = [
       "G-Sync compatible",
       "HDR10 support",
     ],
+    features: [
+      "Nano IPS technology for accurate colors",
+      "144Hz refresh rate for smooth gaming",
+      "VESA DisplayHDR 400 certification",
+    ],
+    fullDescription:
+      "Immersive 4K gaming monitor with stunning visuals and fast performance.",
+    reviews: [],
   },
   {
     id: "9",
@@ -171,6 +271,7 @@ const mockProducts = [
     price: 52999,
     originalPrice: 62999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Processors",
     inStock: true,
     specs: [
@@ -180,6 +281,14 @@ const mockProducts = [
       "PCIe 4.0 support",
       "Unlocked for overclocking",
     ],
+    features: [
+      "Zen 3 core architecture",
+      "Excellent for gaming and content creation",
+      "AM4 socket compatibility",
+    ],
+    fullDescription:
+      "Ultimate desktop processor for enthusiasts and professionals.",
+    reviews: [],
   },
   {
     id: "10",
@@ -189,6 +298,7 @@ const mockProducts = [
       "850W, 80 PLUS Gold, fully modular, low noise operation, 10-year warranty",
     price: 11999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Power Supplies",
     inStock: true,
     specs: [
@@ -198,6 +308,14 @@ const mockProducts = [
       "Low noise operation",
       "10-year warranty",
     ],
+    features: [
+      "80 PLUS Gold certified efficiency",
+      "Zero RPM fan mode for silent operation",
+      "Premium Japanese capacitors",
+    ],
+    fullDescription:
+      "Reliable and efficient power supply for high-performance systems.",
+    reviews: [],
   },
   {
     id: "11",
@@ -207,6 +325,7 @@ const mockProducts = [
     price: 18999,
     originalPrice: 22999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Motherboards",
     inStock: true,
     specs: [
@@ -216,6 +335,14 @@ const mockProducts = [
       "2.5Gb LAN",
       "USB 3.2 Gen 2",
     ],
+    features: [
+      "AI-powered noise cancellation",
+      "Comprehensive cooling with multiple headers",
+      "AURA Sync RGB lighting",
+    ],
+    fullDescription:
+      "Feature-packed gaming motherboard for AMD Ryzen processors.",
+    reviews: [],
   },
   {
     id: "12",
@@ -226,6 +353,7 @@ const mockProducts = [
     price: 7999,
     originalPrice: 9999,
     image: "/brands/acer.png",
+    images: ["/brands/acer.png"],
     category: "Gaming Peripherals",
     inStock: true,
     badge: "Popular",
@@ -236,10 +364,22 @@ const mockProducts = [
       "USB audio control box",
       "Multi-platform compatible",
     ],
+    features: [
+      "Legendary comfort with memory foam",
+      "Immersive 7.1 virtual surround sound",
+      "TeamSpeak and Discord certified",
+    ],
+    fullDescription: "Comfortable gaming headset with excellent sound quality.",
+    reviews: [],
   },
 ];
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
+export default function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = use(params);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -251,7 +391,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     return () => clearTimeout(timer);
   }, []);
 
-  const product = mockProducts.find((p) => p.slug === params.slug);
+  const product = mockProducts.find((p) => p.slug === slug);
 
   if (!isLoading && !product) {
     notFound();
@@ -272,7 +412,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     : 0;
 
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Breadcrumb */}
       <div className="bg-muted py-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -285,13 +425,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               Shop
             </Link>
             <span>/</span>
-            <Link
-              href={`/shop?category=${product.category}`}
-              className="hover:text-foreground"
-            >
-              {product.category}
-            </Link>
-            <span>/</span>
+
             <span className="text-foreground">{product.name}</span>
           </div>
         </div>
@@ -300,34 +434,32 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
       {/* Product Details */}
       <section className="container mx-auto my-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
+          {/* Product Image Gallery */}
           <div className="relative">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted border border-border">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {product.badge && (
-                <div className="absolute top-4 left-4 bg-primary text-primary-foreground text-sm font-bold px-4 py-2 rounded-lg shadow-lg">
-                  {product.badge}
-                </div>
-              )}
-              {discount > 0 && (
-                <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-lg">
-                  -{discount}% OFF
-                </div>
-              )}
-              {!product.inStock && (
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-2xl">
-                    Out of Stock
-                  </span>
-                </div>
-              )}
-            </div>
+            <ProductImageGallery
+              images={product.images || [product.image]}
+              productName={product.name}
+            />
+            {product.badge && (
+              <Badge className="absolute top-4 left-4 text-sm font-bold px-3 py-1 shadow-lg">
+                {product.badge}
+              </Badge>
+            )}
+            {discount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute top-4 right-4 text-sm font-bold px-3 py-1 shadow-lg"
+              >
+                -{discount}%
+              </Badge>
+            )}
+            {!product.inStock && (
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-2xl">
+                <span className="text-white font-bold text-2xl">
+                  Out of Stock
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -343,7 +475,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </p>
 
             {/* Price */}
-            <div className="flex items-baseline gap-4 mb-8">
+            <div className="flex items-baseline flex-wrap gap-4 mb-8">
               <span className="text-4xl font-bold text-foreground">
                 Rs.{product.price.toLocaleString()}
               </span>
@@ -407,36 +539,31 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <Button size="lg" className="flex-1" disabled={!product.inStock}>
+              <Button size="lg" disabled={!product.inStock}>
                 Add to Cart
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="flex-1"
-                disabled={!product.inStock}
-              >
+              <Button size="lg" variant="outline" disabled={!product.inStock}>
                 Buy Now
               </Button>
             </div>
-
-            {/* Specifications */}
-            <div className="border-t border-border pt-8">
-              <h2 className="text-xl font-bold mb-4">Specifications</h2>
-              <ul className="space-y-3">
-                {product.specs?.map((spec, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-3 text-muted-foreground"
-                  >
-                    <span className="text-primary mt-1">✓</span>
-                    <span>{spec}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
+
+        {/* Product Tabs */}
+        <div className="mt-16">
+          <ProductTabs
+            description={product.description}
+            fullDescription={product.fullDescription}
+            specs={product.specs}
+            features={product.features}
+          />
+        </div>
+
+        {/* Related Products */}
+        <RelatedProducts
+          products={mockProducts}
+          currentProductId={product.id}
+        />
       </section>
     </div>
   );
