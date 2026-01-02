@@ -53,14 +53,14 @@ const LatestBlogs = () => {
               {blogsData?.data?.map((blog) => (
                 <CarouselItem
                   key={blog.slug}
-                  className="pl-2 md:pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  className="pl-2 md:pl-4 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
                   <BlogCard key={blog.slug} blog={blog} />
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="-left-2 sm:-left-4 lg:-left-12 h-10 w-10" />
-            <CarouselNext className="-right-2 sm:-right-4 lg:-right-12 h-10 w-10" />
+            <CarouselPrevious className="-left-3 lg:-left-12 size-10" />
+            <CarouselNext className="-right-3 lg:-right-12 size-10" />
           </Carousel>
         </div>
       )}
