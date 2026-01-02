@@ -33,33 +33,35 @@ const PopularBrandsSection = () => {
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
-          {[...Array(8)].map((_, index) => (
-            <div
-              key={index}
-              className="bg-card rounded-lg border border-border p-6 flex items-center justify-center animate-pulse"
-            >
-              <div className="w-24 h-24 bg-muted rounded"></div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {brandsData?.data?.map((brand) => (
+      <Carousel
+        opts={{
+          align: "start",
+          loop: true,
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="-ml-2 md:-ml-4">
+          {isLoading ? (
+            [...Array(6)].map((_, index) => (
+              <CarouselItem
+                key={index}
+                className="px-2 md:px-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6"
+              >
+                <div
+                  key={index}
+                  className="bg-card rounded-lg border border-border p-6 flex items-center justify-center animate-pulse"
+                >
+                  <div className="size-32 bg-muted rounded" />
+                </div>
+              </CarouselItem>
+            ))
+          ) : brandsData?.data && brandsData.data.length ? (
+            brandsData.data.map((brand) => (
               <CarouselItem
                 key={brand.slug}
                 className="px-2 md:px-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6"
               >
                 <Link
-                  key={brand.slug}
                   href="#"
                   className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group"
                 >
@@ -78,12 +80,14 @@ const PopularBrandsSection = () => {
                   </p>
                 </Link>
               </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="-left-3 lg:-left-12 size-10" />
-          <CarouselNext className="-right-3 lg:-right-12 size-10" />
-        </Carousel>
-      )}
+            ))
+          ) : (
+            <div className="w-full text-center py-8">No brands found</div>
+          )}
+        </CarouselContent>
+        <CarouselPrevious className="-left-3 lg:-left-12 size-10" />
+        <CarouselNext className="-right-3 lg:-right-12 size-10" />
+      </Carousel>
     </section>
   );
 };
