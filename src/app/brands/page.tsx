@@ -1,99 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-// Mock data for brands
-const mockBrands = [
-  {
-    id: "1",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 45,
-  },
-  {
-    id: "2",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 38,
-  },
-  {
-    id: "3",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 52,
-  },
-  {
-    id: "4",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 67,
-  },
-  {
-    id: "5",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 29,
-  },
-  {
-    id: "6",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 41,
-  },
-  {
-    id: "7",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 33,
-  },
-  {
-    id: "8",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 56,
-  },
-  {
-    id: "9",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 44,
-  },
-  {
-    id: "10",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 61,
-  },
-  {
-    id: "11",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 37,
-  },
-  {
-    id: "12",
-    name: "Acer",
-    image: "/brands/acer.png",
-    productCount: 48,
-  },
-];
+// import { Brand } from "@/models/Brand"; // To be implemented with Mongoose or plain TS interface
+import useSwr from "swr";
+import { fetcher } from "@/lib/fetcher";
 
 export default function BrandsPage() {
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: brands, isLoading } = useSwr<any[]>("/api/brands", fetcher);
 
-  useEffect(() => {
-    // Simulate API call
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const filteredBrands = mockBrands.filter((brand) =>
+  const filteredBrands = brands?.filter((brand) =>
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -125,7 +43,7 @@ export default function BrandsPage() {
             />
           </div>
           <div className="text-sm text-muted-foreground">
-            {filteredBrands.length} brands found
+            {filteredBrands?.length} brands found
           </div>
         </div>
 
@@ -142,9 +60,9 @@ export default function BrandsPage() {
               </div>
             ))}
           </div>
-        ) : filteredBrands.length > 0 ? (
+        ) : (filteredBrands?.length || 0) > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
-            {filteredBrands.map((brand) => (
+            {filteredBrands?.map((brand) => (
               <Link
                 key={brand.id}
                 href={`/brands/${brand.id}`}
@@ -160,9 +78,6 @@ export default function BrandsPage() {
                 </div>
                 <p className="text-sm font-semibold text-card-foreground text-center mb-2">
                   {brand.name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {brand.productCount} products
                 </p>
               </Link>
             ))}
