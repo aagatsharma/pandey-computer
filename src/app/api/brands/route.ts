@@ -1,5 +1,7 @@
 import Brand from "@/lib/models/Brand";
 import dbConnect from "@/lib/mongoose";
+import { NextRequest, NextResponse } from "next/server";
+import slugify from "slugify";
 
 export async function GET(req: Request) {
   try {
@@ -44,5 +46,45 @@ export async function GET(req: Request) {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    const body = await req.json();
+
+    const { name, logo, order = 0 } = body;
+
+    if (!name) {
+      return NextResponse.json(
+        { message: "Brand name is required" },
+        { status: 400 }
+      );
+    }
+
+    const slug = slugify(name, { lower: true, strict: true });
+
+    const brand = await Brand.create({
+      name,
+      slug,
+      logo,
+      order,
+    });
+
+    return NextResponse.json(
+      { message: "Brand created successfully", data: brand },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { message: "Unknown error occurred" },
+      { status: 500 }
+    );
   }
 }

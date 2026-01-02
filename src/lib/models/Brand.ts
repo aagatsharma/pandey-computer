@@ -10,11 +10,8 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface IBrand extends Document {
   name: string;
   slug: string;
-  description?: string;
   logo?: string;
   mainCategory?: Types.ObjectId; // Reference to MainCategory (e.g., "Laptops")
-  isActive: boolean;
-  isFeatured: boolean;
   order: number;
   createdAt: Date;
   updatedAt: Date;
@@ -35,24 +32,12 @@ const BrandSchema = new Schema<IBrand>(
       lowercase: true,
       trim: true,
     },
-    description: {
-      type: String,
-      maxlength: [500, "Description cannot exceed 500 characters"],
-    },
     logo: {
       type: String,
     },
     mainCategory: {
       type: Schema.Types.ObjectId,
       ref: "MainCategory",
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    isFeatured: {
-      type: Boolean,
-      default: false,
     },
     order: {
       type: Number,

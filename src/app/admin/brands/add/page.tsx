@@ -16,8 +16,8 @@ export default function AddBrandPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) return;
-    const imageUrl = imageToBase64(file);
-    await trigger({ name: name, image: imageUrl });
+    const imageUrl = await imageToBase64(file);
+    await trigger({ name: name, logo: imageUrl, order: 0 });
   };
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4">
