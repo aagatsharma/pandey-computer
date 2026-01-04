@@ -9,7 +9,7 @@ import useSWR, { mutate } from "swr";
 import { useState } from "react";
 import AdminModalForm from "@/components/admin/admin-modal-form";
 
-type Brand = {
+type SubCategory = {
   _id: string;
   name: string;
   slug: string;
@@ -20,7 +20,7 @@ type Brand = {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const columns: ColumnDef<Brand>[] = [
+const columns: ColumnDef<SubCategory>[] = [
   {
     accessorKey: "logo",
     header: "Logo",
@@ -69,42 +69,46 @@ const columns: ColumnDef<Brand>[] = [
   },
 ];
 
-export default function BrandsPage() {
-  const { data, error, isLoading } = useSWR("/api/brands", fetcher);
-  const brands = data?.data || [];
+export default function SubCategoriesPage() {
+  const { data, error, isLoading } = useSWR("/api/subcategories", fetcher);
+  const subcategories = data?.data || [];
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = async (formData: { name: string; logo: string }) => {
-    const response = await fetch("/api/brands", {
+    const response = await fetch("/api/subcategories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) throw new Error("Failed to create brand");
-    mutate("/api/brands");
+    if (!response.ok) throw new Error("Failed to create subcategory");
+    mutate("/api/subcategories");
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Brands</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your brands</p>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Sub Categories
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage your sub categories
+          </p>
         </div>
         <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Brand
+          Add Sub Category
         </Button>
       </div>
 
       <AdminModalForm
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        title="Add Brand"
-        description="Create a new brand"
-        fieldLabel="Brand Name"
-        fieldPlaceholder="Enter brand name"
+        title="Add Sub Category"
+        description="Create a new sub category"
+        fieldLabel="Sub Category Name"
+        fieldPlaceholder="Enter sub category name"
         onSubmit={handleSubmit}
       />
 
@@ -112,10 +116,10 @@ export default function BrandsPage() {
         <div className="text-center py-12">Loading...</div>
       ) : error ? (
         <div className="text-center py-12 text-red-500">
-          Error loading brands
+          Error loading sub categories
         </div>
       ) : (
-        <DataTable columns={columns} data={brands} />
+        <DataTable columns={columns} data={subcategories} />
       )}
     </div>
   );

@@ -10,11 +10,8 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface ISubBrand extends Document {
   name: string;
   slug: string;
-  description?: string;
   logo?: string;
   brand: Types.ObjectId; // Reference to Brand
-  isActive: boolean;
-  order: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,10 +31,6 @@ const SubBrandSchema = new Schema<ISubBrand>(
       lowercase: true,
       trim: true,
     },
-    description: {
-      type: String,
-      maxlength: [500, "Description cannot exceed 500 characters"],
-    },
     logo: {
       type: String,
     },
@@ -46,20 +39,11 @@ const SubBrandSchema = new Schema<ISubBrand>(
       ref: "Brand",
       required: [true, "Brand is required"],
     },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    order: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true }
 );
 
 SubBrandSchema.index({ slug: 1 });
-SubBrandSchema.index({ brand: 1, isActive: 1, order: 1 });
 
 export default mongoose.models.SubBrand ||
   mongoose.model<ISubBrand>("SubBrand", SubBrandSchema);

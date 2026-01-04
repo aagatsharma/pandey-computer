@@ -1,4 +1,4 @@
-import Brand from "@/lib/models/Brand";
+import SuperCategory from "@/lib/models/SuperCategory";
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
@@ -7,7 +7,7 @@ export async function GET() {
   try {
     await dbConnect();
 
-    const data = await Brand.find();
+    const data = await SuperCategory.find();
 
     return new Response(
       JSON.stringify({
@@ -19,11 +19,14 @@ export async function GET() {
       }
     );
   } catch (error) {
-    console.error("Error fetching blogs:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch blogs" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.error("Error fetching SuperCategory:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to fetch SuperCategory" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
 
@@ -33,25 +36,26 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const { name, logo } = body;
+    const { name, logo, order = 0 } = body;
 
     if (!name) {
       return NextResponse.json(
-        { message: "Brand name is required" },
+        { message: "SuperCategory name is required" },
         { status: 400 }
       );
     }
 
     const slug = slugify(name, { lower: true, strict: true });
 
-    const brand = await Brand.create({
+    const data = await SuperCategory.create({
       name,
       slug,
       logo,
+      order,
     });
 
     return NextResponse.json(
-      { message: "Brand created successfully", data: brand },
+      { message: "SuperCategory created successfully", data },
       { status: 201 }
     );
   } catch (error: unknown) {

@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ICategory extends Document {
+export interface ISuperCategory extends Document {
   name: string;
   slug: string;
   logo?: string;
@@ -8,11 +8,11 @@ export interface ICategory extends Document {
   updatedAt: Date;
 }
 
-const CategorySchema = new Schema<ICategory>(
+const SuperCategorySchema = new Schema<ISuperCategory>(
   {
     name: {
       type: String,
-      required: [true, "Category name is required"],
+      required: [true, "Super category name is required"],
       trim: true,
       maxlength: [100, "Name cannot exceed 100 characters"],
     },
@@ -30,7 +30,7 @@ const CategorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
-CategorySchema.index({ slug: 1 });
+SuperCategorySchema.index({ slug: 1 });
 
-export default mongoose.models.Category ||
-  mongoose.model<ICategory>("Category", CategorySchema);
+export default mongoose.models.SuperCategory ||
+  mongoose.model<ISuperCategory>("SuperCategory", SuperCategorySchema);
