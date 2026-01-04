@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import { IBrand } from "./Brand";
 
 /**
  * Sub Brand Model (Level 3)
@@ -10,8 +11,7 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface ISubBrand extends Document {
   name: string;
   slug: string;
-  logo?: string;
-  brand: Types.ObjectId; // Reference to Brand
+  brand: IBrand; // Reference to Brand
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,9 +30,6 @@ const SubBrandSchema = new Schema<ISubBrand>(
       unique: true,
       lowercase: true,
       trim: true,
-    },
-    logo: {
-      type: String,
     },
     brand: {
       type: Schema.Types.ObjectId,

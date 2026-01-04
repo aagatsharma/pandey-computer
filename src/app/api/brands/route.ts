@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const { name, logo } = body;
+    const { name, logo, superCategoryId } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -48,11 +48,102 @@ export async function POST(req: NextRequest) {
       name,
       slug,
       logo,
+      superCategory: superCategoryId || undefined,
     });
 
     return NextResponse.json(
       { message: "Brand created successfully", data: brand },
       { status: 201 }
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { message: "Unknown error occurred" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    const body = await req.json();
+    const { id, name, logo, superCategoryId } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Brand ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!name) {
+      return NextResponse.json(
+        { message: "Brand name is required" },
+        { status: 400 }
+      );
+    }
+
+    const slug = slugify(name, { lower: true, strict: true });
+
+    const brand = await Brand.findByIdAndUpdate(
+      id,
+      {
+        name,
+        slug,
+        logo,
+        superCategory: superCategoryId || undefined,
+      },
+      { new: true }
+    );
+
+    if (!brand) {
+      return NextResponse.json({ message: "Brand not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "Brand updated successfully", data: brand },
+      { status: 200 }
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { message: "Unknown error occurred" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Brand ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const brand = await Brand.findByIdAndDelete(id);
+
+    if (!brand) {
+      return NextResponse.json({ message: "Brand not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "Brand deleted successfully" },
+      { status: 200 }
     );
   } catch (error: unknown) {
     if (error instanceof Error) {

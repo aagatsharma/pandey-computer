@@ -69,3 +69,99 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    const body = await req.json();
+    const { id, name, logo, order = 0 } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "SuperCategory ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!name) {
+      return NextResponse.json(
+        { message: "SuperCategory name is required" },
+        { status: 400 }
+      );
+    }
+
+    const slug = slugify(name, { lower: true, strict: true });
+
+    const data = await SuperCategory.findByIdAndUpdate(
+      id,
+      {
+        name,
+        slug,
+        logo,
+        order,
+      },
+      { new: true }
+    );
+
+    if (!data) {
+      return NextResponse.json(
+        { message: "SuperCategory not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "SuperCategory updated successfully", data },
+      { status: 200 }
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { message: "Unknown error occurred" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "SuperCategory ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const data = await SuperCategory.findByIdAndDelete(id);
+
+    if (!data) {
+      return NextResponse.json(
+        { message: "SuperCategory not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "SuperCategory deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { message: "Unknown error occurred" },
+      { status: 500 }
+    );
+  }
+}

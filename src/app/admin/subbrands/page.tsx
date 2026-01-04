@@ -3,87 +3,152 @@
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Plus } from "lucide-react";
-import Image from "next/image";
+import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import useSWR, { mutate } from "swr";
 import { useState } from "react";
-import AdminModalForm from "@/components/admin/admin-modal-form";
-
-type SubBrand = {
-  _id: string;
-  name: string;
-  slug: string;
-  logo?: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-const columns: ColumnDef<SubBrand>[] = [
-  {
-    accessorKey: "logo",
-    header: "Logo",
-    cell: ({ row }) => {
-      const logo = row.getValue("logo") as string;
-      return logo ? (
-        <Image
-          src={logo}
-          alt={row.getValue("name")}
-          width={40}
-          height={40}
-          className="rounded object-cover"
-        />
-      ) : (
-        <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-          No logo
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "slug",
-    header: "Slug",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      return date.toLocaleDateString();
-    },
-  },
-  {
-    id: "actions",
-    cell: () => {
-      return (
-        <Button variant="ghost" size="icon-sm">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-];
+import SubBrandModalForm from "@/components/admin/subbrand-modal-form";
+import { ISubBrand } from "@/lib/models/SubBrand";
+import { fetcher } from "@/lib/fetcher";
+import Image from "next/image";
+import { IBrand } from "@/lib/models/Brand";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function SubBrandsPage() {
   const { data, error, isLoading } = useSWR("/api/subbrands", fetcher);
   const subbrands = data?.data || [];
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editData, setEditData] = useState<ISubBrand | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleSubmit = async (formData: { name: string; logo: string }) => {
+  const handleSubmit = async (formData: {
+    id?: string;
+    name: string;
+    brand_slug: string;
+  }) => {
+    const method = formData.id ? "PUT" : "POST";
     const response = await fetch("/api/subbrands", {
-      method: "POST",
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) throw new Error("Failed to create subbrand");
+    if (!response.ok)
+      throw new Error(
+        `Failed to ${formData.id ? "update" : "create"} subbrand`
+      );
     mutate("/api/subbrands");
   };
+
+  const handleEdit = (subbrand: ISubBrand) => {
+    setEditData(subbrand);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    const response = await fetch(`/api/subbrands?id=${deleteId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete subbrand");
+    mutate("/api/subbrands");
+    setDeleteId(null);
+  };
+
+  const handleModalClose = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setEditData(null);
+    }
+  };
+
+  const columns: ColumnDef<ISubBrand>[] = [
+    {
+      accessorKey: "brand",
+      cell: ({ row }) => {
+        const brand = row.getValue("brand") as IBrand;
+        return (
+          <div className="flex items-center space-x-2">
+            {brand.logo ? (
+              <Image
+                src={brand.logo}
+                alt={brand.name}
+                height={60}
+                width={60}
+                className="w-8 h-8 rounded object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                No logo
+              </div>
+            )}
+            <span>{brand.name}</span>
+          </div>
+        );
+      },
+      header: "Brand",
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "slug",
+      header: "Slug",
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("createdAt"));
+        return date.toLocaleDateString();
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const subbrand = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon-sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleEdit(subbrand)}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setDeleteId(subbrand._id.toString())}
+                className="text-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
 
   return (
     <div>
@@ -98,15 +163,33 @@ export default function SubBrandsPage() {
         </Button>
       </div>
 
-      <AdminModalForm
+      <SubBrandModalForm
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        title="Add Sub Brand"
-        description="Create a new sub brand"
-        fieldLabel="Sub Brand Name"
-        fieldPlaceholder="Enter sub brand name"
+        onOpenChange={handleModalClose}
         onSubmit={handleSubmit}
+        editData={editData}
       />
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the sub
+              brand.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {isLoading ? (
         <div className="text-center py-12">Loading...</div>

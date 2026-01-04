@@ -3,87 +3,152 @@
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Plus } from "lucide-react";
-import Image from "next/image";
+import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import useSWR, { mutate } from "swr";
 import { useState } from "react";
-import AdminModalForm from "@/components/admin/admin-modal-form";
-
-type SubCategory = {
-  _id: string;
-  name: string;
-  slug: string;
-  logo?: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-const columns: ColumnDef<SubCategory>[] = [
-  {
-    accessorKey: "logo",
-    header: "Logo",
-    cell: ({ row }) => {
-      const logo = row.getValue("logo") as string;
-      return logo ? (
-        <Image
-          src={logo}
-          alt={row.getValue("name")}
-          width={40}
-          height={40}
-          className="rounded object-cover"
-        />
-      ) : (
-        <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-          No logo
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "slug",
-    header: "Slug",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      return date.toLocaleDateString();
-    },
-  },
-  {
-    id: "actions",
-    cell: () => {
-      return (
-        <Button variant="ghost" size="icon-sm">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-];
+import SubCategoryModalForm from "@/components/admin/subcategory-modal-form";
+import { ISubCategory } from "@/lib/models/SubCategory";
+import { fetcher } from "@/lib/fetcher";
+import { ICategory } from "@/lib/models/Category";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function SubCategoriesPage() {
   const { data, error, isLoading } = useSWR("/api/subcategories", fetcher);
   const subcategories = data?.data || [];
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editData, setEditData] = useState<ISubCategory | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleSubmit = async (formData: { name: string; logo: string }) => {
+  const handleSubmit = async (formData: {
+    id?: string;
+    name: string;
+    category_slug: string;
+  }) => {
+    const method = formData.id ? "PUT" : "POST";
     const response = await fetch("/api/subcategories", {
-      method: "POST",
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) throw new Error("Failed to create subcategory");
+    if (!response.ok)
+      throw new Error(
+        `Failed to ${formData.id ? "update" : "create"} subcategory`
+      );
     mutate("/api/subcategories");
   };
+
+  const handleEdit = (subcategory: ISubCategory) => {
+    setEditData(subcategory);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    const response = await fetch(`/api/subcategories?id=${deleteId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete subcategory");
+    mutate("/api/subcategories");
+    setDeleteId(null);
+  };
+
+  const handleModalClose = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setEditData(null);
+    }
+  };
+
+  const columns: ColumnDef<ISubCategory>[] = [
+    {
+      accessorKey: "category",
+      cell: ({ row }) => {
+        const category = row.getValue("category") as ICategory;
+        return (
+          <div className="flex items-center space-x-2">
+            {category.logo ? (
+              <Image
+                src={category.logo}
+                alt={category.name}
+                height={60}
+                width={60}
+                className="w-8 h-8 rounded object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                No logo
+              </div>
+            )}
+            <span>{category.name}</span>
+          </div>
+        );
+      },
+      header: "Category",
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "slug",
+      header: "Slug",
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("createdAt"));
+        return date.toLocaleDateString();
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const subcategory = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon-sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleEdit(subcategory)}>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setDeleteId(subcategory._id.toString())}
+                className="text-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
 
   return (
     <div>
@@ -102,15 +167,33 @@ export default function SubCategoriesPage() {
         </Button>
       </div>
 
-      <AdminModalForm
+      <SubCategoryModalForm
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        title="Add Sub Category"
-        description="Create a new sub category"
-        fieldLabel="Sub Category Name"
-        fieldPlaceholder="Enter sub category name"
+        onOpenChange={handleModalClose}
         onSubmit={handleSubmit}
+        editData={editData}
       />
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the sub
+              category.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {isLoading ? (
         <div className="text-center py-12">Loading...</div>

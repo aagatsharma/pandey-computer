@@ -1,10 +1,10 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import { ICategory } from "./Category";
 
 export interface ISubCategory extends Document {
   name: string;
   slug: string;
-  logo?: string;
-  category: Types.ObjectId; // Reference to Category
+  category: ICategory; // Reference to Category
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,9 +23,6 @@ const SubCategorySchema = new Schema<ISubCategory>(
       unique: true,
       lowercase: true,
       trim: true,
-    },
-    logo: {
-      type: String,
     },
     category: {
       type: Schema.Types.ObjectId,

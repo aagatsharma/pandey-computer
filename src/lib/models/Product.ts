@@ -1,4 +1,9 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import { ISuperCategory } from "./SuperCategory";
+import { ICategory } from "./Category";
+import { ISubCategory } from "./SubCategory";
+import { IBrand } from "./Brand";
+import { ISubBrand } from "./SubBrand";
 
 /**
  * Product Model (Minimal)
@@ -7,23 +12,25 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface IProduct extends Document {
   name: string;
   slug: string;
-  description: string;
+  shortDescription: string;
+  fullDescription: string;
   price: number;
-  compareAtPrice?: number;
+  originalPrice?: number;
+  specs?: Record<string, string>;
+  features?: string[];
 
   // Categorization
-  mainCategory?: Types.ObjectId;
-  category?: Types.ObjectId;
-  subCategory?: Types.ObjectId;
-  brand?: Types.ObjectId;
-  subBrand?: Types.ObjectId;
+  superCategory?: ISuperCategory;
+  category?: ICategory;
+  subCategory?: ISubCategory;
+  brand?: IBrand;
+  subBrand?: ISubBrand;
 
   // Media
   images: string[];
 
   // Status
   quantity: number;
-  isActive: boolean;
   isFeatured: boolean;
 
   createdAt: Date;
@@ -44,7 +51,12 @@ const ProductSchema = new Schema<IProduct>(
       lowercase: true,
       trim: true,
     },
-    description: {
+    shortDescription: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    fullDescription: {
       type: String,
       required: true,
     },
@@ -53,15 +65,23 @@ const ProductSchema = new Schema<IProduct>(
       required: true,
       min: 0,
     },
-    compareAtPrice: {
+    originalPrice: {
       type: Number,
       min: 0,
     },
+    specs: {
+      type: Map,
+      of: String,
+    },
+    features: {
+      type: [String],
+      default: [],
+    },
 
     // Categorization
-    mainCategory: {
+    superCategory: {
       type: Schema.Types.ObjectId,
-      ref: "MainCategory",
+      ref: "SuperCategory",
     },
     category: {
       type: Schema.Types.ObjectId,
@@ -91,10 +111,6 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       default: 0,
       min: 0,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
     },
     isFeatured: {
       type: Boolean,

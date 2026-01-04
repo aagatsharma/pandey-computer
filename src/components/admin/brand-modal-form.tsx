@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, X, Loader2 } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { imageToBase64 } from "@/lib/image-base64";
@@ -24,50 +24,50 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ISuperCategory } from "@/lib/models/SuperCategory";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
+import { IBrand } from "@/lib/models/Brand";
 
 const formSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name cannot exceed 100 characters"),
+  superCategoryId: z.string().optional(),
   logo: z.any().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface AdminModalFormProps {
+interface BrandModalFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
-  description: string;
-  fieldLabel: string;
-  fieldPlaceholder: string;
   onSubmit: (data: {
     id?: string;
     name: string;
     logo: string;
+    superCategoryId?: string;
   }) => Promise<void>;
-  editData?: ISuperCategory | null;
+  editData?: IBrand | null;
 }
 
-export default function AdminModalForm({
+export default function BrandModalForm({
   open,
   onOpenChange,
-  title,
-  description,
-  fieldLabel,
-  fieldPlaceholder,
   onSubmit,
   editData,
-}: AdminModalFormProps) {
+}: BrandModalFormProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: superCategoriesData } = useSWR("/api/supercategory", fetcher);
+  const superCategories = superCategoriesData?.data || [];
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      superCategoryId: "",
       logo: undefined,
     },
   });
@@ -76,12 +76,14 @@ export default function AdminModalForm({
     if (editData) {
       form.reset({
         name: editData.name,
+        superCategoryId: editData.superCategory?.toString() || "",
         logo: undefined,
       });
       setPreview(editData.logo || null);
     } else {
       form.reset({
         name: "",
+        superCategoryId: "",
         logo: undefined,
       });
       setPreview(null);
@@ -98,15 +100,16 @@ export default function AdminModalForm({
       }
 
       await onSubmit({
-        id: editData?._id,
+        id: editData?._id?.toString(),
         name: data.name,
         logo: imageUrl || "",
+        superCategoryId: data.superCategoryId || undefined,
       });
       form.reset();
       setPreview(null);
       onOpenChange(false);
     } catch (error) {
-      console.error(`Error saving ${title.toLowerCase()}:`, error);
+      console.error("Error saving brand:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -116,8 +119,10 @@ export default function AdminModalForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle>{editData ? "Edit Brand" : "Add Brand"}</DialogTitle>
+          <DialogDescription>
+            {editData ? "Update brand details" : "Create a new brand"}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -125,85 +130,90 @@ export default function AdminModalForm({
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-5"
           >
-            {/* Name Input */}
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    {fieldLabel}
-                  </FormLabel>
+                  <FormLabel>Brand Name</FormLabel>
                   <FormControl>
-                    <Input placeholder={fieldPlaceholder} {...field} />
+                    <Input placeholder="Enter brand name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Image Upload */}
+            <FormField
+              control={form.control}
+              name="superCategoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Super Category (Optional)</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+                    >
+                      <option value="">Select super category</option>
+                      {superCategories.map(
+                        (sc: { _id: string; name: string }) => (
+                          <option key={sc._id} value={sc._id}>
+                            {sc.name}
+                          </option>
+                        )
+                      )}
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="logo"
               render={({ field: { onChange, ...field } }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">
+                  <FormLabel>
                     Logo {editData && "(Leave empty to keep current)"}
                   </FormLabel>
                   <FormControl>
-                    <div>
-                      {!preview ? (
-                        <div className="relative">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                onChange(file);
-                                setPreview(URL.createObjectURL(file));
-                              }
-                            }}
-                            className="hidden"
-                            id="file-upload"
-                            {...field}
+                    <div className="space-y-3">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            onChange(file);
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setPreview(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        {...field}
+                      />
+                      {preview && (
+                        <div className="relative w-24 h-24 rounded-lg overflow-hidden border">
+                          <Image
+                            src={preview}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
                           />
-                          <label
-                            htmlFor="file-upload"
-                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-colors"
-                          >
-                            <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                            <p className="text-sm text-gray-600 mb-1">
-                              Click to upload
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              PNG, JPG, WEBP
-                            </p>
-                          </label>
-                        </div>
-                      ) : (
-                        <div className="relative border border-gray-200 rounded-lg p-3 bg-white">
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            size="icon"
                             onClick={() => {
-                              onChange(undefined);
                               setPreview(null);
+                              onChange(undefined);
                             }}
-                            className="absolute top-2 right-2 z-10"
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
                           >
-                            <X className="w-4 h-4" />
-                          </Button>
-                          <div className="relative w-full h-32">
-                            <Image
-                              src={preview}
-                              alt="Preview"
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
+                            <X className="w-3 h-3" />
+                          </button>
                         </div>
                       )}
                     </div>
@@ -213,8 +223,7 @@ export default function AdminModalForm({
               )}
             />
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3">
               <Button
                 type="button"
                 variant="outline"
