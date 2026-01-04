@@ -6,12 +6,16 @@ import Link from "next/link";
 // import { Brand } from "@/models/Brand"; // To be implemented with Mongoose or plain TS interface
 import useSwr from "swr";
 import { fetcher } from "@/lib/fetcher";
+import { IBrand } from "@/lib/models/Brand";
 
 export default function BrandsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: brands, isLoading } = useSwr<any[]>("/api/brands", fetcher);
+  const { data: brands, isLoading } = useSwr<{ data: IBrand[] }>(
+    "/api/brands",
+    fetcher
+  );
 
-  const filteredBrands = brands?.filter((brand) =>
+  const filteredBrands = brands?.data?.filter((brand) =>
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -64,17 +68,19 @@ export default function BrandsPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
             {filteredBrands?.map((brand) => (
               <Link
-                key={brand.id}
-                href={`/brands/${brand.id}`}
+                key={brand.slug}
+                href={`/brands/${brand.slug}`}
                 className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group"
               >
                 <div className="relative w-24 h-24 mb-4">
-                  <Image
-                    src={brand.image}
-                    alt={brand.name}
-                    fill
-                    className="object-contain group-hover:scale-110 transition-transform duration-300"
-                  />
+                  {brand.logo && (
+                    <Image
+                      src={brand.logo}
+                      alt={brand.name}
+                      fill
+                      className="object-contain group-hover:scale-110 transition-transform duration-300"
+                    />
+                  )}
                 </div>
                 <p className="text-sm font-semibold text-card-foreground text-center mb-2">
                   {brand.name}
