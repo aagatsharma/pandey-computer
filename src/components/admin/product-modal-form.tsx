@@ -46,7 +46,7 @@ const formSchema = z.object({
     .min(0, "Original price must be positive")
     .optional(),
   quantity: z.number().min(0, "Quantity must be positive").optional(),
-  mainCategory: z.string().optional(),
+  superCategory: z.string().optional(),
   category: z.string().optional(),
   subCategory: z.string().optional(),
   brand: z.string().optional(),
@@ -70,7 +70,7 @@ interface ProductModalFormProps {
     price: number;
     originalPrice?: number;
     quantity?: number;
-    mainCategory?: string;
+    superCategory?: string;
     category?: string;
     subCategory?: string;
     brand?: string;
@@ -114,7 +114,7 @@ export default function ProductModalForm({
       price: 0,
       originalPrice: 0,
       quantity: 0,
-      mainCategory: "",
+      superCategory: "",
       category: "",
       subCategory: "",
       brand: "",
@@ -144,7 +144,7 @@ export default function ProductModalForm({
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
         quantity: editData.quantity || 0,
-        mainCategory: editData.mainCategory?.toString() || "",
+        superCategory: editData.superCategory?.toString() || "",
         category: editData.category?.toString() || "",
         subCategory: editData.subCategory?.toString() || "",
         brand: editData.brand?.toString() || "",
@@ -164,7 +164,7 @@ export default function ProductModalForm({
         price: 0,
         originalPrice: 0,
         quantity: 0,
-        mainCategory: "",
+        superCategory: "",
         category: "",
         subCategory: "",
         brand: "",
@@ -214,7 +214,7 @@ export default function ProductModalForm({
         price: data.price,
         originalPrice: data.originalPrice || undefined,
         quantity: data.quantity || 0,
-        mainCategory: data.mainCategory || undefined,
+        superCategory: data.superCategory || undefined,
         category: data.category || undefined,
         subCategory: data.subCategory || undefined,
         brand: data.brand || undefined,
@@ -551,7 +551,7 @@ export default function ProductModalForm({
             <FormField
               control={form.control}
               name="images"
-              render={({ field: { onChange, value, ...field } }) => (
+              render={({ field: { onChange, ...field } }) => (
                 <FormItem>
                   <FormLabel>
                     Images {editData && "(Leave empty to keep current)"}

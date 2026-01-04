@@ -147,7 +147,7 @@ export default function ProductsPage() {
       header: "Price",
       cell: ({ row }) => {
         const price = row.getValue("price") as number;
-        return <div>₹{price.toFixed(2)}</div>;
+        return <div>Rs. {price.toFixed(2)}</div>;
       },
     },
     {
@@ -158,7 +158,7 @@ export default function ProductsPage() {
           | number
           | undefined;
         if (!originalPrice) return <div>-</div>;
-        return <div>₹{originalPrice.toFixed(2)}</div>;
+        return <div>Rs. {originalPrice.toFixed(2)}</div>;
       },
     },
     {

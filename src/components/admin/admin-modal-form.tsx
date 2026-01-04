@@ -98,7 +98,7 @@ export default function AdminModalForm({
       }
 
       await onSubmit({
-        id: editData?._id,
+        id: editData?._id.toString(),
         name: data.name,
         logo: imageUrl || "",
       });
