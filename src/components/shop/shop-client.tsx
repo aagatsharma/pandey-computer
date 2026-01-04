@@ -1,26 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { ProductFilters } from "@/components/shop/product-filters";
 import { ProductsGrid } from "@/components/shop/products-grid";
 import { MobileFilters } from "@/components/shop/mobile-filters";
-
-interface Product {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  category: string;
-  inStock: boolean;
-  badge?: string;
-}
-
-interface ShopClientProps {
-  products: Product[];
-}
+import { IProduct } from "@/lib/models/Product";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
 
 const priceRanges = [
   { label: "All", min: 0, max: Infinity },
@@ -31,48 +17,102 @@ const priceRanges = [
   { label: "Above Rs.100,000", min: 100000, max: Infinity },
 ];
 
-export function ShopClient({ products }: ShopClientProps) {
-  const [isLoading, setIsLoading] = useState(true);
+export function ShopClient() {
+  const [selectedSuperCategory, setSelectedSuperCategory] =
+    useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("All");
+  const [selectedBrand, setSelectedBrand] = useState<string>("All");
   const [priceRange, setPriceRange] = useState<string>("All");
   const [availability, setAvailability] = useState<string>("All");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const categories = [
-    "All",
-    ...Array.from(new Set(products.map((p) => p.category))),
-  ];
-
-  const filteredProducts = products.filter((product) => {
-    const categoryMatch =
-      selectedCategory === "All" || product.category === selectedCategory;
+  // Build query params for API
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    if (selectedSuperCategory !== "All")
+      params.append("superCategory", selectedSuperCategory);
+    if (selectedCategory !== "All") params.append("category", selectedCategory);
+    if (selectedSubCategory !== "All")
+      params.append("subCategory", selectedSubCategory);
+    if (selectedBrand !== "All") params.append("brand", selectedBrand);
 
     const selectedPriceRange = priceRanges.find((r) => r.label === priceRange);
-    const priceMatch =
-      !selectedPriceRange ||
-      priceRange === "All" ||
-      (product.price >= selectedPriceRange.min &&
-        product.price <= selectedPriceRange.max);
+    if (selectedPriceRange && priceRange !== "All") {
+      if (selectedPriceRange.min > 0)
+        params.append("minPrice", selectedPriceRange.min.toString());
+      if (selectedPriceRange.max !== Infinity)
+        params.append("maxPrice", selectedPriceRange.max.toString());
+    }
 
-    const availabilityMatch =
-      availability === "All" ||
-      (availability === "In Stock" && product.inStock) ||
-      (availability === "Out of Stock" && !product.inStock);
+    if (availability === "In Stock") params.append("inStock", "true");
+    if (availability === "Out of Stock") params.append("inStock", "false");
 
-    return categoryMatch && priceMatch && availabilityMatch;
-  });
+    return params.toString();
+  }, [
+    selectedSuperCategory,
+    selectedCategory,
+    selectedSubCategory,
+    selectedBrand,
+    priceRange,
+    availability,
+  ]);
+
+  const { data, isLoading } = useSWR<{ data: IProduct[] }>(
+    `/api/products${queryParams ? `?${queryParams}` : ""}`,
+    fetcher
+  );
+
+  const products = useMemo(() => data?.data || [], [data]);
+
+  // Extract unique filter options from products
+  const superCategories = useMemo(
+    () => [
+      "All",
+      ...(Array.from(
+        new Set(products.map((p) => p.superCategory?.name).filter(Boolean))
+      ) as string[]),
+    ],
+    [products]
+  );
+
+  const categories = useMemo(
+    () => [
+      "All",
+      ...(Array.from(
+        new Set(products.map((p) => p.category?.name).filter(Boolean))
+      ) as string[]),
+    ],
+    [products]
+  );
+
+  const subCategories = useMemo(
+    () => [
+      "All",
+      ...(Array.from(
+        new Set(products.map((p) => p.subCategory?.name).filter(Boolean))
+      ) as string[]),
+    ],
+    [products]
+  );
+
+  const brands = useMemo(
+    () => [
+      "All",
+      ...(Array.from(
+        new Set(products.map((p) => p.brand?.name).filter(Boolean))
+      ) as string[]),
+    ],
+    [products]
+  );
+
+  const filteredProducts = products;
 
   const clearFilters = () => {
+    setSelectedSuperCategory("All");
     setSelectedCategory("All");
+    setSelectedSubCategory("All");
+    setSelectedBrand("All");
     setPriceRange("All");
     setAvailability("All");
   };
@@ -83,9 +123,18 @@ export function ShopClient({ products }: ShopClientProps) {
         <MobileFilters
           isOpen={mobileFiltersOpen}
           setIsOpen={setMobileFiltersOpen}
+          superCategories={superCategories}
+          selectedSuperCategory={selectedSuperCategory}
+          setSelectedSuperCategory={setSelectedSuperCategory}
           categories={categories}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
+          subCategories={subCategories}
+          selectedSubCategory={selectedSubCategory}
+          setSelectedSubCategory={setSelectedSubCategory}
+          brands={brands}
+          selectedBrand={selectedBrand}
+          setSelectedBrand={setSelectedBrand}
           priceRange={priceRange}
           setPriceRange={setPriceRange}
           availability={availability}
@@ -94,13 +143,22 @@ export function ShopClient({ products }: ShopClientProps) {
         />
 
         {/* Sidebar Filters - Desktop */}
-        <aside className="hidden lg:block lg:w-64 flex-shrink-0">
+        <aside className="hidden lg:block lg:w-64 shrink-0">
           <div className="sticky top-4 border border-border rounded-lg p-4">
             <h2 className="text-lg font-bold text-foreground mb-4">Filters</h2>
             <ProductFilters
+              superCategories={superCategories}
+              selectedSuperCategory={selectedSuperCategory}
+              setSelectedSuperCategory={setSelectedSuperCategory}
               categories={categories}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
+              subCategories={subCategories}
+              selectedSubCategory={selectedSubCategory}
+              setSelectedSubCategory={setSelectedSubCategory}
+              brands={brands}
+              selectedBrand={selectedBrand}
+              setSelectedBrand={setSelectedBrand}
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               availability={availability}

@@ -4,24 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-
-// Helper function to generate slug from label
-const generateSlug = (text: string): string => {
-  return text
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[&\/]/g, '-')
-    .replace(/--+/g, '-')
-    .replace(/^-+|-+$/g, '');
-};
 
 interface MenuItem {
   label: string;
@@ -470,7 +452,10 @@ export default function NavigationBar() {
                     <div
                       className="grid gap-4 text-sm w-full"
                       style={{
-                        gridTemplateColumns: `repeat(${Math.min(menu.children.length, 5)}, 1fr)`,
+                        gridTemplateColumns: `repeat(${Math.min(
+                          menu.children.length,
+                          5
+                        )}, 1fr)`,
                       }}
                     >
                       {menu.children.map((section) => (
@@ -529,10 +514,11 @@ export default function NavigationBar() {
               <li>
                 <Link
                   href="/"
-                  className={`block py-3 px-4 rounded-md transition-colors ${pathname === "/"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                    }`}
+                  className={`block py-3 px-4 rounded-md transition-colors ${
+                    pathname === "/"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Home
@@ -544,10 +530,11 @@ export default function NavigationBar() {
                 <li key={menu.slug}>
                   <Link
                     href={`/category/${menu.slug}`}
-                    className={`block py-3 px-4 rounded-md transition-colors ${pathname.startsWith(`/category/${menu.slug}`)
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent"
-                      }`}
+                    className={`block py-3 px-4 rounded-md transition-colors ${
+                      pathname.startsWith(`/category/${menu.slug}`)
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-accent"
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {menu.label}
@@ -558,10 +545,11 @@ export default function NavigationBar() {
               <li>
                 <Link
                   href="/about"
-                  className={`block py-3 px-4 rounded-md transition-colors ${pathname === "/about"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                    }`}
+                  className={`block py-3 px-4 rounded-md transition-colors ${
+                    pathname === "/about"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   About Us
@@ -570,10 +558,11 @@ export default function NavigationBar() {
               <li>
                 <Link
                   href="/contact"
-                  className={`block py-3 px-4 rounded-md transition-colors ${pathname === "/contact"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                    }`}
+                  className={`block py-3 px-4 rounded-md transition-colors ${
+                    pathname === "/contact"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-accent"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Contact Us

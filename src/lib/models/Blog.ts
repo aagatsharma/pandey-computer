@@ -27,8 +27,5 @@ const BlogSchema = new Schema<IBlog>(
   { timestamps: true }
 );
 
-// Indexes for better query performance
-BlogSchema.index({ slug: 1 });
-
 export default mongoose.models.Blog ||
   mongoose.model<IBlog>("Blog", BlogSchema);

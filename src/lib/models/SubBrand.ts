@@ -40,7 +40,5 @@ const SubBrandSchema = new Schema<ISubBrand>(
   { timestamps: true }
 );
 
-SubBrandSchema.index({ slug: 1 });
-
 export default mongoose.models.SubBrand ||
   mongoose.model<ISubBrand>("SubBrand", SubBrandSchema);

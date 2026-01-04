@@ -36,7 +36,5 @@ const BrandSchema = new Schema<IBrand>(
   { timestamps: true }
 );
 
-BrandSchema.index({ slug: 1 });
-
 export default mongoose.models.Brand ||
   mongoose.model<IBrand>("Brand", BrandSchema);

@@ -121,10 +121,8 @@ const ProductSchema = new Schema<IProduct>(
 );
 
 // Indexes
-ProductSchema.index({ slug: 1 });
-ProductSchema.index({ mainCategory: 1, category: 1, subCategory: 1 });
-ProductSchema.index({ brand: 1, subBrand: 1 });
-ProductSchema.index({ isActive: 1, isFeatured: 1 });
+ProductSchema.index({ superCategory: 1, category: 1, subCategory: 1 });
+ProductSchema.index({ isFeatured: 1 });
 
 export default mongoose.models.Product ||
   mongoose.model<IProduct>("Product", ProductSchema);

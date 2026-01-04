@@ -3,22 +3,10 @@
 import { ProductCard } from "@/components/reusable/products/product-card";
 import { ProductSkeleton } from "@/components/reusable/products/product-skeleton";
 import { Button } from "@/components/ui/button";
-
-interface Product {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  category: string;
-  inStock: boolean;
-  badge?: string;
-}
+import { IProduct } from "@/lib/models/Product";
 
 interface ProductsGridProps {
-  products: Product[];
+  products: IProduct[];
   isLoading: boolean;
   clearFilters: () => void;
 }
@@ -52,7 +40,7 @@ export function ProductsGrid({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
       {products.map((product) => (
-        <ProductCard key={product.id} {...product} />
+        <ProductCard key={product.slug} product={product} />
       ))}
     </div>
   );

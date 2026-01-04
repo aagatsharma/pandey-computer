@@ -14,7 +14,7 @@ async function getProduct(slug: string) {
     await dbConnect();
 
     const product = await Product.findOne({ slug })
-      .populate("mainCategory", "name slug")
+      .populate("superCategory", "name slug")
       .populate("category", "name slug")
       .populate("subCategory", "name slug")
       .populate("brand", "name slug logo")

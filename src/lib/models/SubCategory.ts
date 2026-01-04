@@ -33,7 +33,5 @@ const SubCategorySchema = new Schema<ISubCategory>(
   { timestamps: true }
 );
 
-SubCategorySchema.index({ slug: 1 });
-
 export default mongoose.models.SubCategory ||
   mongoose.model<ISubCategory>("SubCategory", SubCategorySchema);

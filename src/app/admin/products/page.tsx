@@ -44,7 +44,7 @@ export default function ProductsPage() {
     price: number;
     originalPrice?: number;
     quantity?: number;
-    mainCategory?: string;
+    superCategory?: string;
     category?: string;
     subCategory?: string;
     brand?: string;

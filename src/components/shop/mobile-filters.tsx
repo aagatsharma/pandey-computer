@@ -7,9 +7,18 @@ import { ProductFilters } from "./product-filters";
 interface MobileFiltersProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  superCategories: string[];
+  selectedSuperCategory: string;
+  setSelectedSuperCategory: (superCategory: string) => void;
   categories: string[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
+  subCategories: string[];
+  selectedSubCategory: string;
+  setSelectedSubCategory: (subCategory: string) => void;
+  brands: string[];
+  selectedBrand: string;
+  setSelectedBrand: (brand: string) => void;
   priceRange: string;
   setPriceRange: (range: string) => void;
   availability: string;
@@ -20,9 +29,18 @@ interface MobileFiltersProps {
 export function MobileFilters({
   isOpen,
   setIsOpen,
+  superCategories,
+  selectedSuperCategory,
+  setSelectedSuperCategory,
   categories,
   selectedCategory,
   setSelectedCategory,
+  subCategories,
+  selectedSubCategory,
+  setSelectedSubCategory,
+  brands,
+  selectedBrand,
+  setSelectedBrand,
   priceRange,
   setPriceRange,
   availability,
@@ -65,9 +83,18 @@ export function MobileFilters({
                 </Button>
               </div>
               <ProductFilters
+                superCategories={superCategories}
+                selectedSuperCategory={selectedSuperCategory}
+                setSelectedSuperCategory={setSelectedSuperCategory}
                 categories={categories}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                subCategories={subCategories}
+                selectedSubCategory={selectedSubCategory}
+                setSelectedSubCategory={setSelectedSubCategory}
+                brands={brands}
+                selectedBrand={selectedBrand}
+                setSelectedBrand={setSelectedBrand}
                 priceRange={priceRange}
                 setPriceRange={setPriceRange}
                 availability={availability}

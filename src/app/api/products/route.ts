@@ -1,4 +1,10 @@
 import Product from "@/lib/models/Product";
+import "@/lib/models/Brand";
+import "@/lib/models/SubBrand";
+import "@/lib/models/SuperCategory";
+import "@/lib/models/Category";
+import "@/lib/models/SubCategory";
+
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
@@ -13,15 +19,58 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams?.get("page") || "") || 1;
     const limit = parseInt(searchParams?.get("limit") || "") || 10;
 
+    // Filter parameters
+    const superCategory = searchParams.get("superCategory");
+    const category = searchParams.get("category");
+    const subCategory = searchParams.get("subCategory");
+    const brand = searchParams.get("brand");
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const inStock = searchParams.get("inStock");
+
+    // Build filter query
+    const filter: Record<string, unknown> = {};
+
+    if (superCategory) {
+      filter.superCategory = superCategory;
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (subCategory) {
+      filter.subCategory = subCategory;
+    }
+
+    if (brand) {
+      filter.brand = brand;
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) {
+        (filter.price as Record<string, number>).$gte = parseInt(minPrice);
+      }
+      if (maxPrice) {
+        (filter.price as Record<string, number>).$lte = parseInt(maxPrice);
+      }
+    }
+
+    if (inStock !== null && inStock !== undefined) {
+      const inStockBool = inStock === "true";
+      filter.quantity = inStockBool ? { $gt: 0 } : { $eq: 0 };
+    }
+
     // Calculate skip/offset for the database query
     const skip = (page - 1) * limit;
 
     // Get total count for pagination
-    const total = await Product.countDocuments();
+    const total = await Product.countDocuments(filter);
 
     // Fetch products with pagination and populate references
-    const data = await Product.find()
-      .populate("mainCategory", "name slug")
+    const data = await Product.find(filter)
+      .populate("superCategory", "name slug")
       .populate("category", "name slug")
       .populate("subCategory", "name slug")
       .populate("brand", "name slug logo")
@@ -68,7 +117,7 @@ export async function POST(req: NextRequest) {
       originalPrice,
       specs,
       features,
-      mainCategory,
+      superCategory,
       category,
       subCategory,
       brand,
@@ -117,7 +166,7 @@ export async function POST(req: NextRequest) {
       originalPrice: originalPrice || undefined,
       specs: specs || undefined,
       features: features || [],
-      mainCategory: mainCategory || undefined,
+      superCategory: superCategory || undefined,
       category: category || undefined,
       subCategory: subCategory || undefined,
       brand: brand || undefined,
@@ -157,7 +206,7 @@ export async function PUT(req: NextRequest) {
       originalPrice,
       specs,
       features,
-      mainCategory,
+      superCategory,
       category,
       subCategory,
       brand,
@@ -215,7 +264,7 @@ export async function PUT(req: NextRequest) {
         originalPrice: originalPrice || undefined,
         specs: specs || undefined,
         features: features || [],
-        mainCategory: mainCategory || undefined,
+        superCategory: superCategory || undefined,
         category: category || undefined,
         subCategory: subCategory || undefined,
         brand: brand || undefined,

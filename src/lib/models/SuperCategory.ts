@@ -30,7 +30,5 @@ const SuperCategorySchema = new Schema<ISuperCategory>(
   { timestamps: true }
 );
 
-SuperCategorySchema.index({ slug: 1 });
-
 export default mongoose.models.SuperCategory ||
   mongoose.model<ISuperCategory>("SuperCategory", SuperCategorySchema);
