@@ -1,24 +1,30 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
-import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
-import { ICategory } from "@/lib/models/Category";
+import dbConnect from "@/lib/mongoose";
+import Category, { ICategory } from "@/lib/models/Category";
 
-const CategorySkeleton = () => (
-  <div className="p-4 rounded-lg border bg-card">
-    <Skeleton className="h-20 w-full rounded-md mb-3" />
-    <Skeleton className="h-4 w-3/4" />
-  </div>
-);
+async function getLatestCategories(): Promise<ICategory[]> {
+  try {
+    await dbConnect();
 
-const LatestCategories = () => {
-  const { data: categoriesData, isLoading } = useSWR<{ data: ICategory[] }>(
-    "/api/categories",
-    fetcher
-  );
+    const categories = await Category.find()
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .lean();
+
+    return JSON.parse(JSON.stringify(categories));
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
+}
+
+export default async function LatestCategories() {
+  const categories = await getLatestCategories();
+
+  if (categories.length === 0) {
+    return null;
+  }
 
   return (
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
@@ -39,50 +45,38 @@ const LatestCategories = () => {
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <CategorySkeleton key={index} />
-          ))}
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {categoriesData?.data?.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/shop?category=${category.slug}`}
-                className="group block p-4 rounded-lg border bg-card hover:bg-accent transition-colors duration-200"
-              >
-                <div className="relative h-20 mb-3 rounded-md overflow-hidden">
-                  {category.logo && (
-                    <Image
-                      src={category.logo}
-                      alt={category.name}
-                      fill
-                      className="object-contain"
-                    />
-                  )}
-                </div>
-                <h3 className="text-sm font-semibold text-foreground line-clamp-1">
-                  {category.name}
-                </h3>
-              </Link>
-            ))}
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+        {categories.map((category) => (
+          <Link
+            key={category.slug}
+            href={`/shop?category=${category.slug}`}
+            className="group block p-4 rounded-lg border bg-card hover:bg-accent transition-colors duration-200"
+          >
+            <div className="relative h-20 mb-3 rounded-md overflow-hidden">
+              {category.logo && (
+                <Image
+                  src={category.logo}
+                  alt={category.name}
+                  fill
+                  className="object-contain"
+                />
+              )}
+            </div>
+            <h3 className="text-sm font-semibold text-foreground line-clamp-1">
+              {category.name}
+            </h3>
+          </Link>
+        ))}
+      </div>
 
-          <div className="mt-6 text-center sm:hidden">
-            <Link
-              href="/shop"
-              className="text-sm text-primary hover:underline font-medium"
-            >
-              View All Categories →
-            </Link>
-          </div>
-        </>
-      )}
+      <div className="mt-6 text-center sm:hidden">
+        <Link
+          href="/shop"
+          className="text-sm text-primary hover:underline font-medium"
+        >
+          View All Categories →
+        </Link>
+      </div>
     </section>
   );
-};
-
-export default LatestCategories;
+}

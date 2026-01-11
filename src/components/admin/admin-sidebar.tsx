@@ -10,6 +10,7 @@ import {
   Layers,
   FolderTree,
   Store,
+  Image,
 } from "lucide-react";
 
 const navItems = [
@@ -17,6 +18,11 @@ const navItems = [
     title: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Home Wallpapers",
+    href: "/admin/home-wallpaper",
+    icon: Image,
   },
   {
     title: "Products",
@@ -47,6 +53,11 @@ const navItems = [
     title: "Sub Brands",
     href: "/admin/subbrands",
     icon: Store,
+  },
+  {
+    title: "Blogs",
+    href: "/admin/blogs",
+    icon: Tag,
   },
 ];
 

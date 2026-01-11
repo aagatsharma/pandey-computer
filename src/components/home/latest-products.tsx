@@ -1,24 +1,40 @@
-"use client";
-
 import Link from "next/link";
-import { ProductCard } from "@/components/reusable/products/product-card";
-import { ProductSkeleton } from "@/components/reusable/products/product-skeleton";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
-import { IProduct } from "@/lib/models/Product";
+import dbConnect from "@/lib/mongoose";
+import Product, { IProduct } from "@/lib/models/Product";
+import SuperCategory from "@/lib/models/SuperCategory";
+import Category from "@/lib/models/Category";
+import SubCategory from "@/lib/models/SubCategory";
+import Brand from "@/lib/models/Brand";
+import SubBrand from "@/lib/models/SubBrand";
+import { ProductsCarousel } from "./products-carousel";
 
-const LatestProducts = () => {
-  const { data: productData, isLoading } = useSWR<{ data: IProduct[] }>(
-    "/api/products",
-    fetcher
-  );
+async function getLatestProducts(): Promise<IProduct[]> {
+  try {
+    await dbConnect();
+
+    const products = await Product.find()
+      .populate("superCategory")
+      .populate("category")
+      .populate("subCategory")
+      .populate("brand")
+      .populate("subBrand")
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .lean();
+
+    return JSON.parse(JSON.stringify(products));
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+}
+
+export default async function LatestProducts() {
+  const products = await getLatestProducts();
+
+  if (products.length === 0) {
+    return null;
+  }
 
   return (
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
@@ -34,38 +50,7 @@ const LatestProducts = () => {
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <ProductSkeleton key={index} />
-          ))}
-        </div>
-      ) : (
-        <div className="relative px-2 sm:px-0">
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {productData?.data?.map((product) => (
-                <CarouselItem
-                  key={product.slug}
-                  className="pl-2 md:pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                >
-                  <ProductCard product={product} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="-left-2 sm:-left-4 lg:-left-12 h-10 w-10" />
-            <CarouselNext className="-right-2 sm:-right-4 lg:-right-12 h-10 w-10" />
-          </Carousel>
-        </div>
-      )}
+      <ProductsCarousel products={products} />
     </section>
   );
-};
-
-export default LatestProducts;
+}

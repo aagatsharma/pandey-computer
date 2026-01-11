@@ -46,3 +46,59 @@ export async function GET(req: Request) {
     });
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    await dbConnect();
+
+    const body = await req.json();
+    const { title, excerpt, content, image } = body;
+
+    if (!title || !content) {
+      return new Response(
+        JSON.stringify({ error: "Title and content are required" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Generate slug from title
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+    const blog = await Blog.create({
+      title,
+      slug,
+      excerpt,
+      content,
+      image,
+    });
+
+    return new Response(JSON.stringify({ data: blog }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error: any) {
+    console.error("Error creating blog:", error);
+
+    // Handle duplicate slug error
+    if (error.code === 11000) {
+      return new Response(
+        JSON.stringify({ error: "A blog with this title already exists" }),
+        {
+          status: 409,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    return new Response(JSON.stringify({ error: "Failed to create blog" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}

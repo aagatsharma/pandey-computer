@@ -52,16 +52,29 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  // Find which column exists for filtering
+  const columnIds = table.getAllColumns().map((col) => col.id);
+  const filterColumnId = columnIds.includes("name")
+    ? "name"
+    : columnIds.includes("title")
+    ? "title"
+    : null;
+  const filterColumn = filterColumnId ? table.getColumn(filterColumnId) : null;
+
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Filter by name..."
-        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-        onChange={(event) =>
-          table.getColumn("name")?.setFilterValue(event.target.value)
-        }
-        className="max-w-sm"
-      />
+      {filterColumn && (
+        <Input
+          placeholder={
+            filterColumnId === "name"
+              ? "Filter by name..."
+              : "Filter by title..."
+          }
+          value={(filterColumn.getFilterValue() as string) ?? ""}
+          onChange={(event) => filterColumn.setFilterValue(event.target.value)}
+          className="max-w-sm"
+        />
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

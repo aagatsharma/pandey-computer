@@ -1,9 +1,9 @@
 import Product from "@/lib/models/Product";
-import "@/lib/models/Brand";
-import "@/lib/models/SubBrand";
-import "@/lib/models/SuperCategory";
-import "@/lib/models/Category";
-import "@/lib/models/SubCategory";
+import Brand from "@/lib/models/Brand";
+import SubBrand from "@/lib/models/SubBrand";
+import SuperCategory from "@/lib/models/SuperCategory";
+import Category from "@/lib/models/Category";
+import SubCategory from "@/lib/models/SubCategory";
 
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -17,34 +17,58 @@ export async function GET(req: Request) {
 
     // Query parameters
     const page = parseInt(searchParams?.get("page") || "") || 1;
-    const limit = parseInt(searchParams?.get("limit") || "") || 10;
+    const limit = parseInt(searchParams?.get("limit") || "") || 12;
 
-    // Filter parameters
-    const superCategory = searchParams.get("superCategory");
-    const category = searchParams.get("category");
-    const subCategory = searchParams.get("subCategory");
-    const brand = searchParams.get("brand");
+    // Filter parameters (now using slugs)
+    const name = searchParams.get("name");
+    const superCategorySlug = searchParams.get("superCategory");
+    const categorySlug = searchParams.get("category");
+    const subCategorySlug = searchParams.get("subCategory");
+    const brandSlug = searchParams.get("brand");
+    const subBrandSlug = searchParams.get("subBrand");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const inStock = searchParams.get("inStock");
+    const isFeatured = searchParams.get("isFeatured");
 
     // Build filter query
     const filter: Record<string, unknown> = {};
 
-    if (superCategory) {
-      filter.superCategory = superCategory;
+    // Name search with regex
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
     }
 
-    if (category) {
-      filter.category = category;
+    // Convert slugs to IDs for filtering
+    if (superCategorySlug) {
+      const superCat = await SuperCategory.findOne({
+        slug: superCategorySlug,
+      }).select("_id");
+      if (superCat) filter.superCategory = superCat._id;
     }
 
-    if (subCategory) {
-      filter.subCategory = subCategory;
+    if (categorySlug) {
+      const cat = await Category.findOne({ slug: categorySlug }).select("_id");
+      if (cat) filter.category = cat._id;
     }
 
-    if (brand) {
-      filter.brand = brand;
+    if (subCategorySlug) {
+      const subCat = await SubCategory.findOne({
+        slug: subCategorySlug,
+      }).select("_id");
+      if (subCat) filter.subCategory = subCat._id;
+    }
+
+    if (brandSlug) {
+      const brandDoc = await Brand.findOne({ slug: brandSlug }).select("_id");
+      if (brandDoc) filter.brand = brandDoc._id;
+    }
+
+    if (subBrandSlug) {
+      const subBrandDoc = await SubBrand.findOne({ slug: subBrandSlug }).select(
+        "_id"
+      );
+      if (subBrandDoc) filter.subBrand = subBrandDoc._id;
     }
 
     if (minPrice || maxPrice) {
@@ -60,6 +84,10 @@ export async function GET(req: Request) {
     if (inStock !== null && inStock !== undefined) {
       const inStockBool = inStock === "true";
       filter.quantity = inStockBool ? { $gt: 0 } : { $eq: 0 };
+    }
+
+    if (isFeatured !== null && isFeatured !== undefined) {
+      filter.isFeatured = isFeatured === "true";
     }
 
     // Calculate skip/offset for the database query

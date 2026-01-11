@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Loader2, Plus, Trash2 } from "lucide-react";
@@ -95,15 +96,13 @@ export default function ProductModalForm({
     { key: "", value: "" },
   ]);
 
-  const { data: categoriesData } = useSWR("/api/categories", fetcher);
-  const { data: subCategoriesData } = useSWR("/api/subcategories", fetcher);
-  const { data: brandsData } = useSWR("/api/brands", fetcher);
-  const { data: subBrandsData } = useSWR("/api/subbrands", fetcher);
+  const { data: filterData } = useSWR("/api/products/filters", fetcher);
 
-  const categories = categoriesData?.data || [];
-  const subCategories = subCategoriesData?.data || [];
-  const brands = brandsData?.data || [];
-  const subBrands = subBrandsData?.data || [];
+  const superCategories = filterData?.data?.superCategories || [];
+  const categories = filterData?.data?.categories || [];
+  const subCategories = filterData?.data?.subCategories || [];
+  const brands = filterData?.data?.brands || [];
+  const subBrands = filterData?.data?.subBrands || [];
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -126,6 +125,20 @@ export default function ProductModalForm({
     },
   });
 
+  // Watch form values for dependent filtering
+  const watchedCategory = form.watch("category");
+  const watchedBrand = form.watch("brand");
+
+  // Filter sub-categories by selected category
+  const filteredSubCategories = watchedCategory
+    ? subCategories.filter((subCat: any) => subCat.category === watchedCategory)
+    : subCategories;
+
+  // Filter sub-brands by selected brand
+  const filteredSubBrands = watchedBrand
+    ? subBrands.filter((subBrand: any) => subBrand.brand === watchedBrand)
+    : subBrands;
+
   useEffect(() => {
     if (editData) {
       const specsArray = editData.specs
@@ -136,6 +149,52 @@ export default function ProductModalForm({
         : [{ key: "", value: "" }];
       const featuresString = editData.features?.join("\n") || "";
 
+      // Extract IDs from populated fields or use string IDs directly
+      const superCategoryId =
+        editData.superCategory &&
+        typeof editData.superCategory === "object" &&
+        "_id" in editData.superCategory
+          ? (editData.superCategory as any)._id?.toString()
+          : editData.superCategory
+          ? String(editData.superCategory)
+          : "";
+
+      const categoryId =
+        editData.category &&
+        typeof editData.category === "object" &&
+        "_id" in editData.category
+          ? (editData.category as any)._id?.toString()
+          : editData.category
+          ? String(editData.category)
+          : "";
+
+      const subCategoryId =
+        editData.subCategory &&
+        typeof editData.subCategory === "object" &&
+        "_id" in editData.subCategory
+          ? (editData.subCategory as any)._id?.toString()
+          : editData.subCategory
+          ? String(editData.subCategory)
+          : "";
+
+      const brandId =
+        editData.brand &&
+        typeof editData.brand === "object" &&
+        "_id" in editData.brand
+          ? (editData.brand as any)._id?.toString()
+          : editData.brand
+          ? String(editData.brand)
+          : "";
+
+      const subBrandId =
+        editData.subBrand &&
+        typeof editData.subBrand === "object" &&
+        "_id" in editData.subBrand
+          ? (editData.subBrand as any)._id?.toString()
+          : editData.subBrand
+          ? String(editData.subBrand)
+          : "";
+
       setSpecs(specsArray);
       form.reset({
         name: editData.name,
@@ -144,11 +203,11 @@ export default function ProductModalForm({
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
         quantity: editData.quantity || 0,
-        superCategory: editData.superCategory?.toString() || "",
-        category: editData.category?.toString() || "",
-        subCategory: editData.subCategory?.toString() || "",
-        brand: editData.brand?.toString() || "",
-        subBrand: editData.subBrand?.toString() || "",
+        superCategory: superCategoryId,
+        category: categoryId,
+        subCategory: subCategoryId,
+        brand: brandId,
+        subBrand: subBrandId,
         isFeatured: editData.isFeatured || false,
         specs: "",
         features: featuresString,
@@ -371,6 +430,32 @@ export default function ProductModalForm({
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
+                name="superCategory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Super Category</FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+                      >
+                        <option value="">Select super category</option>
+                        {superCategories.map(
+                          (superCat: { _id: string; name: string }) => (
+                            <option key={superCat._id} value={superCat._id}>
+                              {superCat.name}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
@@ -378,6 +463,13 @@ export default function ProductModalForm({
                     <FormControl>
                       <select
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          // Auto-clear sub-category when category changes
+                          if (e.target.value !== field.value) {
+                            form.setValue("subCategory", "");
+                          }
+                        }}
                         className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                       >
                         <option value="">Select category</option>
@@ -394,7 +486,9 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="subCategory"
@@ -404,10 +498,15 @@ export default function ProductModalForm({
                     <FormControl>
                       <select
                         {...field}
-                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+                        disabled={!watchedCategory}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <option value="">Select sub category</option>
-                        {subCategories.map(
+                        <option value="">
+                          {watchedCategory
+                            ? "Select sub category"
+                            : "Select category first"}
+                        </option>
+                        {filteredSubCategories.map(
                           (subCat: { _id: string; name: string }) => (
                             <option key={subCat._id} value={subCat._id}>
                               {subCat.name}
@@ -420,9 +519,7 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="brand"
@@ -432,6 +529,13 @@ export default function ProductModalForm({
                     <FormControl>
                       <select
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          // Auto-clear sub-brand when brand changes
+                          if (e.target.value !== field.value) {
+                            form.setValue("subBrand", "");
+                          }
+                        }}
                         className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                       >
                         <option value="">Select brand</option>
@@ -446,7 +550,9 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="subBrand"
@@ -456,10 +562,15 @@ export default function ProductModalForm({
                     <FormControl>
                       <select
                         {...field}
-                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+                        disabled={!watchedBrand}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <option value="">Select sub brand</option>
-                        {subBrands.map(
+                        <option value="">
+                          {watchedBrand
+                            ? "Select sub brand"
+                            : "Select brand first"}
+                        </option>
+                        {filteredSubBrands.map(
                           (subBrand: { _id: string; name: string }) => (
                             <option key={subBrand._id} value={subBrand._id}>
                               {subBrand.name}
@@ -472,6 +583,8 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
+
+              <div></div>
             </div>
 
             <div className="space-y-3">

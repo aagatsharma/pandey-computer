@@ -1,24 +1,27 @@
-"use client";
-
 import Link from "next/link";
-import { BlogCard } from "@/components/blog/blog-card";
-import { BlogSkeleton } from "@/components/blog/blog-skeleton";
-import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
-import { IBlog } from "@/lib/models/Blog";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "../ui/carousel";
+import dbConnect from "@/lib/mongoose";
+import Blog, { IBlog } from "@/lib/models/Blog";
+import { BlogsCarousel } from "./blogs-carousel";
 
-const LatestBlogs = () => {
-  const { data: blogsData, isLoading } = useSWR<{ data: IBlog[] }>(
-    "/api/blogs?limit=10",
-    fetcher
-  );
+async function getLatestBlogs(): Promise<IBlog[]> {
+  try {
+    await dbConnect();
+
+    const blogs = await Blog.find().sort({ createdAt: -1 }).limit(10).lean();
+
+    return JSON.parse(JSON.stringify(blogs));
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    return [];
+  }
+}
+
+export default async function LatestBlogs() {
+  const blogs = await getLatestBlogs();
+
+  if (blogs.length === 0) {
+    return null;
+  }
 
   return (
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
@@ -34,38 +37,7 @@ const LatestBlogs = () => {
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, index) => (
-            <BlogSkeleton key={index} />
-          ))}
-        </div>
-      ) : (
-        <div className="relative px-2 sm:px-0">
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {blogsData?.data?.map((blog) => (
-                <CarouselItem
-                  key={blog.slug}
-                  className="pl-2 md:pl-4 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                >
-                  <BlogCard key={blog.slug} blog={blog} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="-left-3 lg:-left-12 size-10" />
-            <CarouselNext className="-right-3 lg:-right-12 size-10" />
-          </Carousel>
-        </div>
-      )}
+      <BlogsCarousel blogs={blogs} />
     </section>
   );
-};
-
-export default LatestBlogs;
+}
