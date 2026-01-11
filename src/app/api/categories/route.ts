@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const { name, logo, superCategoryId } = body;
+    const { name, logo } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
       name,
       slug,
       logo,
-      superCategory: superCategoryId || undefined,
     });
 
     return NextResponse.json(
@@ -72,7 +71,7 @@ export async function PUT(req: NextRequest) {
     await dbConnect();
 
     const body = await req.json();
-    const { id, name, logo, superCategoryId } = body;
+    const { id, name, logo } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -96,7 +95,6 @@ export async function PUT(req: NextRequest) {
         name,
         slug,
         logo,
-        superCategory: superCategoryId || undefined,
       },
       { new: true }
     );

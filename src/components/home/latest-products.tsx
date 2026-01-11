@@ -1,11 +1,10 @@
 import Link from "next/link";
 import dbConnect from "@/lib/mongoose";
 import Product, { IProduct } from "@/lib/models/Product";
-import SuperCategory from "@/lib/models/SuperCategory";
-import Category from "@/lib/models/Category";
-import SubCategory from "@/lib/models/SubCategory";
-import Brand from "@/lib/models/Brand";
-import SubBrand from "@/lib/models/SubBrand";
+import "@/lib/models/Category";
+import "@/lib/models/SubCategory";
+import "@/lib/models/Brand";
+import "@/lib/models/SubBrand";
 import { ProductsCarousel } from "./products-carousel";
 
 async function getLatestProducts(): Promise<IProduct[]> {
@@ -13,7 +12,6 @@ async function getLatestProducts(): Promise<IProduct[]> {
     await dbConnect();
 
     const products = await Product.find()
-      .populate("superCategory")
       .populate("category")
       .populate("subCategory")
       .populate("brand")

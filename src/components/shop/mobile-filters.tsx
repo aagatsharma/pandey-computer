@@ -7,9 +7,6 @@ import { ProductFilters } from "./product-filters";
 interface MobileFiltersProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  superCategories: string[];
-  selectedSuperCategory: string;
-  setSelectedSuperCategory: (superCategory: string) => void;
   categories: string[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
@@ -29,9 +26,6 @@ interface MobileFiltersProps {
 export function MobileFilters({
   isOpen,
   setIsOpen,
-  superCategories,
-  selectedSuperCategory,
-  setSelectedSuperCategory,
   categories,
   selectedCategory,
   setSelectedCategory,
@@ -83,9 +77,6 @@ export function MobileFilters({
                 </Button>
               </div>
               <ProductFilters
-                superCategories={superCategories}
-                selectedSuperCategory={selectedSuperCategory}
-                setSelectedSuperCategory={setSelectedSuperCategory}
                 categories={categories}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}

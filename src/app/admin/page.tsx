@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Package, Tag, Layers, FolderTree, Store } from "lucide-react";
+import { Package, Layers, FolderTree, Store } from "lucide-react";
 
 const quickLinks = [
   {
@@ -11,21 +11,15 @@ const quickLinks = [
     description: "Manage your products",
   },
   {
-    title: "Super Categories",
-    href: "/admin/supercategory",
-    icon: FolderTree,
-    description: "Manage super categories",
-  },
-  {
     title: "Categories",
     href: "/admin/categories",
-    icon: Layers,
+    icon: FolderTree,
     description: "Manage categories",
   },
   {
     title: "Sub Categories",
     href: "/admin/subcategories",
-    icon: Tag,
+    icon: Layers,
     description: "Manage sub categories",
   },
   {

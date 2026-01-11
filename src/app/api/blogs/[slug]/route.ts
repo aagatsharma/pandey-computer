@@ -48,7 +48,7 @@ export async function PUT(
       .replace(/(^-|-$)/g, "");
 
     const blog = await Blog.findOneAndUpdate(
-      { _id: slug }, // Using _id instead of slug for update
+      { slug }, // Query by slug field
       {
         title,
         slug: newSlug,
@@ -87,7 +87,7 @@ export async function DELETE(
   try {
     await dbConnect();
 
-    const blog = await Blog.findByIdAndDelete(slug); // Using _id for delete
+    const blog = await Blog.findOneAndDelete({ slug }); // Query by slug field
 
     if (!blog) {
       return Response.json({ error: "Blog not found" }, { status: 404 });

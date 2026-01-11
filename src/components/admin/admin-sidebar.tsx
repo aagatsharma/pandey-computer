@@ -11,6 +11,8 @@ import {
   FolderTree,
   Store,
   Image,
+  BookOpen,
+  ChartBarStacked,
 } from "lucide-react";
 
 const navItems = [
@@ -25,14 +27,14 @@ const navItems = [
     icon: Image,
   },
   {
+    title: "Navbar Items",
+    href: "/admin/navbar-items",
+    icon: FolderTree,
+  },
+  {
     title: "Products",
     href: "/admin/products",
     icon: Package,
-  },
-  {
-    title: "Super Categories",
-    href: "/admin/supercategory",
-    icon: FolderTree,
   },
   {
     title: "Categories",
@@ -52,12 +54,12 @@ const navItems = [
   {
     title: "Sub Brands",
     href: "/admin/subbrands",
-    icon: Store,
+    icon: ChartBarStacked,
   },
   {
     title: "Blogs",
     href: "/admin/blogs",
-    icon: Tag,
+    icon: BookOpen,
   },
 ];
 

@@ -38,7 +38,6 @@ export default function BrandsPage() {
     id?: string;
     name: string;
     logo: string;
-    superCategoryId?: string;
   }) => {
     const method = formData.id ? "PUT" : "POST";
     const response = await fetch("/api/brands", {

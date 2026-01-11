@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Plus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,25 +25,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { IBlog } from "@/lib/models/Blog";
-import { BlogModalForm } from "@/components/admin/blog-modal-form";
 
 export default function BlogsPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editData, setEditData] = useState<IBlog | null>(null);
+  const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data, mutate } = useSWR("/api/blogs?limit=1000", fetcher);
   const blogs = data?.data || [];
-
-  const handleEdit = (blog: IBlog) => {
-    setEditData(blog);
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setEditData(null);
-  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -57,38 +46,6 @@ export default function BlogsPage() {
     } catch (error) {
       console.error("Error deleting blog:", error);
       alert("Failed to delete blog");
-    }
-  };
-
-  const handleSubmit = async (data: {
-    id?: string;
-    title: string;
-    excerpt?: string;
-    content: string;
-    image?: string;
-  }) => {
-    try {
-      const url = data.id ? `/api/blogs/${data.id}` : "/api/blogs";
-      const method = data.id ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: data.title,
-          excerpt: data.excerpt,
-          content: data.content,
-          image: data.image,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to save blog");
-
-      mutate();
-      handleModalClose();
-    } catch (error) {
-      console.error("Error saving blog:", error);
-      alert("Failed to save blog");
     }
   };
 
@@ -127,7 +84,9 @@ export default function BlogsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleEdit(blog)}>
+              <DropdownMenuItem
+                onClick={() => router.push(`/admin/blogs/${blog.slug}`)}
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
@@ -152,17 +111,13 @@ export default function BlogsPage() {
           <h1 className="text-3xl font-bold">Blogs</h1>
           <p className="text-gray-500 mt-1">Manage your blog posts</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)}>Add Blog</Button>
+        <Button onClick={() => router.push("/admin/blogs/add")}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Blog
+        </Button>
       </div>
 
       <DataTable columns={columns} data={blogs} />
-
-      <BlogModalForm
-        open={isModalOpen}
-        onOpenChange={handleModalClose}
-        onSubmit={handleSubmit}
-        editData={editData}
-      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

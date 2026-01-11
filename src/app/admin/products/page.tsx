@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import {
@@ -22,64 +23,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import ProductModalForm from "@/components/admin/product-modal-form";
 import { IProduct } from "@/lib/models/Product";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
 export default function ProductsPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editData, setEditData] = useState<IProduct | null>(null);
+  const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data, mutate } = useSWR("/api/products", fetcher);
 
   const products = data?.data || [];
-
-  const handleSubmit = async (formData: {
-    id?: string;
-    name: string;
-    shortDescription: string;
-    fullDescription: string;
-    price: number;
-    originalPrice?: number;
-    quantity?: number;
-    superCategory?: string;
-    category?: string;
-    subCategory?: string;
-    brand?: string;
-    subBrand?: string;
-    images: string[];
-    isFeatured: boolean;
-    specs?: Record<string, string>;
-    features?: string[];
-  }) => {
-    try {
-      const method = formData.id ? "PUT" : "POST";
-      const body = formData.id ? { ...formData } : { ...formData };
-
-      const response = await fetch("/api/products", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save product");
-      }
-
-      mutate();
-      setIsModalOpen(false);
-      setEditData(null);
-    } catch (error) {
-      console.error("Error saving product:", error);
-    }
-  };
-
-  const handleEdit = (product: IProduct) => {
-    setEditData(product);
-    setIsModalOpen(true);
-  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -96,13 +50,6 @@ export default function ProductsPage() {
     } catch (error) {
       console.error("Error deleting product:", error);
     }
-  };
-
-  const handleModalClose = (open: boolean) => {
-    if (!open) {
-      setEditData(null);
-    }
-    setIsModalOpen(open);
   };
 
   const columns: ColumnDef<IProduct>[] = [
@@ -218,7 +165,9 @@ export default function ProductsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleEdit(product)}>
+              <DropdownMenuItem
+                onClick={() => router.push(`/admin/products/${product._id}`)}
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
@@ -243,17 +192,13 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-gray-500 mt-1">Manage your products</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)}>Add Product</Button>
+        <Button onClick={() => router.push("/admin/products/add")}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Product
+        </Button>
       </div>
 
       <DataTable columns={columns} data={products} />
-
-      <ProductModalForm
-        open={isModalOpen}
-        onOpenChange={handleModalClose}
-        onSubmit={handleSubmit}
-        editData={editData}
-      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

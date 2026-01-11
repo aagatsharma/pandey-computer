@@ -52,7 +52,5 @@ const HomeWallpaperSchema = new Schema<IHomeWallpaper>(
   { timestamps: true }
 );
 
-HomeWallpaperSchema.index({ order: 1 });
-
 export default mongoose.models.HomeWallpaper ||
   mongoose.model<IHomeWallpaper>("HomeWallpaper", HomeWallpaperSchema);

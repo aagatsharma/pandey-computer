@@ -3,9 +3,6 @@
 import { Button } from "@/components/ui/button";
 
 interface ProductFiltersProps {
-  superCategories: string[];
-  selectedSuperCategory: string;
-  setSelectedSuperCategory: (superCategory: string) => void;
   categories: string[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
@@ -32,9 +29,6 @@ const priceRanges = [
 ];
 
 export function ProductFilters({
-  superCategories,
-  selectedSuperCategory,
-  setSelectedSuperCategory,
   categories,
   selectedCategory,
   setSelectedCategory,
@@ -52,30 +46,6 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   return (
     <div className="space-y-6">
-      {/* Super Categories */}
-      {superCategories.length > 1 && (
-        <div>
-          <h3 className="text-sm font-semibold mb-3 text-foreground">
-            Super Category
-          </h3>
-          <div className="space-y-1">
-            {superCategories.map((superCategory) => (
-              <button
-                key={superCategory}
-                onClick={() => setSelectedSuperCategory(superCategory)}
-                className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                  selectedSuperCategory === superCategory
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-foreground hover:bg-muted"
-                }`}
-              >
-                {superCategory}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Categories */}
       {categories.length > 1 && (
         <div>

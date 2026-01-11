@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     await dbConnect();
 
     const body = await req.json();
-    const { title, image, route, order, isActive, gridSpan } = body;
+    const { title, image, route, order, gridSpan } = body;
 
     if (!title) {
       return NextResponse.json(
@@ -51,7 +51,6 @@ export async function POST(req: NextRequest) {
       image,
       route,
       order: order || 1,
-      isActive: isActive !== undefined ? isActive : true,
       gridSpan: gridSpan || { cols: 1, rows: 1 },
     });
 
@@ -76,7 +75,7 @@ export async function PUT(req: NextRequest) {
     await dbConnect();
 
     const body = await req.json();
-    const { id, title, image, route, order, isActive, gridSpan } = body;
+    const { id, title, image, route, order, gridSpan } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -113,7 +112,6 @@ export async function PUT(req: NextRequest) {
         image,
         route,
         order: order || 1,
-        isActive: isActive !== undefined ? isActive : true,
         gridSpan: gridSpan || { cols: 1, rows: 1 },
       },
       { new: true }

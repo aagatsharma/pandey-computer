@@ -41,7 +41,6 @@ interface SubBrandOption extends FilterOption {
 }
 
 interface FilterData {
-  superCategories: FilterOption[];
   categories: FilterOption[];
   subCategories: SubCategoryOption[];
   brands: (FilterOption & { logo?: string })[];
@@ -55,9 +54,6 @@ export function ShopClient() {
   // State for all filters
   const [searchName, setSearchName] = useState(searchParams.get("name") || "");
   const [debouncedName, setDebouncedName] = useState(searchName);
-  const [selectedSuperCategory, setSelectedSuperCategory] = useState(
-    searchParams.get("superCategory") || ""
-  );
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || ""
   );
@@ -120,8 +116,6 @@ export function ShopClient() {
     const params = new URLSearchParams();
 
     if (debouncedName) params.append("name", debouncedName);
-    if (selectedSuperCategory)
-      params.append("superCategory", selectedSuperCategory);
     if (selectedCategory) params.append("category", selectedCategory);
     if (selectedSubCategory) params.append("subCategory", selectedSubCategory);
     if (selectedBrand) params.append("brand", selectedBrand);
@@ -134,7 +128,6 @@ export function ShopClient() {
     return params.toString();
   }, [
     debouncedName,
-    selectedSuperCategory,
     selectedCategory,
     selectedSubCategory,
     selectedBrand,
@@ -197,7 +190,6 @@ export function ShopClient() {
   const clearFilters = useCallback(() => {
     setSearchName("");
     setDebouncedName("");
-    setSelectedSuperCategory("");
     setSelectedCategory("");
     setSelectedSubCategory("");
     setSelectedBrand("");
@@ -212,7 +204,6 @@ export function ShopClient() {
   const hasActiveFilters = useMemo(() => {
     return !!(
       debouncedName ||
-      selectedSuperCategory ||
       selectedCategory ||
       selectedSubCategory ||
       selectedBrand ||
@@ -222,7 +213,6 @@ export function ShopClient() {
     );
   }, [
     debouncedName,
-    selectedSuperCategory,
     selectedCategory,
     selectedSubCategory,
     selectedBrand,
@@ -248,32 +238,6 @@ export function ShopClient() {
             className="pl-9"
           />
         </div>
-      </div>
-
-      {/* Super Category */}
-      <div>
-        <Label className="text-sm font-semibold mb-2 block">
-          Super Category
-        </Label>
-        <Select
-          value={selectedSuperCategory}
-          onValueChange={(value) => {
-            setSelectedSuperCategory(value === "all" ? "" : value);
-            setCurrentPage(1);
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="All Super Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Super Categories</SelectItem>
-            {filterData?.data?.superCategories.map((sc) => (
-              <SelectItem key={sc._id} value={sc.slug}>
-                {sc.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Category */}

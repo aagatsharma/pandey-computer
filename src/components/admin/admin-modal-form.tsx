@@ -24,7 +24,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ISuperCategory } from "@/lib/models/SuperCategory";
 
 const formSchema = z.object({
   name: z
@@ -48,7 +47,6 @@ interface AdminModalFormProps {
     name: string;
     logo: string;
   }) => Promise<void>;
-  editData?: ISuperCategory | null;
 }
 
 export default function AdminModalForm({

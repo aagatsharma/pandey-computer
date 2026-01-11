@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { ISuperCategory } from "./SuperCategory";
 import { ICategory } from "./Category";
 import { ISubCategory } from "./SubCategory";
 import { IBrand } from "./Brand";
@@ -19,8 +18,6 @@ export interface IProduct extends Document {
   specs?: Record<string, string>;
   features?: string[];
 
-  // Categorization
-  superCategory?: ISuperCategory;
   category?: ICategory;
   subCategory?: ISubCategory;
   brand?: IBrand;
@@ -78,11 +75,6 @@ const ProductSchema = new Schema<IProduct>(
       default: [],
     },
 
-    // Categorization
-    superCategory: {
-      type: Schema.Types.ObjectId,
-      ref: "SuperCategory",
-    },
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
@@ -119,10 +111,6 @@ const ProductSchema = new Schema<IProduct>(
   },
   { timestamps: true }
 );
-
-// Indexes
-ProductSchema.index({ superCategory: 1, category: 1, subCategory: 1 });
-ProductSchema.index({ isFeatured: 1 });
 
 export default mongoose.models.Product ||
   mongoose.model<IProduct>("Product", ProductSchema);

@@ -24,8 +24,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
 import { IBrand } from "@/lib/models/Brand";
 
 const formSchema = z.object({
@@ -33,8 +31,7 @@ const formSchema = z.object({
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name cannot exceed 100 characters"),
-  superCategoryId: z.string().optional(),
-  logo: z.any().optional(),
+  logo: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -46,7 +43,6 @@ interface BrandModalFormProps {
     id?: string;
     name: string;
     logo: string;
-    superCategoryId?: string;
   }) => Promise<void>;
   editData?: IBrand | null;
 }
@@ -59,16 +55,13 @@ export default function BrandModalForm({
 }: BrandModalFormProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { data: superCategoriesData } = useSWR("/api/supercategory", fetcher);
-  const superCategories = superCategoriesData?.data || [];
+  const [imageInputType, setImageInputType] = useState<"url" | "upload">("url");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      superCategoryId: "",
-      logo: undefined,
+      logo: "",
     },
   });
 
@@ -76,34 +69,38 @@ export default function BrandModalForm({
     if (editData) {
       form.reset({
         name: editData.name,
-        superCategoryId: editData.superCategory?.toString() || "",
-        logo: undefined,
+        logo: editData.logo || "",
       });
       setPreview(editData.logo || null);
+      setImageInputType(editData.logo?.startsWith("data:") ? "upload" : "url");
     } else {
       form.reset({
         name: "",
-        superCategoryId: "",
-        logo: undefined,
+        logo: "",
       });
       setPreview(null);
+      setImageInputType("url");
     }
   }, [editData, form]);
 
   const handleSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      let imageUrl = preview;
+      let imageUrl = data.logo || "";
 
-      if (data.logo instanceof File) {
-        imageUrl = await imageToBase64(data.logo);
+      // If upload type and there's a file selected, it's already base64 in the form
+      if (
+        imageInputType === "upload" &&
+        preview &&
+        preview.startsWith("data:")
+      ) {
+        imageUrl = preview;
       }
 
       await onSubmit({
         id: editData?._id?.toString(),
         name: data.name,
-        logo: imageUrl || "",
-        superCategoryId: data.superCategoryId || undefined,
+        logo: imageUrl,
       });
       form.reset();
       setPreview(null);
@@ -146,56 +143,65 @@ export default function BrandModalForm({
 
             <FormField
               control={form.control}
-              name="superCategoryId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Super Category (Optional)</FormLabel>
-                  <FormControl>
-                    <select
-                      {...field}
-                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
-                    >
-                      <option value="">Select super category</option>
-                      {superCategories.map(
-                        (sc: { _id: string; name: string }) => (
-                          <option key={sc._id} value={sc._id}>
-                            {sc.name}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="logo"
-              render={({ field: { onChange, ...field } }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>
                     Logo {editData && "(Leave empty to keep current)"}
                   </FormLabel>
+                  <div className="flex gap-2 mb-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={imageInputType === "url" ? "default" : "outline"}
+                      onClick={() => {
+                        setImageInputType("url");
+                        setPreview(null);
+                        field.onChange("");
+                      }}
+                    >
+                      URL
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={
+                        imageInputType === "upload" ? "default" : "outline"
+                      }
+                      onClick={() => {
+                        setImageInputType("upload");
+                        setPreview(null);
+                        field.onChange("");
+                      }}
+                    >
+                      Upload
+                    </Button>
+                  </div>
                   <FormControl>
                     <div className="space-y-3">
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            onChange(file);
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setPreview(reader.result as string);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                        {...field}
-                      />
+                      {imageInputType === "url" ? (
+                        <Input
+                          placeholder="Enter image URL"
+                          value={field.value || ""}
+                          onChange={(e) => {
+                            field.onChange(e.target.value);
+                            setPreview(e.target.value || null);
+                          }}
+                        />
+                      ) : (
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const base64 = await imageToBase64(file);
+                              setPreview(base64);
+                              field.onChange(base64);
+                            }
+                          }}
+                        />
+                      )}
                       {preview && (
                         <div className="relative w-24 h-24 rounded-lg overflow-hidden border">
                           <Image
@@ -208,7 +214,7 @@ export default function BrandModalForm({
                             type="button"
                             onClick={() => {
                               setPreview(null);
-                              onChange(undefined);
+                              field.onChange("");
                             }}
                             className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
                           >

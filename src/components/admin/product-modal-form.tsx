@@ -47,7 +47,6 @@ const formSchema = z.object({
     .min(0, "Original price must be positive")
     .optional(),
   quantity: z.number().min(0, "Quantity must be positive").optional(),
-  superCategory: z.string().optional(),
   category: z.string().optional(),
   subCategory: z.string().optional(),
   brand: z.string().optional(),
@@ -71,7 +70,6 @@ interface ProductModalFormProps {
     price: number;
     originalPrice?: number;
     quantity?: number;
-    superCategory?: string;
     category?: string;
     subCategory?: string;
     brand?: string;
@@ -98,7 +96,6 @@ export default function ProductModalForm({
 
   const { data: filterData } = useSWR("/api/products/filters", fetcher);
 
-  const superCategories = filterData?.data?.superCategories || [];
   const categories = filterData?.data?.categories || [];
   const subCategories = filterData?.data?.subCategories || [];
   const brands = filterData?.data?.brands || [];
@@ -113,7 +110,6 @@ export default function ProductModalForm({
       price: 0,
       originalPrice: 0,
       quantity: 0,
-      superCategory: "",
       category: "",
       subCategory: "",
       brand: "",
@@ -148,16 +144,6 @@ export default function ProductModalForm({
           }))
         : [{ key: "", value: "" }];
       const featuresString = editData.features?.join("\n") || "";
-
-      // Extract IDs from populated fields or use string IDs directly
-      const superCategoryId =
-        editData.superCategory &&
-        typeof editData.superCategory === "object" &&
-        "_id" in editData.superCategory
-          ? (editData.superCategory as any)._id?.toString()
-          : editData.superCategory
-          ? String(editData.superCategory)
-          : "";
 
       const categoryId =
         editData.category &&
@@ -203,7 +189,6 @@ export default function ProductModalForm({
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
         quantity: editData.quantity || 0,
-        superCategory: superCategoryId,
         category: categoryId,
         subCategory: subCategoryId,
         brand: brandId,
@@ -223,7 +208,7 @@ export default function ProductModalForm({
         price: 0,
         originalPrice: 0,
         quantity: 0,
-        superCategory: "",
+
         category: "",
         subCategory: "",
         brand: "",
@@ -273,7 +258,6 @@ export default function ProductModalForm({
         price: data.price,
         originalPrice: data.originalPrice || undefined,
         quantity: data.quantity || 0,
-        superCategory: data.superCategory || undefined,
         category: data.category || undefined,
         subCategory: data.subCategory || undefined,
         brand: data.brand || undefined,
@@ -430,32 +414,6 @@ export default function ProductModalForm({
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="superCategory"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Super Category</FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
-                      >
-                        <option value="">Select super category</option>
-                        {superCategories.map(
-                          (superCat: { _id: string; name: string }) => (
-                            <option key={superCat._id} value={superCat._id}>
-                              {superCat.name}
-                            </option>
-                          )
-                        )}
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="category"
                 render={({ field }) => (
                   <FormItem>
@@ -474,9 +432,9 @@ export default function ProductModalForm({
                       >
                         <option value="">Select category</option>
                         {categories.map(
-                          (cat: { _id: string; name: string }) => (
-                            <option key={cat._id} value={cat._id}>
-                              {cat.name}
+                          (category: { _id: string; name: string }) => (
+                            <option key={category._id} value={category._id}>
+                              {category.name}
                             </option>
                           )
                         )}
@@ -486,9 +444,7 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="subCategory"
@@ -519,7 +475,9 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="brand"
@@ -550,9 +508,7 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="subBrand"
@@ -583,8 +539,6 @@ export default function ProductModalForm({
                   </FormItem>
                 )}
               />
-
-              <div></div>
             </div>
 
             <div className="space-y-3">

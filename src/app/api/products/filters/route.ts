@@ -1,4 +1,3 @@
-import SuperCategory from "@/lib/models/SuperCategory";
 import Category from "@/lib/models/Category";
 import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
@@ -9,22 +8,19 @@ export async function GET() {
   try {
     await dbConnect();
 
-    const [superCategories, categories, subCategories, brands, subBrands] =
-      await Promise.all([
-        SuperCategory.find().select("_id name slug").sort({ name: 1 }).lean(),
-        Category.find().select("_id name slug").sort({ name: 1 }).lean(),
-        SubCategory.find()
-          .select("_id name slug category")
-          .sort({ name: 1 })
-          .lean(),
-        Brand.find().select("_id name slug logo").sort({ name: 1 }).lean(),
-        SubBrand.find().select("_id name slug brand").sort({ name: 1 }).lean(),
-      ]);
+    const [categories, subCategories, brands, subBrands] = await Promise.all([
+      Category.find().select("_id name slug").sort({ name: 1 }).lean(),
+      SubCategory.find()
+        .select("_id name slug category")
+        .sort({ name: 1 })
+        .lean(),
+      Brand.find().select("_id name slug logo").sort({ name: 1 }).lean(),
+      SubBrand.find().select("_id name slug brand").sort({ name: 1 }).lean(),
+    ]);
 
     return new Response(
       JSON.stringify({
         data: {
-          superCategories,
           categories,
           subCategories,
           brands,

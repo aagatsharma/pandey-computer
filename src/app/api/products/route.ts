@@ -1,7 +1,6 @@
 import Product from "@/lib/models/Product";
 import Brand from "@/lib/models/Brand";
 import SubBrand from "@/lib/models/SubBrand";
-import SuperCategory from "@/lib/models/SuperCategory";
 import Category from "@/lib/models/Category";
 import SubCategory from "@/lib/models/SubCategory";
 
@@ -15,20 +14,40 @@ export async function GET(req: Request) {
 
     await dbConnect();
 
+    // Check if fetching single product by ID
+    const id = searchParams.get("id");
+    if (id) {
+      const product = await Product.findById(id)
+        .populate("category", "name slug")
+        .populate("subCategory", "name slug")
+        .populate("brand", "name slug logo")
+        .populate("subBrand", "name slug");
+
+      if (!product) {
+        return new Response(JSON.stringify({ error: "Product not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ data: [product] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     // Query parameters
     const page = parseInt(searchParams?.get("page") || "") || 1;
     const limit = parseInt(searchParams?.get("limit") || "") || 12;
 
     // Filter parameters (now using slugs)
     const name = searchParams.get("name");
-    const superCategorySlug = searchParams.get("superCategory");
     const categorySlug = searchParams.get("category");
     const subCategorySlug = searchParams.get("subCategory");
     const brandSlug = searchParams.get("brand");
     const subBrandSlug = searchParams.get("subBrand");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
-    const inStock = searchParams.get("inStock");
     const isFeatured = searchParams.get("isFeatured");
 
     // Build filter query
@@ -37,14 +56,6 @@ export async function GET(req: Request) {
     // Name search with regex
     if (name) {
       filter.name = { $regex: name, $options: "i" };
-    }
-
-    // Convert slugs to IDs for filtering
-    if (superCategorySlug) {
-      const superCat = await SuperCategory.findOne({
-        slug: superCategorySlug,
-      }).select("_id");
-      if (superCat) filter.superCategory = superCat._id;
     }
 
     if (categorySlug) {
@@ -81,11 +92,6 @@ export async function GET(req: Request) {
       }
     }
 
-    if (inStock !== null && inStock !== undefined) {
-      const inStockBool = inStock === "true";
-      filter.quantity = inStockBool ? { $gt: 0 } : { $eq: 0 };
-    }
-
     if (isFeatured !== null && isFeatured !== undefined) {
       filter.isFeatured = isFeatured === "true";
     }
@@ -98,7 +104,6 @@ export async function GET(req: Request) {
 
     // Fetch products with pagination and populate references
     const data = await Product.find(filter)
-      .populate("superCategory", "name slug")
       .populate("category", "name slug")
       .populate("subCategory", "name slug")
       .populate("brand", "name slug logo")
@@ -145,7 +150,6 @@ export async function POST(req: NextRequest) {
       originalPrice,
       specs,
       features,
-      superCategory,
       category,
       subCategory,
       brand,
@@ -194,7 +198,6 @@ export async function POST(req: NextRequest) {
       originalPrice: originalPrice || undefined,
       specs: specs || undefined,
       features: features || [],
-      superCategory: superCategory || undefined,
       category: category || undefined,
       subCategory: subCategory || undefined,
       brand: brand || undefined,
@@ -234,7 +237,6 @@ export async function PUT(req: NextRequest) {
       originalPrice,
       specs,
       features,
-      superCategory,
       category,
       subCategory,
       brand,
@@ -292,7 +294,6 @@ export async function PUT(req: NextRequest) {
         originalPrice: originalPrice || undefined,
         specs: specs || undefined,
         features: features || [],
-        superCategory: superCategory || undefined,
         category: category || undefined,
         subCategory: subCategory || undefined,
         brand: brand || undefined,

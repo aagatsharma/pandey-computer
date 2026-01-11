@@ -9,7 +9,6 @@ interface IHomeWallpaper {
   image: string;
   route: string;
   order: number;
-  isActive: boolean;
   gridSpan?: {
     cols: number;
     rows: number;
@@ -20,9 +19,7 @@ async function getWallpapers(): Promise<IHomeWallpaper[]> {
   try {
     await dbConnect();
 
-    const wallpapers = await HomeWallpaper.find({ isActive: true })
-      .sort({ order: 1 })
-      .lean();
+    const wallpapers = await HomeWallpaper.find().sort({ order: 1 }).lean();
 
     return JSON.parse(JSON.stringify(wallpapers));
   } catch (error) {

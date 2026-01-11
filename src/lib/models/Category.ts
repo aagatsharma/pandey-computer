@@ -1,11 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { ISuperCategory } from "./SuperCategory";
 
 export interface ICategory extends Document {
   name: string;
   slug: string;
   logo?: string;
-  superCategory?: ISuperCategory;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,10 +25,6 @@ const CategorySchema = new Schema<ICategory>(
     },
     logo: {
       type: String,
-    },
-    superCategory: {
-      type: Schema.Types.ObjectId,
-      ref: "SuperCategory",
     },
   },
   { timestamps: true }
