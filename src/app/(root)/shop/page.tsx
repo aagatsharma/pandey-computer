@@ -1,4 +1,5 @@
 import { ShopClient } from "@/components/shop/shop-client";
+import { Suspense } from "react";
 
 export default function ShopPage() {
   return (
@@ -13,8 +14,9 @@ export default function ShopPage() {
           </p>
         </div>
       </div>
-
-      <ShopClient />
+      <Suspense>
+        <ShopClient />
+      </Suspense>
     </div>
   );
 }
