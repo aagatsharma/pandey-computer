@@ -60,7 +60,7 @@ export default async function Header() {
                 <span>061-585498</span>
               </Link>
               <Link
-                href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4403.733258338522!2d83.98639519999999!3d28.217570600000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595490aeb14c1%3A0x134c7867410d3012!2sPandey%20Computer%20Suppliers!5e1!3m2!1sen!2snp!4v1764773124355!5m2!1sen!2snp"
+                href="https://maps.app.goo.gl/QVgnB6DGFTp8SfQB8"
                 target="_blank"
                 className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
               >

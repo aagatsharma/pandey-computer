@@ -148,9 +148,9 @@ export default function Footer() {
                   size={20}
                   className="text-primary mt-0.5 shrink-0 group-hover:scale-110 transition-transform"
                 />
-                <div>
+                <Link href="https://maps.app.goo.gl/QVgnB6DGFTp8SfQB8" target="_blank">
                   <p className="text-sm text-zinc-400">Newroad , Pokhara</p>
-                </div>
+                </Link>
               </div>
               <div className="flex items-start gap-3 group">
                 <Mail
