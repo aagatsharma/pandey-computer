@@ -206,9 +206,9 @@ export default function PrivacyPolicy() {
               Privacy Policy or our data practices, please contact us at:
             </p>
             <div className="mt-4 text-zinc-600">
-              <p>Email: info@pandeycomputer.com</p>
-              <p>Phone: 01-5350040 / 01-5911594</p>
-              <p>Address: Putalisadak, Kathmandu</p>
+              <p>Email: pandeycomputer7@gmail.com</p>
+              <p>Phone:  061-585498 / 9856035498</p>
+              <p>Address: Newroad, Pokhara</p>
             </div>
           </section>
 

@@ -35,7 +35,7 @@ export function CategoriesCarousel({ categories }: CategoriesCarouselProps) {
             className="px-2 md:px-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6"
           >
             <Link
-              href="#"
+              href={`/shop?category=${category.slug}`}
               className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group"
             >
               <div className="relative w-24 h-24 mb-3">

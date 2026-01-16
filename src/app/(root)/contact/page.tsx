@@ -72,10 +72,10 @@ export default function ContactUsPage() {
                     Call Us
                   </h3>
                   <a
-                    href="tel:+977585498"
+                    href="tel:061-585498"
                     className="text-primary hover:opacity-80 transition-opacity block"
                   >
-                    01-585498
+                    061-585498
                   </a>
                   <a
                     href="tel:+9779856035498"

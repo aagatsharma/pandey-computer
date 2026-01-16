@@ -69,7 +69,7 @@ export default function BrandsPage() {
             {filteredBrands?.map((brand) => (
               <Link
                 key={brand.slug}
-                href={`/brands/${brand.slug}`}
+                href={`/shop?brand=${brand.slug}`}
                 className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group"
               >
                 <div className="relative w-24 h-24 mb-4">

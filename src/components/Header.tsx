@@ -2,7 +2,38 @@ import { MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import NavigationBar from "./header/navigation-bar";
 
-export default function Header() {
+interface NavbarItem {
+  _id: string;
+  label: string;
+  slug: string;
+  level: 1 | 2 | 3;
+  type: "category" | "brand" | "subCategory" | "subBrand";
+  children?: NavbarItem[];
+}
+
+async function getNavigationData(): Promise<NavbarItem[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/navbar-items?nested=true`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch navigation data");
+      return [];
+    }
+
+    const data = await res.json();
+    return data.data || [];
+  } catch (error) {
+    console.error("Error fetching navigation data:", error);
+    return [];
+  }
+}
+
+export default async function Header() {
+  const navigationData = await getNavigationData();
+
   return (
     <header className="w-full bg-background sticky top-0 z-50 shadow-sm">
       {/* Top Info Bar */}
@@ -22,7 +53,7 @@ export default function Header() {
             {/* Right: Contact Info */}
             <div className="hidden lg:flex items-center gap-4">
               <Link
-                href="tel:061585498"
+                href="tel:061-585498"
                 className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
               >
                 <Phone size={14} />
@@ -41,7 +72,7 @@ export default function Header() {
         </div>
       </div>
 
-      <NavigationBar />
+      <NavigationBar menuData={navigationData} />
     </header>
   );
 }
