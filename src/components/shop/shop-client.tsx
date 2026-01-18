@@ -447,20 +447,6 @@ export function ShopClient() {
 
         {/* Products Grid */}
         <div className="flex-1 min-w-0">
-          {/* Results Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              {isLoading ? (
-                "Loading..."
-              ) : (
-                <>
-                  Showing {products.length > 0 ? (currentPage - 1) * 12 + 1 : 0}{" "}
-                  - {Math.min(currentPage * 12, pagination?.total || 0)} of{" "}
-                  {pagination?.total || 0} products
-                </>
-              )}
-            </p>
-          </div>
 
           <ProductsGrid
             products={products}

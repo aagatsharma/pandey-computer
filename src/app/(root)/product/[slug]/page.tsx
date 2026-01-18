@@ -96,15 +96,15 @@ export default async function ProductPage({
 
   const relatedProducts = product.category
     ? await getRelatedProducts(
-        product.category.toString(),
-        product._id.toString()
-      )
+      (product.category as any)._id,
+      product._id.toString()
+    )
     : [];
 
   const discount = product.originalPrice
     ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100
-      )
+      ((product.originalPrice - product.price) / product.originalPrice) * 100
+    )
     : 0;
 
   // Convert specs object to array format
@@ -148,7 +148,7 @@ export default async function ProductPage({
             {discount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute top-4 right-4 text-sm font-bold px-3 py-1 shadow-lg"
+                className="absolute top-4 right-4 text-sm font-bold px-3 py-1 shadow-lg text-white"
               >
                 -{discount}%
               </Badge>
@@ -165,7 +165,14 @@ export default async function ProductPage({
           {/* Product Info */}
           <div className="flex flex-col">
             <div className="text-sm text-primary font-semibold uppercase tracking-wide mb-2">
-              {product.category?.name || product.brand?.name || ""}
+              {[
+                product.category?.name,
+                product.brand?.name ||
+                product.subBrand?.name ||
+                product.subCategory?.name,
+              ]
+                .filter(Boolean)
+                .join(" > ")}
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {product.name}
@@ -207,10 +214,7 @@ export default async function ProductPage({
               )}
             </div>
 
-            <ProductActions
-              inStock={!!(product.quantity && product.quantity > 0)}
-              price={product.price}
-            />
+            <ProductActions product={product} />
           </div>
         </div>
 

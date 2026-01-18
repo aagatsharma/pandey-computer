@@ -34,8 +34,8 @@ export function BlogsCarousel({ blogs }: BlogsCarouselProps) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="-left-3 lg:-left-12 size-10" />
-        <CarouselNext className="-right-3 lg:-right-12 size-10" />
+        <CarouselPrevious className="-left-3 lg:-left-12 size-10 max-md:hidden" />
+        <CarouselNext className="-right-3 lg:-right-12 size-10 max-md:hidden" />
       </Carousel>
     </div>
   );

@@ -13,6 +13,7 @@ import {
   Image,
   BookOpen,
   ChartBarStacked,
+  PackageCheck,
 } from "lucide-react";
 
 const navItems = [
@@ -60,6 +61,11 @@ const navItems = [
     title: "Blogs",
     href: "/admin/blogs",
     icon: BookOpen,
+  },
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    icon: PackageCheck
   },
 ];
 

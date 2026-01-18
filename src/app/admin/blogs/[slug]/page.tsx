@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import BlogForm from "@/components/admin/blog-form";
+import Loader from "@/components/loader";
 
 export default function EditBlogPage() {
   const router = useRouter();
@@ -37,9 +38,7 @@ export default function EditBlogPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Loading...</div>
-      </div>
+      <Loader />
     );
   }
 

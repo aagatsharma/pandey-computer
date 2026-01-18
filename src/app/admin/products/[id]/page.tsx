@@ -5,6 +5,7 @@ import { use } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import ProductForm from "@/components/admin/product-form";
+import Loader from "@/components/loader";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -49,20 +50,14 @@ export default function EditProductPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!product) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Product not found</div>
-      </div>
-    );
+    return <div className="text-center py-12 text-red-500">Error loading product</div>;
   }
+
+
 
   return (
     <div>

@@ -39,19 +39,19 @@ export default async function Header() {
       {/* Top Info Bar */}
       <div className="border-b">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-10 text-xs md:text-sm">
+          <div className="flex items-center justify-between text-xs md:text-sm p-2">
             {/* Left: Tagline */}
-            <div className="hidden md:block font-medium">
+            <div className="hidden md:block font-medium shrink-0">
               Think. Innovate. Succeed.
             </div>
 
             {/* Middle: Delivery Info */}
-            <div className="flex-1 md:flex-none text-center font-medium">
+            <div className="hidden lg:flex text-center font-medium">
               Free Delivery All Over Nepal
             </div>
 
             {/* Right: Contact Info */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="flex items-center gap-4 max-lg:w-full justify-center">
               <Link
                 href="tel:061-585498"
                 className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"

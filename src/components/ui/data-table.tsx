@@ -26,11 +26,13 @@ import { Input } from "@/components/ui/input";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  searchKey?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  searchKey,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -52,26 +54,15 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  // Find which column exists for filtering
-  const columnIds = table.getAllColumns().map((col) => col.id);
-  const filterColumnId = columnIds.includes("name")
-    ? "name"
-    : columnIds.includes("title")
-    ? "title"
-    : null;
-  const filterColumn = filterColumnId ? table.getColumn(filterColumnId) : null;
-
   return (
     <div className="space-y-4">
-      {filterColumn && (
+      {searchKey && (
         <Input
-          placeholder={
-            filterColumnId === "name"
-              ? "Filter by name..."
-              : "Filter by title..."
+          placeholder="Search..."
+          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn(searchKey)?.setFilterValue(event.target.value)
           }
-          value={(filterColumn.getFilterValue() as string) ?? ""}
-          onChange={(event) => filterColumn.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
       )}
@@ -86,9 +77,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}

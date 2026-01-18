@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   ],
 };
 
+import { Toaster } from "sonner";
+
+// ... existing imports
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,7 +40,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased`}>{children}</body>
+      <body className={`${poppins.className} antialiased`}>
+        {children}
+        <Toaster richColors position="top-center" />
+      </body>
     </html>
   );
 }

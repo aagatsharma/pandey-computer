@@ -26,12 +26,13 @@ import { DataTable } from "@/components/ui/data-table";
 import { IProduct } from "@/lib/models/Product";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
+import Loader from "@/components/loader";
 
 export default function ProductsPage() {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data, mutate } = useSWR("/api/products", fetcher);
+  const { data, mutate, isLoading, error } = useSWR("/api/products", fetcher);
 
   const products = data?.data || [];
 
@@ -184,6 +185,14 @@ export default function ProductsPage() {
       },
     },
   ];
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading products</div>;
+  }
 
   return (
     <div>

@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Loader from "@/components/loader";
 
 export default function SubCategoriesPage() {
   const { data, error, isLoading } = useSWR("/api/subcategories", fetcher);
@@ -150,6 +151,14 @@ export default function SubCategoriesPage() {
     },
   ];
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading sub categories</div>;
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -195,15 +204,9 @@ export default function SubCategoriesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-12 text-red-500">
-          Error loading sub categories
-        </div>
-      ) : (
-        <DataTable columns={columns} data={subcategories} />
-      )}
+
+      <DataTable columns={columns} data={subcategories} />
+
     </div>
   );
 }

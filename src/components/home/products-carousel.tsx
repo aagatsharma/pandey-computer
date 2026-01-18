@@ -34,8 +34,8 @@ export function ProductsCarousel({ products }: ProductsCarouselProps) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="-left-2 sm:-left-4 lg:-left-12 h-10 w-10" />
-        <CarouselNext className="-right-2 sm:-right-4 lg:-right-12 h-10 w-10" />
+        <CarouselPrevious className="-left-2 sm:-left-4 lg:-left-12 h-10 w-10 max-md:hidden" />
+        <CarouselNext className="-right-2 sm:-right-4 lg:-right-12 h-10 w-10 max-md:hidden" />
       </Carousel>
     </div>
   );

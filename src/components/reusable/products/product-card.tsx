@@ -2,6 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IProduct } from "@/lib/models/Product";
+import { useCartStore } from "@/store/cart-store";
+import { ShoppingCart, X } from "lucide-react";
+import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: IProduct }) {
   const {
@@ -17,9 +20,34 @@ export function ProductCard({ product }: { product: IProduct }) {
   const image = images && images.length > 0 ? images[0] : "/placeholder.png";
   const inStock = quantity && quantity > 0;
 
+  const { cart, addToCart, removeFromCart } = useCartStore();
+  const cartItem = cart.find((item) => item._id === String(product._id));
+  const isInCart = !!cartItem;
+
   const discount = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
+
+  const handleToggleCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isInCart) {
+      removeFromCart(String(product._id));
+      toast.error("Item removed from cart");
+    } else {
+      addToCart({
+        _id: String(product._id),
+        name,
+        slug,
+        price,
+        image,
+        quantity: 1,
+        maxQuantity: quantity,
+      });
+      toast.success("Item added to cart");
+    }
+  };
 
   return (
     <Link href={`/product/${slug}`} className="block">
@@ -61,13 +89,25 @@ export function ProductCard({ product }: { product: IProduct }) {
                 </span>
               )}
             </div>
-            <Button
-              size="sm"
-              variant={inStock ? "default" : "secondary"}
-              disabled={!inStock}
-            >
-              {inStock ? "Add" : "Sold Out"}
-            </Button>
+
+            {inStock ? (
+              <Button
+                size="sm"
+                variant={isInCart ? "destructive" : "secondary"}
+                onClick={handleToggleCart}
+                className={isInCart ? "" : ""}
+              >
+                {isInCart ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <ShoppingCart className="h-4 w-4" />
+                )}
+              </Button>
+            ) : (
+              <Button size="sm" variant="secondary" disabled>
+                Sold Out
+              </Button>
+            )}
           </div>
         </div>
       </div>

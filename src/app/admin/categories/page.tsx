@@ -9,6 +9,7 @@ import useSWR, { mutate } from "swr";
 import { useState } from "react";
 import CategoryModalForm from "@/components/admin/category-modal-form";
 import { fetcher } from "@/lib/fetcher";
+import Loader from "@/components/loader";
 import { ICategory } from "@/lib/models/Category";
 import {
   DropdownMenu,
@@ -144,6 +145,14 @@ export default function CategoriesPage() {
     },
   ];
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading categories</div>;
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -185,15 +194,9 @@ export default function CategoriesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-12 text-red-500">
-          Error loading categories
-        </div>
-      ) : (
-        <DataTable columns={columns} data={categories} />
-      )}
+
+      <DataTable columns={columns} data={categories} />
+
     </div>
   );
 }

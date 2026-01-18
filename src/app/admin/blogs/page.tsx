@@ -25,12 +25,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { IBlog } from "@/lib/models/Blog";
+import Loader from "@/components/loader";
 
 export default function BlogsPage() {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data, mutate } = useSWR("/api/blogs?limit=1000", fetcher);
+  const { data, mutate, isLoading, error } = useSWR("/api/blogs?limit=1000", fetcher);
   const blogs = data?.data || [];
 
   const handleDelete = async (id: string) => {
@@ -103,6 +104,14 @@ export default function BlogsPage() {
       },
     },
   ];
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading blogs</div>;
+  }
 
   return (
     <div>

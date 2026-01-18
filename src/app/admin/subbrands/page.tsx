@@ -27,6 +27,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { RingLoader } from "react-spinners"
+import Loader from "@/components/loader";
 
 export default function SubBrandsPage() {
   const { data, error, isLoading } = useSWR("/api/subbrands", fetcher);
@@ -150,6 +152,14 @@ export default function SubBrandsPage() {
     },
   ];
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading sub brands</div>;
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -191,15 +201,8 @@ export default function SubBrandsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-12 text-red-500">
-          Error loading sub brands
-        </div>
-      ) : (
-        <DataTable columns={columns} data={subbrands} />
-      )}
+      <DataTable columns={columns} data={subbrands} />
+
     </div>
   );
 }

@@ -30,6 +30,7 @@ import {
 import { INavbarItem } from "@/lib/models/NavbarItem";
 import { NavbarItemModalForm } from "@/components/admin/navbar-item-modal-form";
 import { Badge } from "@/components/ui/badge";
+import Loader from "@/components/loader";
 
 type NavbarItemWithChildren = INavbarItem & {
   children?: NavbarItemWithChildren[];
@@ -42,7 +43,7 @@ export default function NavbarItemsPage() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   // Fetch nested hierarchy from API
-  const { data, mutate } = useSWR("/api/navbar-items?nested=true", fetcher);
+  const { data, mutate, isLoading, error } = useSWR("/api/navbar-items?nested=true", fetcher);
   const hierarchyData = useMemo<NavbarItemWithChildren[]>(
     () => data?.data || [],
     [data]
@@ -135,9 +136,8 @@ export default function NavbarItemsPage() {
 
     return (
       <span
-        className={`px-2 py-1 rounded-full text-xs font-medium ${
-          colorMap[type] || "bg-gray-100 text-gray-800"
-        }`}
+        className={`px-2 py-1 rounded-full text-xs font-medium ${colorMap[type] || "bg-gray-100 text-gray-800"
+          }`}
       >
         {type}
       </span>
@@ -177,8 +177,8 @@ export default function NavbarItemsPage() {
                 item.level === 1
                   ? "default"
                   : item.level === 2
-                  ? "secondary"
-                  : "outline"
+                    ? "secondary"
+                    : "outline"
               }
             >
               L{item.level}
@@ -222,6 +222,14 @@ export default function NavbarItemsPage() {
       </div>
     );
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading navbar items</div>;
+  }
 
   return (
     <div>

@@ -9,6 +9,7 @@ import useSWR, { mutate } from "swr";
 import { useState } from "react";
 import BrandModalForm from "@/components/admin/brand-modal-form";
 import { fetcher } from "@/lib/fetcher";
+import Loader from "@/components/loader";
 import { IBrand } from "@/lib/models/Brand";
 import {
   DropdownMenu,
@@ -142,6 +143,14 @@ export default function BrandsPage() {
     },
   ];
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading brands</div>;
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -183,15 +192,9 @@ export default function BrandsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-12 text-red-500">
-          Error loading brands
-        </div>
-      ) : (
-        <DataTable columns={columns} data={brands} />
-      )}
+
+      <DataTable columns={columns} data={brands} />
+
     </div>
   );
 }

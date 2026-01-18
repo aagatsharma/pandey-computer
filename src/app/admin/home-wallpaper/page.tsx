@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Loader from "@/components/loader";
 
 interface IHomeWallpaper {
   _id: string;
@@ -62,7 +63,7 @@ export default function HomeWallpaperPage() {
     gridSpan: { cols: 1, rows: 1 },
   });
 
-  const { data, mutate } = useSWR("/api/home-wallpaper", fetcher);
+  const { data, mutate, isLoading, error } = useSWR("/api/home-wallpaper", fetcher);
 
   const wallpapers = data?.data || [];
 
@@ -231,6 +232,14 @@ export default function HomeWallpaperPage() {
       ),
     },
   ];
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-500">Error loading wallpapers</div>;
+  }
 
   return (
     <div>

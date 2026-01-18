@@ -2,8 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, Menu, X, ChevronDown, ChevronRight, CircleArrowRight } from "lucide-react";
+import CartIcon from "./cart-icon";
 
 interface NavbarItem {
   _id: string;
@@ -18,18 +19,118 @@ interface NavigationBarProps {
   menuData: NavbarItem[];
 }
 
+interface MobileMenuItemProps {
+  item: NavbarItem;
+  parentParams: string;
+  closeMenu: () => void;
+}
+
+const MobileMenuItem = ({ item, parentParams, closeMenu }: MobileMenuItemProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const pathname = usePathname();
+  const hasChildren = item.children && item.children.length > 0;
+
+  // Construct the query params for this item
+  const currentParams = parentParams
+    ? `${parentParams}&${item.type}=${item.slug}`
+    : `${item.type}=${item.slug}`;
+
+  const href = `/shop?${currentParams}`;
+  const isActive = pathname.startsWith("/shop") && pathname.includes(currentParams);
+
+  if (!hasChildren) {
+    return (
+      <li>
+        <Link
+          href={href}
+          className={`block py-3 px-4 text-sm rounded-md transition-colors ${isActive
+            ? "bg-primary/10 text-primary font-medium"
+            : "text-foreground hover:bg-accent hover:text-accent-foreground"
+            }`}
+          onClick={closeMenu}
+        >
+          {item.label}
+        </Link>
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      <div className="flex flex-col">
+        <div
+          className={`flex items-center justify-between py-3 px-4 rounded-md transition-colors cursor-pointer ${isActive || isExpanded
+            ? "bg-accent/50"
+            : "hover:bg-accent"
+            }`}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span className={`text-sm ${isActive ? "text-primary font-medium" : "text-foreground"}`}>
+            {item.label}
+          </span>
+          <button
+            className="p-1 hover:bg-background rounded-full transition-colors"
+            aria-label={isExpanded ? "Collapse" : "Expand"}
+          >
+            {isExpanded ? (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            )}
+          </button>
+        </div>
+        {isExpanded && (
+          <ul className="pl-4 border-l ml-4 space-y-1 my-1">
+            {/* Link to the category itself */}
+            <li>
+              <Link
+                href={href}
+                className="block py-2 px-4 text-sm text-muted-foreground hover:text-primary transition-colors"
+                onClick={closeMenu}
+              >
+                All {item.label}
+              </Link>
+            </li>
+            {item.children!.map((child) => (
+              <MobileMenuItem
+                key={child._id}
+                item={child}
+                parentParams={currentParams}
+                closeMenu={closeMenu}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+    </li>
+  );
+};
+
 export default function NavigationBar({ menuData }: NavigationBarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?name=${encodeURIComponent(searchQuery.trim())}`);
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
 
   // Filter only level 1 items (top-level navigation)
   const topLevelItems = menuData.filter((item) => item.level === 1);
 
-
   return (
     <>
       {/* Section 1: Logo, Search, Cart */}
-      <div className="border-b bg-background">
+      <div className="border-b bg-background sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
@@ -46,43 +147,57 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl hidden md:block">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
+                  name="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for products..."
-                  className="w-full px-4 py-2.5 pl-10 border border-input rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-4 py-2.5 pl-10 pr-20 border border-input rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              </div>
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                </div>
+
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      className="p-1 hover:bg-accent rounded-full transition-colors"
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="p-1 hover:bg-accent rounded-full transition-colors text-primary"
+                  >
+                    <CircleArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Right Side: Cart & Mobile Menu */}
             <div className="flex items-center gap-4">
-              <Link
-                href="/cart"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
-              </Link>
+              <CartIcon />
 
               {/* Mobile Menu Button */}
               <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                onClick={() => setIsMobileMenuOpen(true)}
                 className="lg:hidden text-foreground hover:text-primary transition-all"
-                aria-label="Toggle mobile menu"
+                aria-label="Open mobile menu"
               >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
+                <Menu className="h-6 w-6" />
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Section 2: Navigation Menu */}
+      {/* Section 2: Navigation Menu (Desktop) */}
       <nav className="bg-primary text-white hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 relative">
           <div className="flex items-center h-12 gap-1">
@@ -158,78 +273,94 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-b bg-background animate-in slide-in-from-top-5 duration-300">
-          <nav className="container mx-auto px-4 py-4">
-            {/* Mobile Search */}
-            <div className="mb-4 md:hidden">
-              <div className="relative">
+        <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col animate-in slide-in-from-left duration-300">
+          {/* Mobile Menu Header */}
+          <div className="flex items-center justify-between p-4 border-b">
+            <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image
+                src="/logo.png"
+                alt="Pandey Computer"
+                width={120}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 text-foreground hover:bg-accent rounded-full transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4 space-y-4">
+              {/* Mobile Search */}
+              <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
+                  name="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for products..."
-                  className="w-full px-4 py-2.5 pl-10 border border-input rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-4 py-2.5 pl-10 pr-20 border border-input rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              </div>
-            </div>
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                </div>
 
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/"
-                  className={`block py-3 px-4 rounded-md transition-colors ${pathname === "/"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                    }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Home
-                </Link>
-              </li>
-
-              {/* Dynamic Mega Menu Categories */}
-              {topLevelItems.map((menu) => (
-                <li key={menu._id}>
-                  <Link
-                    href={`/shop?${menu.type}=${menu.slug}`}
-                    className={`block py-3 px-4 rounded-md transition-colors ${pathname.startsWith(`/shop`) && pathname.includes(`${menu.type}=${menu.slug}`)
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent"
-                      }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={clearSearch}
+                      className="p-1 hover:bg-accent rounded-full transition-colors"
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="p-1 hover:bg-accent rounded-full transition-colors text-primary"
                   >
-                    {menu.label}
-                  </Link>
-                </li>
-              ))}
+                    <CircleArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </form>
 
-              <li>
-                <Link
-                  href="/about"
-                  className={`block py-3 px-4 rounded-md transition-colors ${pathname === "/about"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                    }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className={`block py-3 px-4 rounded-md transition-colors ${pathname === "/contact"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                    }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
-          </nav>
+              {/* Navigation Links */}
+              <nav>
+                <ul className="space-y-1">
+                  <li>
+                    <Link
+                      href="/"
+                      className={`block py-3 px-4 text-sm rounded-md transition-colors ${pathname === "/"
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-foreground hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
+                  </li>
+
+                  {/* Dynamic Recursive Menu */}
+                  {topLevelItems.map((menu) => (
+                    <MobileMenuItem
+                      key={menu._id}
+                      item={menu}
+                      parentParams=""
+                      closeMenu={() => setIsMobileMenuOpen(false)}
+                    />
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </div>
         </div>
       )}
     </>
