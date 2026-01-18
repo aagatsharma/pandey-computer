@@ -86,7 +86,7 @@ export default function SubCategoriesPage() {
         const category = row.getValue("category") as ICategory;
         return (
           <div className="flex items-center space-x-2">
-            {category.logo ? (
+            {category?.logo ? (
               <Image
                 src={category.logo}
                 alt={category.name}
@@ -99,7 +99,7 @@ export default function SubCategoriesPage() {
                 No logo
               </div>
             )}
-            <span>{category.name}</span>
+            <span>{category?.name}</span>
           </div>
         );
       },

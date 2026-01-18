@@ -39,7 +39,7 @@ export function CategoriesCarousel({ categories }: CategoriesCarouselProps) {
               className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group"
             >
               <div className="relative w-24 h-24 mb-3">
-                {category.logo && (
+                {category?.logo && (
                   <Image
                     src={category.logo}
                     alt={category.name}
