@@ -45,11 +45,6 @@ export default async function Header() {
               Think. Innovate. Succeed.
             </div>
 
-            {/* Middle: Delivery Info */}
-            <div className="hidden lg:flex text-center font-medium">
-              Free Delivery All Over Nepal
-            </div>
-
             {/* Right: Contact Info */}
             <div className="flex items-center gap-4 max-lg:w-full justify-center">
               <Link

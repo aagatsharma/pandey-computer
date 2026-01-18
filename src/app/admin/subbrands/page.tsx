@@ -27,7 +27,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { RingLoader } from "react-spinners"
 import Loader from "@/components/loader";
 
 export default function SubBrandsPage() {
@@ -51,7 +50,7 @@ export default function SubBrandsPage() {
 
     if (!response.ok)
       throw new Error(
-        `Failed to ${formData.id ? "update" : "create"} subbrand`
+        `Failed to ${formData.id ? "update" : "create"} subbrand`,
       );
     mutate("/api/subbrands");
   };
@@ -87,7 +86,7 @@ export default function SubBrandsPage() {
         const brand = row.getValue("brand") as IBrand;
         return (
           <div className="flex items-center space-x-2">
-            {brand.logo ? (
+            {brand?.logo ? (
               <Image
                 src={brand.logo}
                 alt={brand.name}
@@ -100,7 +99,7 @@ export default function SubBrandsPage() {
                 No logo
               </div>
             )}
-            <span>{brand.name}</span>
+            <span>{brand?.name}</span>
           </div>
         );
       },
@@ -157,7 +156,11 @@ export default function SubBrandsPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading sub brands</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading sub brands
+      </div>
+    );
   }
 
   return (
@@ -202,7 +205,6 @@ export default function SubBrandsPage() {
       </AlertDialog>
 
       <DataTable columns={columns} data={subbrands} />
-
     </div>
   );
 }

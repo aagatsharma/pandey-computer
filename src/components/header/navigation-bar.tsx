@@ -3,7 +3,14 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Menu, X, ChevronDown, ChevronRight, CircleArrowRight } from "lucide-react";
+import {
+  Search,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronRight,
+  CircleArrowRight,
+} from "lucide-react";
 import CartIcon from "./cart-icon";
 
 interface NavbarItem {
@@ -25,7 +32,11 @@ interface MobileMenuItemProps {
   closeMenu: () => void;
 }
 
-const MobileMenuItem = ({ item, parentParams, closeMenu }: MobileMenuItemProps) => {
+const MobileMenuItem = ({
+  item,
+  parentParams,
+  closeMenu,
+}: MobileMenuItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
   const hasChildren = item.children && item.children.length > 0;
@@ -36,17 +47,19 @@ const MobileMenuItem = ({ item, parentParams, closeMenu }: MobileMenuItemProps) 
     : `${item.type}=${item.slug}`;
 
   const href = `/shop?${currentParams}`;
-  const isActive = pathname.startsWith("/shop") && pathname.includes(currentParams);
+  const isActive =
+    pathname.startsWith("/shop") && pathname.includes(currentParams);
 
   if (!hasChildren) {
     return (
       <li>
         <Link
           href={href}
-          className={`block py-3 px-4 text-sm rounded-md transition-colors ${isActive
-            ? "bg-primary/10 text-primary font-medium"
-            : "text-foreground hover:bg-accent hover:text-accent-foreground"
-            }`}
+          className={`block py-3 px-4 text-sm rounded-md transition-colors ${
+            isActive
+              ? "bg-primary/10 text-primary font-medium"
+              : "text-foreground hover:bg-accent hover:text-accent-foreground"
+          }`}
           onClick={closeMenu}
         >
           {item.label}
@@ -59,13 +72,14 @@ const MobileMenuItem = ({ item, parentParams, closeMenu }: MobileMenuItemProps) 
     <li>
       <div className="flex flex-col">
         <div
-          className={`flex items-center justify-between py-3 px-4 rounded-md transition-colors cursor-pointer ${isActive || isExpanded
-            ? "bg-accent/50"
-            : "hover:bg-accent"
-            }`}
+          className={`flex items-center justify-between py-3 px-4 rounded-md transition-colors cursor-pointer ${
+            isActive || isExpanded ? "bg-accent/50" : "hover:bg-accent"
+          }`}
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <span className={`text-sm ${isActive ? "text-primary font-medium" : "text-foreground"}`}>
+          <span
+            className={`text-sm ${isActive ? "text-primary font-medium" : "text-foreground"}`}
+          >
             {item.label}
           </span>
           <button
@@ -134,7 +148,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center flex-shrink-0">
+            <Link href="/" className="flex items-center shrink-0">
               <Image
                 src="/logo.png"
                 alt="Pandey Computer"
@@ -199,25 +213,17 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
 
       {/* Section 2: Navigation Menu (Desktop) */}
       <nav className="bg-primary text-white hidden lg:block">
-        <div className="max-w-7xl mx-auto px-4 relative">
+        <div className="max-w-7xl mx-auto relative">
           <div className="flex items-center h-12 gap-1">
             {topLevelItems.map((menu) => (
               <div key={menu._id} className="group">
                 {/* Top Level */}
                 <Link
                   href={`/shop?${menu.type}=${menu.slug}`}
-                  className="flex items-center h-12 px-3 hover:bg-primary/80 text-sm font-medium transition-colors whitespace-nowrap"
+                  className="flex items-center h-12 px-3 text-sm font-medium transition-colors whitespace-nowrap hover:bg-white hover:text-primary"
                 >
                   {menu.label}
-                  <svg
-                    className="ml-1 h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronDown className="ml-1 size-4 group-hover:rotate-180 transition-transform duration-300" />
                 </Link>
 
                 {/* Mega Menu Dropdown - Positioned relative to nav container */}
@@ -233,7 +239,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                       style={{
                         gridTemplateColumns: `repeat(${Math.min(
                           menu.children?.length || 0,
-                          5
+                          5,
                         )}, 1fr)`,
                       }}
                     >
@@ -278,7 +284,11 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
         <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col animate-in slide-in-from-left duration-300">
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-4 border-b">
-            <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link
+              href="/"
+              className="flex items-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               <Image
                 src="/logo.png"
                 alt="Pandey Computer"
@@ -338,10 +348,11 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                   <li>
                     <Link
                       href="/"
-                      className={`block py-3 px-4 text-sm rounded-md transition-colors ${pathname === "/"
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "text-foreground hover:bg-accent hover:text-accent-foreground"
-                        }`}
+                      className={`block py-3 px-4 text-sm rounded-md transition-colors ${
+                        pathname === "/"
+                          ? "bg-primary/10 text-primary font-medium"
+                          : "text-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Home
