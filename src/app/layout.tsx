@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 
+import { Toaster } from "sonner";
+import NextProgress from "@/components/top-loader";
+
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -29,8 +32,6 @@ export const metadata: Metadata = {
   ],
 };
 
-import { Toaster } from "sonner";
-
 // ... existing imports
 
 export default function RootLayout({
@@ -41,6 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
+        <NextProgress />
         {children}
         <Toaster richColors position="top-center" />
       </body>
