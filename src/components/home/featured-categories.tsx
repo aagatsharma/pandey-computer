@@ -11,7 +11,7 @@ async function getLatestProducts(): Promise<IProduct[]> {
   try {
     await dbConnect();
 
-    const products = await Product.find()
+    const products = await Product.find({ isFeatured: true })
       .populate("category")
       .populate("subCategory")
       .populate("brand")
@@ -27,7 +27,7 @@ async function getLatestProducts(): Promise<IProduct[]> {
   }
 }
 
-export default async function LatestProducts() {
+export default async function FeaturedCategories() {
   const products = await getLatestProducts();
 
   if (products.length === 0) {
@@ -38,7 +38,7 @@ export default async function LatestProducts() {
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-          Latest Products
+          Featured Products
         </h2>
         <Link
           href="/shop"

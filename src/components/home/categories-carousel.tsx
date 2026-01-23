@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
 } from "../ui/carousel";
 import { ICategory } from "@/lib/models/Category";
+import Autoplay from "embla-carousel-autoplay";
 
 interface CategoriesCarouselProps {
   categories: ICategory[];
@@ -26,6 +27,11 @@ export function CategoriesCarousel({ categories }: CategoriesCarouselProps) {
         align: "start",
         loop: true,
       }}
+      plugins={[
+        Autoplay({
+          delay: 3000,
+        }),
+      ]}
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">

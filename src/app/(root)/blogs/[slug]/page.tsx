@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 async function getItemDetails(slug: string) {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/blogs/${slug}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/blogs/${slug}`,
   );
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -22,7 +22,6 @@ export default async function BlogPage({
 
   const data = await getItemDetails(slug);
 
-  console.log("Blog data:", data);
   if (!data) {
     notFound();
   }

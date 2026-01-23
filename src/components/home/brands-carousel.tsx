@@ -10,6 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 interface BrandsCarouselProps {
   brands: IBrand[];
@@ -26,6 +27,11 @@ export function BrandsCarousel({ brands }: BrandsCarouselProps) {
         align: "start",
         loop: true,
       }}
+      plugins={[
+        Autoplay({
+          delay: 2000,
+        }),
+      ]}
       className="w-full"
     >
       <CarouselContent className="-ml-2 md:-ml-4">
