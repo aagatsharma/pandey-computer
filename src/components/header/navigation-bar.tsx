@@ -250,7 +250,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                             href={`/shop?${menu.type}=${menu.slug}&${section.type}=${section.slug}`}
                             className="block"
                           >
-                            <h4 className="text-red-600 font-semibold hover:text-red-700 transition-colors pb-2 text-base">
+                            <h4 className="text-black font-semibold hover:opacity-70 transition-colors pb-2 text-base">
                               {section.label}
                             </h4>
                           </Link>
