@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -50,9 +51,9 @@ export function ProductCard({ product }: { product: IProduct }) {
   };
 
   return (
-    <Link href={`/product/${slug}`} className="block">
-      <div className="group bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all">
-        {/* Image Container */}
+    <Link href={`/product/${slug}`} className="block h-full">
+      <div className="group bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all h-full flex flex-col">
+        {/* Image */}
         <div className="relative w-full aspect-4/3 overflow-hidden">
           <Image
             src={image}
@@ -60,7 +61,6 @@ export function ProductCard({ product }: { product: IProduct }) {
             fill
             className="object-contain transition-transform duration-300 group-hover:scale-105"
           />
-
           {discount > 0 && (
             <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
               -{discount}%
@@ -69,18 +69,19 @@ export function ProductCard({ product }: { product: IProduct }) {
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-1">
           <div className="text-xs text-muted-foreground uppercase mb-2">
             {category?.name || brand?.name || ""}
           </div>
 
-          <h3 className="font-semibold text-sm leading-tight line-clamp-2 mb-3 min-h-10 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 mb-3 group-hover:text-primary transition-colors">
             {name}
           </h3>
 
-          <div className="flex items-center justify-between">
+          {/* Bottom aligned */}
+          <div className="mt-auto flex items-center justify-between">
             <div>
-              <span className="text-xl font-bold text-foreground">
+              <span className="text-xl font-bold">
                 Rs.{price.toLocaleString()}
               </span>
               {originalPrice && (
@@ -95,7 +96,6 @@ export function ProductCard({ product }: { product: IProduct }) {
                 size="sm"
                 variant={isInCart ? "destructive" : "secondary"}
                 onClick={handleToggleCart}
-                className={isInCart ? "" : ""}
               >
                 {isInCart ? (
                   <X className="h-4 w-4" />
@@ -104,7 +104,7 @@ export function ProductCard({ product }: { product: IProduct }) {
                 )}
               </Button>
             ) : (
-              <Button size="sm" variant="secondary" disabled>
+              <Button size="sm" disabled>
                 Sold Out
               </Button>
             )}
