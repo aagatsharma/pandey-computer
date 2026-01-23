@@ -16,7 +16,7 @@ export async function GET() {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching Category:", error);
@@ -33,12 +33,12 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const { name, logo } = body;
+    const { name, logo, showInHomepage } = body;
 
     if (!name) {
       return NextResponse.json(
         { message: "Category name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -48,11 +48,12 @@ export async function POST(req: NextRequest) {
       name,
       slug,
       logo,
+      showInHomepage,
     });
 
     return NextResponse.json(
       { message: "Category created successfully", data: category },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -71,19 +72,19 @@ export async function PUT(req: NextRequest) {
     await dbConnect();
 
     const body = await req.json();
-    const { id, name, logo } = body;
+    const { id, name, logo, showInHomepage } = body;
 
     if (!id) {
       return NextResponse.json(
         { message: "Category ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!name) {
       return NextResponse.json(
         { message: "Category name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,20 +96,21 @@ export async function PUT(req: NextRequest) {
         name,
         slug,
         logo,
+        showInHomepage,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!category) {
       return NextResponse.json(
         { message: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Category updated successfully", data: category },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -117,7 +119,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -132,7 +134,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "Category ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -141,13 +143,13 @@ export async function DELETE(req: NextRequest) {
     if (!category) {
       return NextResponse.json(
         { message: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Category deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -156,7 +158,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

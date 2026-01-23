@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ICategory } from "@/lib/models/Category";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
   name: z
@@ -32,6 +33,7 @@ const formSchema = z.object({
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name cannot exceed 100 characters"),
   logo: z.string().optional(),
+  showInHomepage: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -43,6 +45,7 @@ interface CategoryModalFormProps {
     id?: string;
     name: string;
     logo: string;
+    showInHomepage?: boolean;
   }) => Promise<void>;
   editData?: ICategory | null;
 }
@@ -62,6 +65,7 @@ export default function CategoryModalForm({
     defaultValues: {
       name: "",
       logo: "",
+      showInHomepage: false,
     },
   });
 
@@ -70,6 +74,7 @@ export default function CategoryModalForm({
       form.reset({
         name: editData.name,
         logo: editData.logo || "",
+        showInHomepage: editData.showInHomepage || false,
       });
       setPreview(editData.logo || null);
       setImageInputType(editData.logo?.startsWith("data:") ? "upload" : "url");
@@ -77,6 +82,7 @@ export default function CategoryModalForm({
       form.reset({
         name: "",
         logo: "",
+        showInHomepage: false,
       });
       setPreview(null);
       setImageInputType("url");
@@ -101,6 +107,7 @@ export default function CategoryModalForm({
         id: editData?._id?.toString(),
         name: data.name,
         logo: imageUrl,
+        showInHomepage: data.showInHomepage,
       });
       form.reset();
       setPreview(null);
@@ -226,6 +233,26 @@ export default function CategoryModalForm({
                       )}
                     </div>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="showInHomepage"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      id="checkbox"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel htmlFor="checkbox" className="mb-0 cursor-pointer">
+                    Show in Homepage
+                  </FormLabel>
                   <FormMessage />
                 </FormItem>
               )}

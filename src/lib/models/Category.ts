@@ -4,6 +4,7 @@ export interface ICategory extends Document {
   name: string;
   slug: string;
   logo?: string;
+  showInHomepage?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,8 +27,12 @@ const CategorySchema = new Schema<ICategory>(
     logo: {
       type: String,
     },
+    showInHomepage: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.Category ||

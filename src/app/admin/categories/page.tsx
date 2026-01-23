@@ -39,6 +39,7 @@ export default function CategoriesPage() {
     id?: string;
     name: string;
     logo: string;
+    showInHomepage?: boolean;
   }) => {
     const method = formData.id ? "PUT" : "POST";
     const response = await fetch("/api/categories", {
@@ -49,7 +50,7 @@ export default function CategoriesPage() {
 
     if (!response.ok)
       throw new Error(
-        `Failed to ${formData.id ? "update" : "create"} category`
+        `Failed to ${formData.id ? "update" : "create"} category`,
       );
     mutate("/api/categories");
   };
@@ -108,6 +109,14 @@ export default function CategoriesPage() {
       header: "Slug",
     },
     {
+      accessorKey: "showInHomepage",
+      header: "Show in Homepage",
+      cell: ({ row }) => {
+        const showInHomepage = row.getValue("showInHomepage") as boolean;
+        return showInHomepage ? "Yes" : "No";
+      },
+    },
+    {
       accessorKey: "createdAt",
       header: "Created At",
       cell: ({ row }) => {
@@ -150,7 +159,11 @@ export default function CategoriesPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading categories</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading categories
+      </div>
+    );
   }
 
   return (
@@ -194,9 +207,7 @@ export default function CategoriesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-
       <DataTable columns={columns} data={categories} />
-
     </div>
   );
 }
