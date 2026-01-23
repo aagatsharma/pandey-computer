@@ -141,8 +141,8 @@ export default function ProductForm({
         "_id" in editData.category
           ? (editData.category as any)._id?.toString()
           : editData.category
-          ? String(editData.category)
-          : "";
+            ? String(editData.category)
+            : "";
 
       const subCategoryId =
         editData.subCategory &&
@@ -150,8 +150,8 @@ export default function ProductForm({
         "_id" in editData.subCategory
           ? (editData.subCategory as any)._id?.toString()
           : editData.subCategory
-          ? String(editData.subCategory)
-          : "";
+            ? String(editData.subCategory)
+            : "";
 
       const brandId =
         editData.brand &&
@@ -159,8 +159,8 @@ export default function ProductForm({
         "_id" in editData.brand
           ? (editData.brand as any)._id?.toString()
           : editData.brand
-          ? String(editData.brand)
-          : "";
+            ? String(editData.brand)
+            : "";
 
       const subBrandId =
         editData.subBrand &&
@@ -168,8 +168,8 @@ export default function ProductForm({
         "_id" in editData.subBrand
           ? (editData.subBrand as any)._id?.toString()
           : editData.subBrand
-          ? String(editData.subBrand)
-          : "";
+            ? String(editData.subBrand)
+            : "";
 
       setSpecs(specsArray);
       form.reset({
@@ -219,7 +219,7 @@ export default function ProductForm({
 
       if (data.images && data.images.length > 0) {
         const uploadPromises = Array.from(data.images as FileList).map(
-          (file: File) => imageToBase64(file)
+          (file: File) => imageToBase64(file),
         );
         imageUrls = await Promise.all(uploadPromises);
       }
@@ -330,11 +330,9 @@ export default function ProductForm({
                       type="number"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? parseFloat(e.target.value) : 0
-                        )
-                      }
+                      {...form.register("price", {
+                        setValueAs: (value: string) => parseFloat(value),
+                      })}
                     />
                   </FormControl>
                   <FormMessage />
@@ -353,11 +351,9 @@ export default function ProductForm({
                       type="number"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? parseFloat(e.target.value) : 0
-                        )
-                      }
+                      {...form.register("originalPrice", {
+                        setValueAs: (value: string) => parseFloat(value),
+                      })}
                     />
                   </FormControl>
                   <FormMessage />
@@ -377,11 +373,9 @@ export default function ProductForm({
                     type="number"
                     placeholder="0"
                     {...field}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? parseInt(e.target.value) : 0
-                      )
-                    }
+                    {...form.register("quantity", {
+                      setValueAs: (value: string) => parseFloat(value),
+                    })}
                   />
                 </FormControl>
                 <FormMessage />
@@ -414,7 +408,7 @@ export default function ProductForm({
                           <option key={category._id} value={category._id}>
                             {category.name}
                           </option>
-                        )
+                        ),
                       )}
                     </select>
                   </FormControl>
@@ -445,7 +439,7 @@ export default function ProductForm({
                           <option key={subCat._id} value={subCat._id}>
                             {subCat.name}
                           </option>
-                        )
+                        ),
                       )}
                     </select>
                   </FormControl>
@@ -509,7 +503,7 @@ export default function ProductForm({
                           <option key={subBrand._id} value={subBrand._id}>
                             {subBrand.name}
                           </option>
-                        )
+                        ),
                       )}
                     </select>
                   </FormControl>

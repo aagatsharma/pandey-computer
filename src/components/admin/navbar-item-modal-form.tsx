@@ -52,7 +52,7 @@ const formSchema = z
     {
       message: "Parent is required for Level 2 and Level 3",
       path: ["parent"],
-    }
+    },
   );
 
 type FormValues = z.infer<typeof formSchema>;
@@ -105,7 +105,7 @@ export function NavbarItemModalForm({
   // Fetch parent options (navbar items of lower level)
   const { data: parentItemsData } = useSWR(
     watchedLevel > 1 ? `/api/navbar-items?level=${watchedLevel - 1}` : null,
-    fetcher
+    fetcher,
   );
 
   const categories = categoriesData?.data || [];
@@ -114,14 +114,14 @@ export function NavbarItemModalForm({
   const subBrands = subBrandsData?.data || [];
   const parentItems = useMemo(
     () => parentItemsData?.data || [],
-    [parentItemsData]
+    [parentItemsData],
   );
 
   // Update selected parent item when parent changes
   useEffect(() => {
     if (watchedParent && parentItems.length > 0) {
       const parent = parentItems.find(
-        (item: INavbarItem) => item._id.toString() === watchedParent
+        (item: INavbarItem) => item._id.toString() === watchedParent,
       );
       setSelectedParentItem(parent || null);
     } else {
@@ -194,7 +194,7 @@ export function NavbarItemModalForm({
                 ? sub.category.toString()
                 : "");
             return categoryId === selectedParentItem.referenceId.toString();
-          }
+          },
         );
       }
 
@@ -208,7 +208,7 @@ export function NavbarItemModalForm({
                 ? sub.brand.toString()
                 : "");
             return brandId === selectedParentItem.referenceId.toString();
-          }
+          },
         );
       }
     }
@@ -461,7 +461,7 @@ export function NavbarItemModalForm({
                           <SelectItem key={item._id} value={item._id}>
                             {item.name}
                           </SelectItem>
-                        )
+                        ),
                       )}
                     </SelectContent>
                   </Select>
@@ -481,11 +481,9 @@ export function NavbarItemModalForm({
                       type="number"
                       placeholder="0"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? parseInt(e.target.value) : 0
-                        )
-                      }
+                      {...form.register("order", {
+                        setValueAs: (value: string) => parseFloat(value),
+                      })}
                     />
                   </FormControl>
                   <FormMessage />
