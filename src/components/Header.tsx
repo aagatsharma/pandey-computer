@@ -1,6 +1,8 @@
 import { MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import NavigationBar from "./header/navigation-bar";
+import NavbarItem from "@/lib/models/NavbarItem";
+import dbConnect from "@/lib/mongoose";
 
 interface NavbarItem {
   _id: string;
@@ -11,28 +13,39 @@ interface NavbarItem {
   children?: NavbarItem[];
 }
 
-async function getNavigationData(): Promise<NavbarItem[]> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/navbar-items?nested=true`, {
-      cache: "no-store",
-    });
+async function getNavbarItems() {
+  await dbConnect();
 
-    if (!res.ok) {
-      console.error("Failed to fetch navigation data");
-      return [];
+  const level1Items = await NavbarItem.find({ level: 1 })
+    .sort({ order: 1 })
+    .lean();
+
+  for (const item of level1Items) {
+    const level2Children = await NavbarItem.find({
+      parent: item._id,
+      level: 2,
+    })
+      .sort({ order: 1 })
+      .lean();
+
+    for (const child of level2Children) {
+      child.children = await NavbarItem.find({
+        parent: child._id,
+        level: 3,
+      })
+        .sort({ order: 1 })
+        .lean();
     }
 
-    const data = await res.json();
-    return data.data || [];
-  } catch (error) {
-    console.error("Error fetching navigation data:", error);
-    return [];
+    item.children = level2Children;
   }
+
+  return JSON.parse(JSON.stringify(level1Items));
 }
 
 export default async function Header() {
-  const navigationData = await getNavigationData();
+  const navigationData = await getNavbarItems();
+  console.log("Navigation Data:", navigationData);
 
   return (
     <header className="w-full bg-background sticky top-0 z-50 shadow-sm">

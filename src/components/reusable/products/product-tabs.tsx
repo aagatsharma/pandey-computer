@@ -3,38 +3,19 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProductTabsProps {
-  description: string;
-  fullDescription?: string;
   specs?: string[];
   features?: string[];
 }
 
-export function ProductTabs({
-  description,
-  fullDescription,
-  specs = [],
-  features = [],
-}: ProductTabsProps) {
+export function ProductTabs({ specs = [], features = [] }: ProductTabsProps) {
   return (
-    <Tabs defaultValue="description" className="w-full">
+    <Tabs defaultValue="specifications" className="w-full">
       <TabsList className="w-full justify-start">
-        <TabsTrigger value="description">Description</TabsTrigger>
         <TabsTrigger value="specifications">Specifications</TabsTrigger>
         {features.length > 0 && (
           <TabsTrigger value="features">Features</TabsTrigger>
         )}
       </TabsList>
-
-      <TabsContent value="description" className="space-y-4 py-6">
-        <div className="prose prose-gray dark:prose-invert max-w-none">
-          <p className="text-lg text-muted-foreground">{description}</p>
-          {fullDescription && (
-            <div className="mt-4 text-muted-foreground whitespace-pre-line">
-              {fullDescription}
-            </div>
-          )}
-        </div>
-      </TabsContent>
 
       <TabsContent value="specifications" className="py-6">
         <div className="grid gap-4">

@@ -11,11 +11,10 @@ import { ISubBrand } from "./SubBrand";
 export interface IProduct extends Document {
   name: string;
   slug: string;
-  shortDescription: string;
-  fullDescription: string;
   price: number;
   originalPrice?: number;
   specs?: Record<string, string>;
+  keyFeatures?: string[];
   features?: string[];
 
   category?: ICategory;
@@ -29,6 +28,8 @@ export interface IProduct extends Document {
   // Status
   quantity: number;
   isFeatured: boolean;
+  hotDeals?: boolean;
+  topSelling?: boolean;
 
   createdAt: Date;
   updatedAt: Date;
@@ -48,15 +49,6 @@ const ProductSchema = new Schema<IProduct>(
       lowercase: true,
       trim: true,
     },
-    shortDescription: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    fullDescription: {
-      type: String,
-      required: true,
-    },
     price: {
       type: Number,
       required: true,
@@ -69,6 +61,10 @@ const ProductSchema = new Schema<IProduct>(
     specs: {
       type: Map,
       of: String,
+    },
+    keyFeatures: {
+      type: [String],
+      default: [],
     },
     features: {
       type: [String],
@@ -108,8 +104,16 @@ const ProductSchema = new Schema<IProduct>(
       type: Boolean,
       default: false,
     },
+    hotDeals: {
+      type: Boolean,
+      default: false,
+    },
+    topSelling: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.Product ||

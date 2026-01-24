@@ -8,6 +8,8 @@ import { ProductActions } from "@/components/reusable/products/product-actions";
 import { IProduct } from "@/lib/models/Product";
 import dbConnect from "@/lib/mongoose";
 import Product from "@/lib/models/Product";
+import { Types } from "mongoose";
+import { GoDotFill } from "react-icons/go";
 
 async function getProduct(slug: string) {
   try {
@@ -33,8 +35,8 @@ async function getProduct(slug: string) {
 }
 
 async function getRelatedProducts(
-  categoryId: string,
-  currentProductId: string
+  categoryId: string | Types.ObjectId,
+  currentProductId: string | Types.ObjectId,
 ) {
   try {
     await dbConnect();
@@ -71,11 +73,8 @@ export async function generateMetadata({
 
   return {
     title: `${product.name} | Pandey Computer`,
-    description:
-      product.shortDescription || product.fullDescription?.substring(0, 160),
     openGraph: {
       title: product.name,
-      description: product.shortDescription,
       images:
         product.images && product.images.length > 0 ? [product.images[0]] : [],
     },
@@ -95,16 +94,13 @@ export default async function ProductPage({
   }
 
   const relatedProducts = product.category
-    ? await getRelatedProducts(
-      (product.category as any)._id,
-      product._id.toString()
-    )
+    ? await getRelatedProducts(product?.category?._id, product._id.toString())
     : [];
 
   const discount = product.originalPrice
     ? Math.round(
-      ((product.originalPrice - product.price) / product.originalPrice) * 100
-    )
+        ((product.originalPrice - product.price) / product.originalPrice) * 100,
+      )
     : 0;
 
   // Convert specs object to array format
@@ -168,8 +164,8 @@ export default async function ProductPage({
               {[
                 product.category?.name,
                 product.brand?.name ||
-                product.subBrand?.name ||
-                product.subCategory?.name,
+                  product.subBrand?.name ||
+                  product.subCategory?.name,
               ]
                 .filter(Boolean)
                 .join(" > ")}
@@ -177,9 +173,6 @@ export default async function ProductPage({
             <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               {product.name}
             </h1>
-            <p className="text-lg text-muted-foreground mb-6">
-              {product.shortDescription}
-            </p>
 
             {/* Price */}
             <div className="flex items-baseline flex-wrap gap-4 mb-8">
@@ -215,17 +208,28 @@ export default async function ProductPage({
             </div>
 
             <ProductActions product={product} />
+
+            <div className="text-lg text-muted-foreground my-6">
+              {product.keyFeatures && product?.keyFeatures?.length > 0 && (
+                <>
+                  <h3 className="text-black font-semibold">Key Features</h3>
+                  {product?.keyFeatures?.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-3 mt-2">
+                      <div className="mt-1 text-primary">
+                        <GoDotFill className="size-5" />
+                      </div>
+                      <p className="text-muted-foreground">{feature}</p>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Product Tabs */}
         <div className="mt-16">
-          <ProductTabs
-            description={product.shortDescription}
-            fullDescription={product.fullDescription}
-            specs={specsArray}
-            features={product.features || []}
-          />
+          <ProductTabs specs={specsArray} features={product.features || []} />
         </div>
 
         {/* Related Products */}

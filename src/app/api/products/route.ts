@@ -77,7 +77,7 @@ export async function GET(req: Request) {
 
     if (subBrandSlug) {
       const subBrandDoc = await SubBrand.findOne({ slug: subBrandSlug }).select(
-        "_id"
+        "_id",
       );
       if (subBrandDoc) filter.subBrand = subBrandDoc._id;
     }
@@ -125,7 +125,7 @@ export async function GET(req: Request) {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -144,8 +144,7 @@ export async function POST(req: NextRequest) {
 
     const {
       name,
-      shortDescription,
-      fullDescription,
+      keyFeatures,
       price,
       originalPrice,
       specs,
@@ -157,33 +156,21 @@ export async function POST(req: NextRequest) {
       images,
       quantity,
       isFeatured,
+      hotDeals,
+      topSelling,
     } = body;
 
     if (!name) {
       return NextResponse.json(
         { message: "Product name is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!shortDescription) {
-      return NextResponse.json(
-        { message: "Short description is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!fullDescription) {
-      return NextResponse.json(
-        { message: "Full description is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (price === undefined || price === null) {
       return NextResponse.json(
         { message: "Product price is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -192,8 +179,7 @@ export async function POST(req: NextRequest) {
     const product = await Product.create({
       name,
       slug,
-      shortDescription,
-      fullDescription,
+      keyFeatures: keyFeatures || [],
       price,
       originalPrice: originalPrice || undefined,
       specs: specs || undefined,
@@ -205,11 +191,13 @@ export async function POST(req: NextRequest) {
       images: images || [],
       quantity: quantity || 0,
       isFeatured: isFeatured || false,
+      hotDeals: hotDeals || false,
+      topSelling: topSelling || false,
     });
 
     return NextResponse.json(
       { message: "Product created successfully", data: product },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -218,7 +206,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -231,8 +219,7 @@ export async function PUT(req: NextRequest) {
     const {
       id,
       name,
-      shortDescription,
-      fullDescription,
+      keyFeatures,
       price,
       originalPrice,
       specs,
@@ -244,40 +231,28 @@ export async function PUT(req: NextRequest) {
       images,
       quantity,
       isFeatured,
+      hotDeals,
+      topSelling,
     } = body;
 
     if (!id) {
       return NextResponse.json(
         { message: "Product ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!name) {
       return NextResponse.json(
         { message: "Product name is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!shortDescription) {
-      return NextResponse.json(
-        { message: "Short description is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!fullDescription) {
-      return NextResponse.json(
-        { message: "Full description is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (price === undefined || price === null) {
       return NextResponse.json(
         { message: "Product price is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -288,8 +263,7 @@ export async function PUT(req: NextRequest) {
       {
         name,
         slug,
-        shortDescription,
-        fullDescription,
+        keyFeatures: keyFeatures || [],
         price,
         originalPrice: originalPrice || undefined,
         specs: specs || undefined,
@@ -301,20 +275,22 @@ export async function PUT(req: NextRequest) {
         images: images || [],
         quantity: quantity || 0,
         isFeatured: isFeatured || false,
+        hotDeals: hotDeals || false,
+        topSelling: topSelling || false,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!product) {
       return NextResponse.json(
         { message: "Product not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Product updated successfully", data: product },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -323,7 +299,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -338,7 +314,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "Product ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -347,13 +323,13 @@ export async function DELETE(req: NextRequest) {
     if (!product) {
       return NextResponse.json(
         { message: "Product not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "Product deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -362,7 +338,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

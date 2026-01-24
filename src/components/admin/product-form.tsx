@@ -27,13 +27,7 @@ const formSchema = z.object({
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(200, "Name cannot exceed 200 characters"),
-  shortDescription: z
-    .string()
-    .min(10, "Short description must be at least 10 characters")
-    .max(500, "Short description cannot exceed 500 characters"),
-  fullDescription: z
-    .string()
-    .min(20, "Full description must be at least 20 characters"),
+  keyFeatures: z.string().optional(),
   price: z.number().min(0, "Price must be positive"),
   originalPrice: z
     .number()
@@ -46,6 +40,8 @@ const formSchema = z.object({
   subBrand: z.string().optional(),
   images: z.any().optional(),
   isFeatured: z.boolean().optional(),
+  hotDeals: z.boolean().optional(),
+  topSelling: z.boolean().optional(),
   specs: z.string().optional(),
   features: z.string().optional(),
 });
@@ -55,8 +51,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface ProductFormProps {
   onSubmit: (data: {
     name: string;
-    shortDescription: string;
-    fullDescription: string;
+    keyFeatures?: string[];
     price: number;
     originalPrice?: number;
     quantity?: number;
@@ -66,6 +61,8 @@ interface ProductFormProps {
     subBrand?: string;
     images: string[];
     isFeatured: boolean;
+    hotDeals?: boolean;
+    topSelling?: boolean;
     specs?: Record<string, string>;
     features?: string[];
   }) => Promise<void>;
@@ -95,8 +92,7 @@ export default function ProductForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      shortDescription: "",
-      fullDescription: "",
+      keyFeatures: "",
       price: 0,
       originalPrice: 0,
       quantity: 0,
@@ -106,6 +102,8 @@ export default function ProductForm({
       subBrand: "",
       images: undefined,
       isFeatured: false,
+      hotDeals: false,
+      topSelling: false,
       specs: "",
       features: "",
     },
@@ -174,8 +172,7 @@ export default function ProductForm({
       setSpecs(specsArray);
       form.reset({
         name: editData.name,
-        shortDescription: editData.shortDescription,
-        fullDescription: editData.fullDescription,
+        keyFeatures: editData.keyFeatures?.join("\n") || "",
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
         quantity: editData.quantity || 0,
@@ -184,6 +181,8 @@ export default function ProductForm({
         brand: brandId,
         subBrand: subBrandId,
         isFeatured: editData.isFeatured || false,
+        hotDeals: editData.hotDeals || false,
+        topSelling: editData.topSelling || false,
         specs: "",
         features: featuresString,
         images: undefined,
@@ -193,8 +192,7 @@ export default function ProductForm({
       setSpecs([{ key: "", value: "" }]);
       form.reset({
         name: "",
-        shortDescription: "",
-        fullDescription: "",
+        keyFeatures: "",
         price: 0,
         originalPrice: 0,
         quantity: 0,
@@ -205,6 +203,8 @@ export default function ProductForm({
         subBrand: "",
         images: undefined,
         isFeatured: false,
+        hotDeals: false,
+        topSelling: false,
         specs: "",
         features: "",
       });
@@ -242,8 +242,12 @@ export default function ProductForm({
 
       await onSubmit({
         name: data.name,
-        shortDescription: data.shortDescription,
-        fullDescription: data.fullDescription,
+        keyFeatures: data.keyFeatures
+          ? data.keyFeatures
+              .split("\n")
+              .map((f) => f.trim())
+              .filter((f) => f.length > 0)
+          : [],
         price: data.price,
         originalPrice: data.originalPrice || undefined,
         quantity: data.quantity || 0,
@@ -253,6 +257,8 @@ export default function ProductForm({
         subBrand: data.subBrand || undefined,
         images: imageUrls,
         isFeatured: data.isFeatured || false,
+        hotDeals: data.hotDeals || false,
+        topSelling: data.topSelling || false,
         specs: Object.keys(specsObject).length > 0 ? specsObject : undefined,
         features: features.length > 0 ? features : undefined,
       });
@@ -288,28 +294,14 @@ export default function ProductForm({
 
           <FormField
             control={form.control}
-            name="shortDescription"
+            name="keyFeatures"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Short Description</FormLabel>
-                <FormControl>
-                  <Input placeholder="Brief product summary" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fullDescription"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Description</FormLabel>
+                <FormLabel>Key Features (One per line)</FormLabel>
                 <FormControl>
                   <textarea
-                    placeholder="Complete product description"
-                    className="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+                    placeholder="Fast processing&#10;Large storage&#10;High quality display"
+                    className="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                     {...field}
                   />
                 </FormControl>
@@ -659,6 +651,42 @@ export default function ProductForm({
                   />
                 </FormControl>
                 <FormLabel className="mt-0!">Featured Product</FormLabel>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="hotDeals"
+            render={({ field }) => (
+              <FormItem className="flex items-center space-x-2">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={field.onChange}
+                    className="h-4 w-4"
+                  />
+                </FormControl>
+                <FormLabel className="mt-0!">Hot Deals</FormLabel>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="topSelling"
+            render={({ field }) => (
+              <FormItem className="flex items-center space-x-2">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={field.onChange}
+                    className="h-4 w-4"
+                  />
+                </FormControl>
+                <FormLabel className="mt-0!">Top Selling</FormLabel>
               </FormItem>
             )}
           />

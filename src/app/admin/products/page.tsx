@@ -27,6 +27,8 @@ import { IProduct } from "@/lib/models/Product";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Loader from "@/components/loader";
+import { IBrand } from "@/lib/models/Brand";
+import { ICategory } from "@/lib/models/Category";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -83,14 +85,6 @@ export default function ProductsPage() {
       header: "Name",
     },
     {
-      accessorKey: "shortDescription",
-      header: "Description",
-      cell: ({ row }) => {
-        const desc = row.getValue("shortDescription") as string;
-        return <div className="max-w-md truncate">{desc}</div>;
-      },
-    },
-    {
       accessorKey: "price",
       header: "Price",
       cell: ({ row }) => {
@@ -125,7 +119,7 @@ export default function ProductsPage() {
       accessorKey: "category",
       header: "Category",
       cell: ({ row }) => {
-        const category = row.getValue("category") as { name: string } | null;
+        const category = row.getValue("category") as ICategory | null;
         return <div>{category?.name || "-"}</div>;
       },
     },
@@ -133,8 +127,20 @@ export default function ProductsPage() {
       accessorKey: "brand",
       header: "Brand",
       cell: ({ row }) => {
-        const brand = row.getValue("brand") as { name: string } | null;
-        return <div>{brand?.name || "-"}</div>;
+        const brand = row.getValue("brand") as IBrand | null;
+        return (
+          <div className="flex flex-col gap-2 items-center">
+            {brand?.logo && (
+              <Image
+                src={brand?.logo}
+                height={60}
+                width={60}
+                alt={brand?.name || "Brand logo"}
+              />
+            )}
+            {brand?.name || "-"}
+          </div>
+        );
       },
     },
     {
@@ -191,7 +197,11 @@ export default function ProductsPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading products</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading products
+      </div>
+    );
   }
 
   return (

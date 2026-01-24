@@ -34,13 +34,7 @@ const formSchema = z.object({
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(200, "Name cannot exceed 200 characters"),
-  shortDescription: z
-    .string()
-    .min(10, "Short description must be at least 10 characters")
-    .max(500, "Short description cannot exceed 500 characters"),
-  fullDescription: z
-    .string()
-    .min(20, "Full description must be at least 20 characters"),
+  keyFeatures: z.string().optional(),
   price: z.number().min(0, "Price must be positive"),
   originalPrice: z
     .number()
@@ -65,9 +59,8 @@ interface ProductModalFormProps {
   onSubmit: (data: {
     id?: string;
     name: string;
-    shortDescription: string;
-    fullDescription: string;
     price: number;
+    keyFeatures?: string[];
     originalPrice?: number;
     quantity?: number;
     category?: string;
@@ -105,8 +98,7 @@ export default function ProductModalForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      shortDescription: "",
-      fullDescription: "",
+      keyFeatures: "",
       price: 0,
       originalPrice: 0,
       quantity: 0,
@@ -184,8 +176,7 @@ export default function ProductModalForm({
       setSpecs(specsArray);
       form.reset({
         name: editData.name,
-        shortDescription: editData.shortDescription,
-        fullDescription: editData.fullDescription,
+        keyFeatures: editData.keyFeatures?.join("\n") || "",
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
         quantity: editData.quantity || 0,
@@ -203,8 +194,7 @@ export default function ProductModalForm({
       setSpecs([{ key: "", value: "" }]);
       form.reset({
         name: "",
-        shortDescription: "",
-        fullDescription: "",
+        keyFeatures: "",
         price: 0,
         originalPrice: 0,
         quantity: 0,
@@ -253,8 +243,12 @@ export default function ProductModalForm({
       await onSubmit({
         id: editData?._id?.toString(),
         name: data.name,
-        shortDescription: data.shortDescription,
-        fullDescription: data.fullDescription,
+        keyFeatures: data.keyFeatures
+          ? data.keyFeatures
+              .split("\n")
+              .map((f) => f.trim())
+              .filter((f) => f.length > 0)
+          : [],
         price: data.price,
         originalPrice: data.originalPrice || undefined,
         quantity: data.quantity || 0,
@@ -310,28 +304,14 @@ export default function ProductModalForm({
 
             <FormField
               control={form.control}
-              name="shortDescription"
+              name="keyFeatures"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Short Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Brief product summary" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="fullDescription"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Description</FormLabel>
+                  <FormLabel>Key Features (One per line)</FormLabel>
                   <FormControl>
                     <textarea
-                      placeholder="Complete product description"
-                      className="flex min-h-[120px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+                      placeholder="Fast processing&#10;Large storage&#10;High quality display"
+                      className="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                       {...field}
                     />
                   </FormControl>

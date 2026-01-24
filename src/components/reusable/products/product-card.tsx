@@ -74,7 +74,7 @@ export function ProductCard({ product }: { product: IProduct }) {
             {category?.name || brand?.name || ""}
           </div>
 
-          <h3 className="font-semibold text-sm leading-tight line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-sm leading-tight line-clamp-3 mb-3 group-hover:text-primary transition-colors">
             {name}
           </h3>
 

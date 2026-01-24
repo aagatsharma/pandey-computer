@@ -8,8 +8,7 @@ export default function AddProductPage() {
 
   const handleSubmit = async (formData: {
     name: string;
-    shortDescription: string;
-    fullDescription: string;
+    keyFeatures?: string[];
     price: number;
     originalPrice?: number;
     quantity?: number;
@@ -19,6 +18,8 @@ export default function AddProductPage() {
     subBrand?: string;
     images: string[];
     isFeatured: boolean;
+    hotDeals?: boolean;
+    topSelling?: boolean;
     specs?: Record<string, string>;
     features?: string[];
   }) => {

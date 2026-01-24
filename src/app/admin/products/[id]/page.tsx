@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { use } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import ProductForm from "@/components/admin/product-form";
@@ -17,8 +16,7 @@ export default function EditProductPage() {
 
   const handleSubmit = async (formData: {
     name: string;
-    shortDescription: string;
-    fullDescription: string;
+    keyFeatures?: string[];
     price: number;
     originalPrice?: number;
     quantity?: number;
@@ -28,6 +26,8 @@ export default function EditProductPage() {
     subBrand?: string;
     images: string[];
     isFeatured: boolean;
+    hotDeals?: boolean;
+    topSelling?: boolean;
     specs?: Record<string, string>;
     features?: string[];
   }) => {
@@ -54,10 +54,12 @@ export default function EditProductPage() {
   }
 
   if (!product) {
-    return <div className="text-center py-12 text-red-500">Error loading product</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading product
+      </div>
+    );
   }
-
-
 
   return (
     <div>
