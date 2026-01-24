@@ -48,7 +48,7 @@ export default async function Header() {
   console.log("Navigation Data:", navigationData);
 
   return (
-    <header className="w-full bg-background sticky top-0 z-50 shadow-sm">
+    <header className="w-full bg-muted sticky top-0 z-50 shadow-sm">
       {/* Top Info Bar */}
       <div className="border-b">
         <div className="container mx-auto px-4">

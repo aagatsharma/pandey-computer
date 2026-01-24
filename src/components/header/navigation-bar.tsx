@@ -281,7 +281,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col animate-in slide-in-from-left duration-300">
+        <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col animate-in slide-in-from-right duration-300">
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <Link

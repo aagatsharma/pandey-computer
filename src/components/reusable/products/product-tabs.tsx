@@ -1,74 +1,111 @@
+// "use client";
+
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// interface ProductTabsProps {
+//   specs?: string[];
+//   features?: string[];
+// }
+
+// export function ProductTabs({ specs = [], features = [] }: ProductTabsProps) {
+//   return (
+//     <Tabs defaultValue="specifications" className="w-full">
+//       <TabsList className="w-full justify-start">
+//         <TabsTrigger value="specifications">Specifications</TabsTrigger>
+//         {features.length > 0 && (
+//           <TabsTrigger value="features">Features</TabsTrigger>
+//         )}
+//       </TabsList>
+
+//       <TabsContent value="specifications" className="py-6">
+//         <div className="grid gap-4">
+//           {specs.length > 0 ? (
+//             specs.map((spec, index) => {
+//               const [label, ...valueParts] = spec.split(":");
+//               const value = valueParts.join(":");
+//               return (
+//                 <div
+//                   key={index}
+//                   className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-3 border-b border-border last:border-0"
+//                 >
+//                   <div className="font-semibold text-foreground">{label}</div>
+//                   <div className="sm:col-span-2 text-muted-foreground">
+//                     {value || label}
+//                   </div>
+//                 </div>
+//               );
+//             })
+//           ) : (
+//             <p className="text-muted-foreground">
+//               No specifications available.
+//             </p>
+//           )}
+//         </div>
+//       </TabsContent>
+
+//       {features.length > 0 && (
+//         <TabsContent value="features" className="py-6">
+//           <div className="grid gap-4">
+//             {features.map((feature, index) => (
+//               <div key={index} className="flex items-start gap-3">
+//                 <div className="mt-1 text-primary">
+//                   <svg
+//                     className="w-5 h-5"
+//                     fill="none"
+//                     stroke="currentColor"
+//                     viewBox="0 0 24 24"
+//                   >
+//                     <path
+//                       strokeLinecap="round"
+//                       strokeLinejoin="round"
+//                       strokeWidth={2}
+//                       d="M5 13l4 4L19 7"
+//                     />
+//                   </svg>
+//                 </div>
+//                 <p className="text-muted-foreground">{feature}</p>
+//               </div>
+//             ))}
+//           </div>
+//         </TabsContent>
+//       )}
+//     </Tabs>
+//   );
+// }
+
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-interface ProductTabsProps {
+interface ProductSpecsProps {
   specs?: string[];
-  features?: string[];
 }
 
-export function ProductTabs({ specs = [], features = [] }: ProductTabsProps) {
+export function ProductSpecs({ specs = [] }: ProductSpecsProps) {
   return (
-    <Tabs defaultValue="specifications" className="w-full">
-      <TabsList className="w-full justify-start">
-        <TabsTrigger value="specifications">Specifications</TabsTrigger>
-        {features.length > 0 && (
-          <TabsTrigger value="features">Features</TabsTrigger>
-        )}
-      </TabsList>
+    <section className="w-full">
+      <h2 className="text-lg font-semibold mb-4">Specifications</h2>
 
-      <TabsContent value="specifications" className="py-6">
-        <div className="grid gap-4">
-          {specs.length > 0 ? (
-            specs.map((spec, index) => {
-              const [label, ...valueParts] = spec.split(":");
-              const value = valueParts.join(":");
-              return (
-                <div
-                  key={index}
-                  className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-3 border-b border-border last:border-0"
-                >
-                  <div className="font-semibold text-foreground">{label}</div>
-                  <div className="sm:col-span-2 text-muted-foreground">
-                    {value || label}
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <p className="text-muted-foreground">
-              No specifications available.
-            </p>
-          )}
-        </div>
-      </TabsContent>
+      <div className="grid gap-4">
+        {specs.length > 0 ? (
+          specs.map((spec, index) => {
+            const [label, ...valueParts] = spec.split(":");
+            const value = valueParts.join(":").trim();
 
-      {features.length > 0 && (
-        <TabsContent value="features" className="py-6">
-          <div className="grid gap-4">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <div className="mt-1 text-primary">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+            return (
+              <div
+                key={index}
+                className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-3 border-b border-border last:border-0"
+              >
+                <div className="font-semibold text-foreground">{label}</div>
+                <div className="sm:col-span-2 text-muted-foreground">
+                  {value || label}
                 </div>
-                <p className="text-muted-foreground">{feature}</p>
               </div>
-            ))}
-          </div>
-        </TabsContent>
-      )}
-    </Tabs>
+            );
+          })
+        ) : (
+          <p className="text-muted-foreground">No specifications available.</p>
+        )}
+      </div>
+    </section>
   );
 }

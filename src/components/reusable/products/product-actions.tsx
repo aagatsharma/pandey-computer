@@ -58,7 +58,13 @@ export function ProductActions({ product }: ProductActionsProps) {
   };
 
   const getButtonConfig = () => {
-    if (!inStock) return { text: "Out of Stock", icon: ShoppingCart, variant: "default" as const, disabled: true };
+    if (!inStock)
+      return {
+        text: "Out of Stock",
+        icon: ShoppingCart,
+        variant: "default" as const,
+        disabled: true,
+      };
 
     if (isInCart) {
       if (quantity !== cartQuantity) {
@@ -66,14 +72,14 @@ export function ProductActions({ product }: ProductActionsProps) {
           text: `Update Cart - Rs.${(price * quantity).toLocaleString()}`,
           icon: RefreshCw,
           variant: "default" as const,
-          disabled: false
+          disabled: false,
         };
       }
       return {
         text: "Remove from Cart",
         icon: Trash2,
         variant: "default" as const,
-        disabled: false
+        disabled: false,
       };
     }
 
@@ -81,7 +87,7 @@ export function ProductActions({ product }: ProductActionsProps) {
       text: `Add to Cart - Rs.${(price * quantity).toLocaleString()}`,
       icon: ShoppingCart,
       variant: "default" as const,
-      disabled: false
+      disabled: false,
     };
   };
 
@@ -118,11 +124,13 @@ export function ProductActions({ product }: ProductActionsProps) {
         </div>
       )}
 
+      <p className="my-4 text-gray-500">**Price is inclusive of VAT**</p>
+
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4">
         <Button
           size="lg"
-          className="flex-1 text-base"
+          className="text-base w-full"
           disabled={buttonConfig.disabled}
           onClick={handleAction}
           variant={buttonConfig.variant}

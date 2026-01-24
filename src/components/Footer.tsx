@@ -7,66 +7,67 @@ import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="bg-secondary text-white relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 bg-grid-zinc-800/[0.04] bg-size-[20px_20px]" />
-      <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-primary to-transparent" />
-
+    <footer className="bg-muted relative overflow-hidden text-black">
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
           <div className="space-y-6">
-            <div>
-              <div className="bg-white rounded-lg p-3 inline-block mb-4">
-                <Image
-                  src="/logo.png"
-                  alt="Pandey Computer"
-                  width={180}
-                  height={60}
-                  className="h-10 w-auto"
-                />
-              </div>
-              <p className="text-sm text-zinc-400 leading-relaxed">
+            <div className="space-y-4">
+              <Image
+                src="/logo.png"
+                alt="Pandey Computer"
+                width={180}
+                height={60}
+                className="h-10 w-auto"
+              />
+              <p className="text-sm leading-relaxed">
                 Your trusted partner for the latest computer products and
                 technology solutions.
               </p>
             </div>
             <div>
-              <h5 className="text-sm font-semibold mb-3 text-zinc-300">
-                Follow Us
-              </h5>
+              <h5 className="text-sm font-semibold mb-3">Follow Us</h5>
               <div className="flex gap-3">
+                {/* Facebook */}
                 <Link
                   href="https://www.facebook.com/profile.php?id=61567056315599"
-                  className="group bg-zinc-800 hover:bg-primary p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/50"
-                  aria-label="Facebook"
                   target="_blank"
+                  aria-label="Facebook"
+                  className="group bg-[#1877F2] p-2.5 rounded-full transition-all duration-300
+                 hover:scale-110 hover:shadow-lg hover:shadow-[#1877F2]/50"
                 >
                   <FaFacebook
                     size={18}
-                    className="group-hover:scale-110 transition-transform"
+                    className="text-white transition-transform group-hover:scale-110"
                   />
                 </Link>
+
+                {/* Instagram */}
                 <Link
                   href="https://www.instagram.com/pandey.computer/"
                   target="_blank"
-                  className="group bg-zinc-800 hover:bg-primary p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/50"
                   aria-label="Instagram"
+                  className="group p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg
+                 bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#515BD4]
+                 hover:shadow-[#DD2A7B]/50"
                 >
                   <FaInstagram
                     size={18}
-                    className="group-hover:scale-110 transition-transform"
+                    className="text-white transition-transform group-hover:scale-110"
                   />
                 </Link>
+
+                {/* WhatsApp */}
                 <Link
                   href="https://api.whatsapp.com/send?phone=9779802803711"
                   target="_blank"
-                  className="group bg-zinc-800 hover:bg-primary p-2.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-primary/50"
-                  aria-label="Instagram"
+                  aria-label="WhatsApp"
+                  className="group bg-[#25D366] p-2.5 rounded-full transition-all duration-300
+                 hover:scale-110 hover:shadow-lg hover:shadow-[#25D366]/50"
                 >
                   <FaWhatsapp
                     size={18}
-                    className="group-hover:scale-110 transition-transform"
+                    className="text-white transition-transform group-hover:scale-110"
                   />
                 </Link>
               </div>
@@ -90,7 +91,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="group text-zinc-400 hover:text-white transition-all duration-300 flex items-center gap-2"
+                    className="group hover:text-primary transition-all duration-300 flex items-center gap-2"
                   >
                     <ChevronRight
                       size={16}
@@ -105,37 +106,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Categories */}
-          {/* <div>
-            <h4 className="text-lg font-semibold mb-6 relative inline-block">
-              Categories
-              <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-primary rounded-full" />
-            </h4>
-            <ul className="space-y-3">
-              {[
-                { href: "/category/laptops", label: "Laptops" },
-                { href: "/category/desktops", label: "Desktops" },
-                { href: "/category/accessories", label: "Accessories" },
-                { href: "/category/components", label: "Components" },
-              ].map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="group text-zinc-400 hover:text-white transition-all duration-300 flex items-center gap-2"
-                  >
-                    <ChevronRight
-                      size={16}
-                      className="group-hover:translate-x-1 transition-transform"
-                    />
-                    <span className="group-hover:translate-x-1 transition-transform">
-                      {link.label}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div> */}
-
           {/* Contact & Map */}
           <div>
             <h4 className="text-lg font-semibold mb-6 relative inline-block">
@@ -148,8 +118,11 @@ export default function Footer() {
                   size={20}
                   className="text-primary mt-0.5 shrink-0 group-hover:scale-110 transition-transform"
                 />
-                <Link href="https://maps.app.goo.gl/QVgnB6DGFTp8SfQB8" target="_blank">
-                  <p className="text-sm text-zinc-400">Newroad , Pokhara</p>
+                <Link
+                  href="https://maps.app.goo.gl/QVgnB6DGFTp8SfQB8"
+                  target="_blank"
+                >
+                  <p className="text-sm ">Newroad , Pokhara</p>
                 </Link>
               </div>
               <div className="flex items-start gap-3 group">
@@ -160,7 +133,7 @@ export default function Footer() {
                 <div>
                   <a
                     href="mailto:pandeycomputer7@gmail.com"
-                    className="text-sm text-zinc-400 hover:text-primary transition-colors break-all"
+                    className="text-sm  hover:text-primary transition-colors break-all"
                   >
                     pandeycomputer7@gmail.com
                   </a>
@@ -174,13 +147,13 @@ export default function Footer() {
                 <div>
                   <a
                     href="tel:061-585498"
-                    className="text-sm text-zinc-400 hover:text-primary transition-colors block"
+                    className="text-sm  hover:text-primary transition-colors block"
                   >
                     061-585498
                   </a>
                   <a
                     href="tel:+9779856035498"
-                    className="text-sm text-zinc-400 hover:text-primary transition-colors block"
+                    className="text-sm  hover:text-primary transition-colors block"
                   >
                     9856035498
                   </a>
@@ -208,13 +181,15 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-zinc-800/50 relative z-10">
+      <div className="border-t relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm">
-            <p className="text-zinc-400">
+            <p className="">
               © {new Date().getFullYear()}{" "}
-              <span className="text-white font-semibold">Pandey Computer</span>.
-              All Rights Reserved.
+              <span className="text-primary font-semibold">
+                Pandey Computer
+              </span>
+              . All Rights Reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
               {[
@@ -225,7 +200,7 @@ export default function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-zinc-400 hover:text-white transition-colors relative group"
+                  className=" hover:text-white transition-colors relative group"
                 >
                   {link.label}
                   <span className="absolute bottom-0 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />

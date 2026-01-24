@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
 import { ProductImageGallery } from "@/components/reusable/products/product-image-gallery";
-import { ProductTabs } from "@/components/reusable/products/product-tabs";
+import { ProductSpecs } from "@/components/reusable/products/product-tabs";
 import { RelatedProducts } from "@/components/reusable/products/related-products";
 import { ProductActions } from "@/components/reusable/products/product-actions";
 import { IProduct } from "@/lib/models/Product";
@@ -170,13 +170,13 @@ export default async function ProductPage({
                 .filter(Boolean)
                 .join(" > ")}
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">
               {product.name}
             </h1>
 
             {/* Price */}
             <div className="flex items-baseline flex-wrap gap-4 mb-8">
-              <span className="text-4xl font-bold text-foreground">
+              <span className="text-2xl text-primary font-medium">
                 Rs.{product.price.toLocaleString()}
               </span>
               {product.originalPrice && (
@@ -229,7 +229,8 @@ export default async function ProductPage({
 
         {/* Product Tabs */}
         <div className="mt-16">
-          <ProductTabs specs={specsArray} features={product.features || []} />
+          {/* <ProductTabs specs={specsArray} features={product.features || []} /> */}
+          <ProductSpecs specs={specsArray} />
         </div>
 
         {/* Related Products */}
