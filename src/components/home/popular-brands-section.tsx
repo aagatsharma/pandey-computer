@@ -7,7 +7,7 @@ async function getPopularBrands(): Promise<IBrand[]> {
   try {
     await dbConnect();
 
-    const brands = await Brand.find().sort({ createdAt: -1 }).limit(12).lean();
+    const brands = await Brand.find().sort({ createdAt: -1 }).limit(10).lean();
 
     return JSON.parse(JSON.stringify(brands));
   } catch (error) {
@@ -25,17 +25,17 @@ export default async function PopularBrandsSection() {
 
   return (
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+      <div className="flex items-center justify-center mb-8">
+        <h2 className="text-2xl sm:text-3xl font-semibold uppercase text-foreground">
           Popular Brands
         </h2>
-        <Link
-          href="/brands"
-          className="text-sm sm:text-base font-medium text-primary hover:opacity-80 transition-opacity"
-        >
-          View All →
-        </Link>
       </div>
+      <Link
+        href="/brands"
+        className="text-sm mb-2 block text-right w-full text-primary hover:underline font-medium px-4"
+      >
+        View all
+      </Link>
 
       <BrandsCarousel brands={brands} />
     </section>

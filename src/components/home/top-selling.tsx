@@ -7,11 +7,11 @@ import "@/lib/models/Brand";
 import "@/lib/models/SubBrand";
 import { ProductsCarousel } from "./products-carousel";
 
-async function getLatestProducts(): Promise<IProduct[]> {
+async function getProduct(): Promise<IProduct[]> {
   try {
     await dbConnect();
 
-    const products = await Product.find({ isFeatured: true })
+    const products = await Product.find({ topSelling: true })
       .populate("category")
       .populate("subCategory")
       .populate("brand")
@@ -27,8 +27,8 @@ async function getLatestProducts(): Promise<IProduct[]> {
   }
 }
 
-export default async function FeaturedCategories() {
-  const products = await getLatestProducts();
+export default async function TopSelling() {
+  const products = await getProduct();
 
   if (products.length === 0) {
     return null;
@@ -38,7 +38,7 @@ export default async function FeaturedCategories() {
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-8">
         <h2 className="text-2xl sm:text-3xl font-semibold uppercase text-foreground">
-          Featured Products
+          Top Selling Products
         </h2>
       </div>
       <Link

@@ -5,16 +5,20 @@ import LatestCategories from "@/components/home/latest-categories";
 import PopularBrandsSection from "@/components/home/popular-brands-section";
 import FeaturedCategories from "@/components/home/featured-categories";
 import ProductByCategories from "@/components/home/categories-products/product-by-categories";
+import HotDeals from "@/components/home/hot-deals";
+import TopSelling from "@/components/home/top-selling";
 
 export default function Home() {
   return (
     <>
       <HeroSection />
+      <HotDeals />
+      <TopSelling />
       <PopularBrandsSection />
-      <LatestCategories />
       <FeaturedCategories />
       <LatestProducts />
       <ProductByCategories />
+      <LatestCategories />
       <LatestBlogs />
     </>
   );

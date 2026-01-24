@@ -25,17 +25,17 @@ export default async function LatestBlogs() {
 
   return (
     <section className="container mx-auto my-20 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+      <div className="flex items-center justify-center mb-8">
+        <h2 className="text-2xl sm:text-3xl font-semibold uppercase text-foreground">
           Latest Blogs
         </h2>
-        <Link
-          href="/blogs"
-          className="text-sm sm:text-base font-medium text-primary hover:opacity-80 transition-opacity"
-        >
-          View All →
-        </Link>
       </div>
+      <Link
+        href="/blogs"
+        className="text-sm mb-2 block text-right w-full text-primary hover:underline font-medium px-4"
+      >
+        View all
+      </Link>
 
       <BlogsCarousel blogs={blogs} />
     </section>
