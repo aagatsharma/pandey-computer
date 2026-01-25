@@ -44,7 +44,7 @@ export default async function CategoryProducts({
   }
 
   return (
-    <section className="container mx-auto p-4 sm:px-6 lg:px-8">
+    <section className="container mx-auto my-20 p-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-8">
         <h2 className="text-2xl sm:text-3xl font-semibold uppercase text-foreground">
           {category.name}
