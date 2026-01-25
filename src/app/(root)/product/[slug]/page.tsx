@@ -8,6 +8,11 @@ import { ProductActions } from "@/components/reusable/products/product-actions";
 import { IProduct } from "@/lib/models/Product";
 import dbConnect from "@/lib/mongoose";
 import Product from "@/lib/models/Product";
+import "@/lib/models/Category";
+import "@/lib/models/SubCategory";
+import "@/lib/models/Brand";
+import "@/lib/models/SubBrand";
+
 import { Types } from "mongoose";
 import { GoDotFill } from "react-icons/go";
 
