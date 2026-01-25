@@ -143,7 +143,38 @@ export default function ProductsPage() {
         );
       },
     },
-
+    {
+      accessorKey: "hotDeals",
+      header: "Hot Deals",
+      cell: ({ row }) => {
+        const hotDeals = row.getValue("hotDeals") as boolean;
+        return (
+          <div>
+            {hotDeals ? (
+              <span className="text-green-600 font-semibold">Yes</span>
+            ) : (
+              <span className="text-gray-400">No</span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "topSelling",
+      header: "Top Selling",
+      cell: ({ row }) => {
+        const topSelling = row.getValue("topSelling") as boolean;
+        return (
+          <div>
+            {topSelling ? (
+              <span className="text-green-600 font-semibold">Yes</span>
+            ) : (
+              <span className="text-gray-400">No</span>
+            )}
+          </div>
+        );
+      },
+    },
     {
       id: "actions",
       cell: ({ row }) => {
