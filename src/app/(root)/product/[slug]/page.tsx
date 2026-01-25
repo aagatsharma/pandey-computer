@@ -23,7 +23,7 @@ async function getProduct(slug: string) {
     .populate("subBrand", "name slug")
     .lean();
 
-  return product ? (product as IProduct) : null;
+  return JSON.parse(JSON.stringify(product)) as IProduct | null;
 }
 
 async function getRelatedProducts(
@@ -41,15 +41,16 @@ async function getRelatedProducts(
     .limit(4)
     .lean();
 
-  return products as IProduct[];
+  return JSON.parse(JSON.stringify(products)) as IProduct[];
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const product = await getProduct(params.slug);
+  const { slug } = await params;
+  const product = await getProduct(slug);
   if (!product) return { title: "Product Not Found" };
 
   return {
@@ -66,9 +67,10 @@ export async function generateMetadata({
 export default async function ProductPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const product = await getProduct(params.slug);
+  const { slug } = await params;
+  const product = await getProduct(slug);
   if (!product) notFound();
 
   const relatedProducts = product.category
