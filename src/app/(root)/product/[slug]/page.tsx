@@ -11,68 +11,50 @@ import Product from "@/lib/models/Product";
 import { Types } from "mongoose";
 import { GoDotFill } from "react-icons/go";
 
+export const revalidate = 3600; // 1 hour caching for SEO/performance
+
 async function getProduct(slug: string) {
-  try {
-    await dbConnect();
+  await dbConnect();
 
-    const product = await Product.findOne({ slug })
-      .populate("category", "name slug")
-      .populate("subCategory", "name slug")
-      .populate("brand", "name slug logo")
-      .populate("subBrand", "name slug")
-      .lean();
+  const product = await Product.findOne({ slug })
+    .populate("category", "name slug")
+    .populate("subCategory", "name slug")
+    .populate("brand", "name slug logo")
+    .populate("subBrand", "name slug")
+    .lean();
 
-    if (!product) {
-      return null;
-    }
-
-    // Convert MongoDB document to plain object
-    return JSON.parse(JSON.stringify(product)) as IProduct;
-  } catch (error) {
-    console.error("Error fetching product:", error);
-    return null;
-  }
+  return product ? (product as IProduct) : null;
 }
 
 async function getRelatedProducts(
   categoryId: string | Types.ObjectId,
   currentProductId: string | Types.ObjectId,
 ) {
-  try {
-    await dbConnect();
+  await dbConnect();
 
-    const products = await Product.find({
-      category: categoryId,
-      _id: { $ne: currentProductId },
-    })
-      .populate("category", "name slug")
-      .populate("brand", "name slug logo")
-      .limit(4)
-      .lean();
+  const products = await Product.find({
+    category: categoryId,
+    _id: { $ne: currentProductId },
+  })
+    .populate("category", "name slug")
+    .populate("brand", "name slug logo")
+    .limit(4)
+    .lean();
 
-    return JSON.parse(JSON.stringify(products)) as IProduct[];
-  } catch (error) {
-    console.error("Error fetching related products:", error);
-    return [];
-  }
+  return products as IProduct[];
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
-  const product = await getProduct(slug);
-
-  if (!product) {
-    return {
-      title: "Product Not Found",
-    };
-  }
+  const product = await getProduct(params.slug);
+  if (!product) return { title: "Product Not Found" };
 
   return {
     title: `${product.name} | Pandey Computer`,
+    description: product.specs ? Object.values(product.specs).join(", ") : "",
     openGraph: {
       title: product.name,
       images:
@@ -84,17 +66,13 @@ export async function generateMetadata({
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
-  const product = await getProduct(slug);
-
-  if (!product) {
-    notFound();
-  }
+  const product = await getProduct(params.slug);
+  if (!product) notFound();
 
   const relatedProducts = product.category
-    ? await getRelatedProducts(product?.category?._id, product._id.toString())
+    ? await getRelatedProducts(product.category._id, product._id.toString())
     : [];
 
   const discount = product.originalPrice
@@ -103,9 +81,8 @@ export default async function ProductPage({
       )
     : 0;
 
-  // Convert specs object to array format
   const specsArray = product.specs
-    ? Object.entries(product.specs).map(([key, value]) => `${key}: ${value}`)
+    ? Object.entries(product.specs).map(([k, v]) => `${k}: ${v}`)
     : [];
 
   return (
@@ -130,7 +107,7 @@ export default async function ProductPage({
       {/* Product Details */}
       <section className="container mx-auto my-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image Gallery */}
+          {/* Image Gallery */}
           <div className="relative">
             <ProductImageGallery
               images={product.images || []}
@@ -192,44 +169,42 @@ export default async function ProductPage({
               )}
             </div>
 
-            {/* Stock Status */}
+            {/* Stock */}
             <div className="mb-6">
               {product.quantity && product.quantity > 0 ? (
                 <span className="text-green-600 font-semibold flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-600 rounded-full"></span>
-                  In Stock ({product.quantity} available)
+                  <span className="w-2 h-2 bg-green-600 rounded-full"></span>In
+                  Stock ({product.quantity} available)
                 </span>
               ) : (
                 <span className="text-red-600 font-semibold flex items-center gap-2">
-                  <span className="w-2 h-2 bg-red-600 rounded-full"></span>
-                  Out of Stock
+                  <span className="w-2 h-2 bg-red-600 rounded-full"></span>Out
+                  of Stock
                 </span>
               )}
             </div>
 
             <ProductActions product={product} />
 
-            <div className="text-lg text-muted-foreground my-6">
-              {product.keyFeatures && product?.keyFeatures?.length > 0 && (
-                <>
-                  <h3 className="text-black font-semibold">Key Features</h3>
-                  {product?.keyFeatures?.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-3 mt-2">
-                      <div className="mt-1 text-primary">
-                        <GoDotFill className="size-5" />
-                      </div>
-                      <p className="text-muted-foreground">{feature}</p>
+            {/* Key Features */}
+            {product?.keyFeatures && product.keyFeatures?.length > 0 && (
+              <div className="text-lg text-muted-foreground my-6">
+                <h3 className="text-black font-semibold">Key Features</h3>
+                {product?.keyFeatures?.map((f, i) => (
+                  <div key={i} className="flex items-start gap-3 mt-2">
+                    <div className="mt-1 text-primary">
+                      <GoDotFill className="size-5" />
                     </div>
-                  ))}
-                </>
-              )}
-            </div>
+                    <p className="text-muted-foreground">{f}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Product Tabs */}
+        {/* Tabs */}
         <div className="mt-16">
-          {/* <ProductTabs specs={specsArray} features={product.features || []} /> */}
           <ProductSpecs specs={specsArray} />
         </div>
 

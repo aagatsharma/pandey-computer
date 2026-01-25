@@ -12,6 +12,7 @@ interface NavbarItem {
   type: "category" | "brand" | "subCategory" | "subBrand";
   children?: NavbarItem[];
 }
+export const revalidate = 3600;
 
 async function getNavbarItems() {
   await dbConnect();
@@ -45,7 +46,6 @@ async function getNavbarItems() {
 
 export default async function Header() {
   const navigationData = await getNavbarItems();
-  console.log("Navigation Data:", navigationData);
 
   return (
     <header className="w-full bg-muted sticky top-0 z-50 shadow-sm">
