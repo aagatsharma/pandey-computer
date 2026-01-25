@@ -113,11 +113,7 @@ export default async function ProductPage({
               images={product.images || []}
               productName={product.name}
             />
-            {product.isFeatured && (
-              <Badge className="absolute top-4 left-4 text-sm font-bold px-3 py-1 shadow-lg">
-                Featured
-              </Badge>
-            )}
+
             {discount > 0 && (
               <Badge
                 variant="destructive"

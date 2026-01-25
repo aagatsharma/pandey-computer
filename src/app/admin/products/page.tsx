@@ -143,22 +143,7 @@ export default function ProductsPage() {
         );
       },
     },
-    {
-      accessorKey: "isFeatured",
-      header: "Featured",
-      cell: ({ row }) => {
-        const isFeatured = row.getValue("isFeatured") as boolean;
-        return (
-          <div>
-            {isFeatured ? (
-              <span className="text-green-600 font-semibold">Yes</span>
-            ) : (
-              <span className="text-gray-400">No</span>
-            )}
-          </div>
-        );
-      },
-    },
+
     {
       id: "actions",
       cell: ({ row }) => {

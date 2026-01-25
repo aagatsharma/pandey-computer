@@ -46,9 +46,7 @@ const formSchema = z.object({
   brand: z.string().optional(),
   subBrand: z.string().optional(),
   images: z.any().optional(),
-  isFeatured: z.boolean().optional(),
   specs: z.string().optional(),
-  features: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,9 +66,7 @@ interface ProductModalFormProps {
     brand?: string;
     subBrand?: string;
     images: string[];
-    isFeatured: boolean;
     specs?: Record<string, string>;
-    features?: string[];
   }) => Promise<void>;
   editData?: IProduct | null;
 }
@@ -107,9 +103,7 @@ export default function ProductModalForm({
       brand: "",
       subBrand: "",
       images: undefined,
-      isFeatured: false,
       specs: "",
-      features: "",
     },
   });
 
@@ -135,7 +129,6 @@ export default function ProductModalForm({
             value,
           }))
         : [{ key: "", value: "" }];
-      const featuresString = editData.features?.join("\n") || "";
 
       const categoryId =
         editData.category &&
@@ -184,9 +177,7 @@ export default function ProductModalForm({
         subCategory: subCategoryId,
         brand: brandId,
         subBrand: subBrandId,
-        isFeatured: editData.isFeatured || false,
         specs: "",
-        features: featuresString,
         images: undefined,
       });
       setPreviews(editData.images || []);
@@ -204,9 +195,7 @@ export default function ProductModalForm({
         brand: "",
         subBrand: "",
         images: undefined,
-        isFeatured: false,
         specs: "",
-        features: "",
       });
       setPreviews([]);
     }
@@ -232,14 +221,6 @@ export default function ProductModalForm({
         }
       });
 
-      // Parse features from string (one per line)
-      const features = data.features
-        ? data.features
-            .split("\n")
-            .map((f) => f.trim())
-            .filter((f) => f.length > 0)
-        : [];
-
       await onSubmit({
         id: editData?._id?.toString(),
         name: data.name,
@@ -257,9 +238,7 @@ export default function ProductModalForm({
         brand: data.brand || undefined,
         subBrand: data.subBrand || undefined,
         images: imageUrls,
-        isFeatured: data.isFeatured || false,
         specs: Object.keys(specsObject).length > 0 ? specsObject : undefined,
-        features: features.length > 0 ? features : undefined,
       });
 
       form.reset();
@@ -573,24 +552,6 @@ export default function ProductModalForm({
 
             <FormField
               control={form.control}
-              name="features"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Features (One per line)</FormLabel>
-                  <FormControl>
-                    <textarea
-                      placeholder="Fast processing&#10;Large storage&#10;High quality display"
-                      className="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="images"
               render={({ field: { onChange, ...field } }) => (
                 <FormItem>
@@ -643,24 +604,6 @@ export default function ProductModalForm({
                     </div>
                   </FormControl>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="isFeatured"
-              render={({ field }) => (
-                <FormItem className="flex items-center space-x-2">
-                  <FormControl>
-                    <input
-                      type="checkbox"
-                      checked={field.value}
-                      onChange={field.onChange}
-                      className="h-4 w-4"
-                    />
-                  </FormControl>
-                  <FormLabel className="mt-0!">Featured Product</FormLabel>
                 </FormItem>
               )}
             />

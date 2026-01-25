@@ -17,11 +17,9 @@ export default function AddProductPage() {
     brand?: string;
     subBrand?: string;
     images: string[];
-    isFeatured: boolean;
     hotDeals?: boolean;
     topSelling?: boolean;
     specs?: Record<string, string>;
-    features?: string[];
   }) => {
     try {
       const response = await fetch("/api/products", {

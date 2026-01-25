@@ -48,7 +48,6 @@ export async function GET(req: Request) {
     const subBrandSlug = searchParams.get("subBrand");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
-    const isFeatured = searchParams.get("isFeatured");
 
     // Build filter query
     const filter: Record<string, unknown> = {};
@@ -90,10 +89,6 @@ export async function GET(req: Request) {
       if (maxPrice) {
         (filter.price as Record<string, number>).$lte = parseInt(maxPrice);
       }
-    }
-
-    if (isFeatured !== null && isFeatured !== undefined) {
-      filter.isFeatured = isFeatured === "true";
     }
 
     // Calculate skip/offset for the database query
@@ -148,14 +143,13 @@ export async function POST(req: NextRequest) {
       price,
       originalPrice,
       specs,
-      features,
+
       category,
       subCategory,
       brand,
       subBrand,
       images,
       quantity,
-      isFeatured,
       hotDeals,
       topSelling,
     } = body;
@@ -183,14 +177,12 @@ export async function POST(req: NextRequest) {
       price,
       originalPrice: originalPrice || undefined,
       specs: specs || undefined,
-      features: features || [],
       category: category || undefined,
       subCategory: subCategory || undefined,
       brand: brand || undefined,
       subBrand: subBrand || undefined,
       images: images || [],
       quantity: quantity || 0,
-      isFeatured: isFeatured || false,
       hotDeals: hotDeals || false,
       topSelling: topSelling || false,
     });
@@ -223,14 +215,12 @@ export async function PUT(req: NextRequest) {
       price,
       originalPrice,
       specs,
-      features,
       category,
       subCategory,
       brand,
       subBrand,
       images,
       quantity,
-      isFeatured,
       hotDeals,
       topSelling,
     } = body;
@@ -267,14 +257,12 @@ export async function PUT(req: NextRequest) {
         price,
         originalPrice: originalPrice || undefined,
         specs: specs || undefined,
-        features: features || [],
         category: category || undefined,
         subCategory: subCategory || undefined,
         brand: brand || undefined,
         subBrand: subBrand || undefined,
         images: images || [],
         quantity: quantity || 0,
-        isFeatured: isFeatured || false,
         hotDeals: hotDeals || false,
         topSelling: topSelling || false,
       },

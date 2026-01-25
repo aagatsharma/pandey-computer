@@ -15,7 +15,6 @@ export interface IProduct extends Document {
   originalPrice?: number;
   specs?: Record<string, string>;
   keyFeatures?: string[];
-  features?: string[];
 
   category?: ICategory;
   subCategory?: ISubCategory;
@@ -27,7 +26,6 @@ export interface IProduct extends Document {
 
   // Status
   quantity: number;
-  isFeatured: boolean;
   hotDeals?: boolean;
   topSelling?: boolean;
 
@@ -66,11 +64,6 @@ const ProductSchema = new Schema<IProduct>(
       type: [String],
       default: [],
     },
-    features: {
-      type: [String],
-      default: [],
-    },
-
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
@@ -99,10 +92,6 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       default: 0,
       min: 0,
-    },
-    isFeatured: {
-      type: Boolean,
-      default: false,
     },
     hotDeals: {
       type: Boolean,
