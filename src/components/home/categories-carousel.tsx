@@ -42,7 +42,7 @@ export function CategoriesCarousel({ categories }: CategoriesCarouselProps) {
           >
             <Link
               href={`/shop?category=${category.slug}`}
-              className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group"
+              className="bg-card rounded-lg border border-border p-6 hover:shadow-lg hover:border-primary transition-all duration-300 flex flex-col items-center justify-center group h-full"
             >
               <div className="relative w-24 h-24 mb-3">
                 {category?.logo && (
