@@ -7,6 +7,7 @@ import SubCategory from "@/lib/models/SubCategory";
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: Request) {
   try {
@@ -186,6 +187,7 @@ export async function POST(req: NextRequest) {
       hotDeals: hotDeals || false,
       topSelling: topSelling || false,
     });
+    await revalidatePath(`/product/${slug}`);
 
     return NextResponse.json(
       { message: "Product created successfully", data: product },
@@ -275,6 +277,7 @@ export async function PUT(req: NextRequest) {
         { status: 404 },
       );
     }
+    await revalidatePath(`/product/${slug}`);
 
     return NextResponse.json(
       { message: "Product updated successfully", data: product },
@@ -314,6 +317,7 @@ export async function DELETE(req: NextRequest) {
         { status: 404 },
       );
     }
+    await revalidatePath(`/product/${product.slug}`);
 
     return NextResponse.json(
       { message: "Product deleted successfully" },
