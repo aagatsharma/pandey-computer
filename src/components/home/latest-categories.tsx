@@ -7,10 +7,7 @@ async function getCategories(): Promise<ICategory[]> {
   try {
     await dbConnect();
 
-    const categories = await Category.find()
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .lean();
+    const categories = await Category.find().lean();
 
     return JSON.parse(JSON.stringify(categories));
   } catch (error) {
