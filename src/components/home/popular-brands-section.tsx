@@ -7,7 +7,7 @@ async function getPopularBrands(): Promise<IBrand[]> {
   try {
     await dbConnect();
 
-    const brands = await Brand.find().sort({ createdAt: -1 }).limit(10).lean();
+    const brands = await Brand.find().lean();
 
     return JSON.parse(JSON.stringify(brands));
   } catch (error) {
