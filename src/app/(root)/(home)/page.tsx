@@ -7,7 +7,7 @@ import ProductByCategories from "@/components/home/categories-products/product-b
 import HotDeals from "@/components/home/hot-deals";
 import TopSelling from "@/components/home/top-selling";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export default function Home() {
   return (
