@@ -10,7 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
+import AutoScroll from "embla-carousel-auto-scroll";
 
 interface BrandsCarouselProps {
   brands: IBrand[];
@@ -28,8 +28,8 @@ export function BrandsCarousel({ brands }: BrandsCarouselProps) {
         loop: true,
       }}
       plugins={[
-        Autoplay({
-          delay: 2000,
+        AutoScroll({
+          speed: 1,
         }),
       ]}
       className="w-full"
