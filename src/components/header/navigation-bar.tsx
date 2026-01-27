@@ -273,8 +273,8 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
       {/* Section 3: Navigation Menu (Desktop) */}
       <nav
         className={`bg-primary text-white hidden lg:block
-    overflow-hidden transition-all duration-300 ease-in-out
-    ${isCollapsed ? "max-h-0 opacity-0" : "max-h-12 opacity-100"}
+    transition-all duration-300 ease-in-out
+    ${isCollapsed ? "max-h-0 opacity-0" : "opacity-100"}
   `}
       >
         <div className="max-w-7xl mx-auto relative">
