@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -10,6 +10,8 @@ import {
   ChevronDown,
   ChevronRight,
   CircleArrowRight,
+  Phone,
+  MapPin,
 } from "lucide-react";
 import CartIcon from "./cart-icon";
 
@@ -141,9 +143,66 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
   // Filter only level 1 items (top-level navigation)
   const topLevelItems = menuData.filter((item) => item.level === 1);
 
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+        // scrolling down
+        setIsCollapsed(true);
+      } else {
+        // scrolling up
+        setIsCollapsed(false);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <>
-      {/* Section 1: Logo, Search, Cart */}
+    <header className="w-full bg-muted sticky top-0 z-50 shadow-sm">
+      {/* Section 1: Top Info Bar */}
+      <div
+        className={`border-b overflow-hidden transition-all duration-300 ease-in-out
+    ${isCollapsed ? "max-h-0 opacity-0" : "max-h-20 opacity-100"}
+  `}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between text-xs md:text-sm p-2">
+            {/* Left: Tagline */}
+            <div className="hidden md:block font-medium shrink-0">
+              Think. Innovate. Succeed.
+            </div>
+
+            {/* Right: Contact Info */}
+            <div className="flex items-center gap-4 max-lg:w-full justify-center">
+              <Link
+                href="tel:061-585498"
+                className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+              >
+                <Phone size={14} />
+                <span>061-585498</span>
+              </Link>
+              <Link
+                href="https://maps.app.goo.gl/QVgnB6DGFTp8SfQB8"
+                target="_blank"
+                className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+              >
+                <MapPin size={14} />
+                <span>Store Location</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 2: Logo, Search, Cart */}
       <div className="border-b bg-background sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
@@ -211,8 +270,13 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
         </div>
       </div>
 
-      {/* Section 2: Navigation Menu (Desktop) */}
-      <nav className="bg-primary text-white hidden lg:block">
+      {/* Section 3: Navigation Menu (Desktop) */}
+      <nav
+        className={`bg-primary text-white hidden lg:block
+    overflow-hidden transition-all duration-300 ease-in-out
+    ${isCollapsed ? "max-h-0 opacity-0" : "max-h-12 opacity-100"}
+  `}
+      >
         <div className="max-w-7xl mx-auto relative">
           <div className="flex items-center h-12 gap-1">
             {topLevelItems.map((menu) => (
@@ -374,6 +438,6 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
           </div>
         </div>
       )}
-    </>
+    </header>
   );
 }
