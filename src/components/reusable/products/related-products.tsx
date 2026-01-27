@@ -12,7 +12,7 @@ export function RelatedProducts({
   currentProductId,
 }: RelatedProductsProps) {
   const relatedProducts = products.filter(
-    (p) => p._id.toString() !== currentProductId
+    (p) => p._id.toString() !== currentProductId,
   );
 
   if (relatedProducts.length === 0) {
@@ -22,7 +22,7 @@ export function RelatedProducts({
   return (
     <section className="py-12 border-t border-border">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold">You May Also Like</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold">Similar Products</h2>
         <Link
           href="/shop"
           className="text-primary hover:underline text-sm font-semibold"
