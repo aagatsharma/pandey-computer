@@ -160,15 +160,9 @@ export default async function ProductPage({
                 Rs.{product.price.toLocaleString()}
               </span>
               {product.originalPrice && (
-                <>
-                  <span className="text-xl text-muted-foreground line-through">
-                    Rs.{product.originalPrice.toLocaleString()}
-                  </span>
-                  <span className="text-lg text-green-600 font-semibold">
-                    Save Rs.
-                    {(product.originalPrice - product.price).toLocaleString()}
-                  </span>
-                </>
+                <span className="text-xl text-muted-foreground line-through">
+                  Rs.{product.originalPrice.toLocaleString()}
+                </span>
               )}
             </div>
 
@@ -177,7 +171,7 @@ export default async function ProductPage({
               {product.quantity && product.quantity > 0 ? (
                 <span className="text-green-600 font-semibold flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-600 rounded-full"></span>In
-                  Stock ({product.quantity} available)
+                  Stock
                 </span>
               ) : (
                 <span className="text-red-600 font-semibold flex items-center gap-2">
