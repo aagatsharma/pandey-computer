@@ -23,6 +23,7 @@ export function ProductActions({ product }: ProductActionsProps) {
 
   useEffect(() => {
     if (cartQuantity > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuantity(cartQuantity);
     } else {
       setQuantity(1); // Reset quantity if item is no longer in cart

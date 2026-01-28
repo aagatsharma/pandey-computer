@@ -313,7 +313,11 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                         <div key={section._id} className="min-w-0">
                           {/* Category/Brand Header */}
                           <Link
-                            href={`/shop?${menu.type}=${menu.slug}&${section.type}=${section.slug}`}
+                            href={`/shop?${
+                              section.type === menu.type
+                                ? `${section.type}=${section.slug}`
+                                : `${menu.type}=${menu.slug}&${section.type}=${section.slug}`
+                            }`}
                             className="block"
                           >
                             <h4 className="text-black font-semibold hover:opacity-70 transition-colors pb-2 text-base">
@@ -326,7 +330,11 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                             {section.children?.map((item) => (
                               <li key={item._id}>
                                 <Link
-                                  href={`/shop?${menu.type}=${menu.slug}&${section.type}=${section.slug}&${item.type}=${item.slug}`}
+                                  href={`/shop?${
+                                    section.type === menu.type
+                                      ? `${section.type}=${section.slug}&${item.type}=${item.slug}`
+                                      : `${menu.type}=${menu.slug}&${section.type}=${section.slug}&${item.type}=${item.slug}`
+                                  }`}
                                   className="block text-gray-700 hover:text-red-600 hover:translate-x-1 transition-all duration-150 w-fit"
                                 >
                                   {item.label}

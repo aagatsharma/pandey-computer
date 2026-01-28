@@ -55,25 +55,37 @@ export function ShopClient() {
   const [searchName, setSearchName] = useState(searchParams.get("name") || "");
   const [debouncedName, setDebouncedName] = useState(searchName);
   const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || ""
+    searchParams.get("category") || "",
   );
   const [selectedSubCategory, setSelectedSubCategory] = useState(
-    searchParams.get("subCategory") || ""
+    searchParams.get("subCategory") || "",
   );
   const [selectedBrand, setSelectedBrand] = useState(
-    searchParams.get("brand") || ""
+    searchParams.get("brand") || "",
   );
   const [selectedSubBrand, setSelectedSubBrand] = useState(
-    searchParams.get("subBrand") || ""
+    searchParams.get("subBrand") || "",
   );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [debouncedMinPrice, setDebouncedMinPrice] = useState(minPrice);
   const [debouncedMaxPrice, setDebouncedMaxPrice] = useState(maxPrice);
   const [currentPage, setCurrentPage] = useState(
-    parseInt(searchParams.get("page") || "1")
+    parseInt(searchParams.get("page") || "1"),
   );
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchName(searchParams.get("name") || "");
+    setSelectedCategory(searchParams.get("category") || "");
+    setSelectedSubCategory(searchParams.get("subCategory") || "");
+    setSelectedBrand(searchParams.get("brand") || "");
+    setSelectedSubBrand(searchParams.get("subBrand") || "");
+    setMinPrice(searchParams.get("minPrice") || "");
+    setMaxPrice(searchParams.get("maxPrice") || "");
+    setCurrentPage(parseInt(searchParams.get("page") || "1"));
+  }, [searchParams]);
 
   // Debounce search name
   useEffect(() => {
@@ -108,7 +120,7 @@ export function ShopClient() {
   // Fetch filter options
   const { data: filterData } = useSWR<{ data: FilterData }>(
     "/api/products/filters",
-    fetcher
+    fetcher,
   );
 
   // Build query params for API
@@ -162,12 +174,12 @@ export function ShopClient() {
 
     // Find the selected category's _id
     const selectedCat = filterData.data.categories.find(
-      (cat) => cat.slug === selectedCategory
+      (cat) => cat.slug === selectedCategory,
     );
     if (!selectedCat) return filterData.data.subCategories;
 
     return filterData.data.subCategories.filter(
-      (subCat) => subCat.category === selectedCat._id
+      (subCat) => subCat.category === selectedCat._id,
     );
   }, [filterData, selectedCategory]);
 
@@ -178,12 +190,12 @@ export function ShopClient() {
 
     // Find the selected brand's _id
     const selectedBrandObj = filterData.data.brands.find(
-      (brand) => brand.slug === selectedBrand
+      (brand) => brand.slug === selectedBrand,
     );
     if (!selectedBrandObj) return filterData.data.subBrands;
 
     return filterData.data.subBrands.filter(
-      (subBrand) => subBrand.brand === selectedBrandObj._id
+      (subBrand) => subBrand.brand === selectedBrandObj._id,
     );
   }, [filterData, selectedBrand]);
 
@@ -447,7 +459,6 @@ export function ShopClient() {
 
         {/* Products Grid */}
         <div className="flex-1 min-w-0">
-
           <ProductsGrid
             products={products}
             isLoading={isLoading}
