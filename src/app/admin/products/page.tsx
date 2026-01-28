@@ -31,10 +31,26 @@ import { IBrand } from "@/lib/models/Brand";
 import { ICategory } from "@/lib/models/Category";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ProductsPage() {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { data: brandsData } = useSWR<{ data: IBrand[] }>(
+    "/api/brands",
+    fetcher,
+  );
+  const { data: categoriesData } = useSWR<{ data: ICategory[] }>(
+    "/api/categories",
+    fetcher,
+  );
 
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -44,8 +60,6 @@ export default function ProductsPage() {
     name: "",
     category: "",
     brand: "",
-    minPrice: "",
-    maxPrice: "",
   });
 
   const debouncedFilters = useDebounce(filters, 500);
@@ -56,12 +70,6 @@ export default function ProductsPage() {
     ...(debouncedFilters.name && { name: debouncedFilters.name }),
     ...(debouncedFilters.category && { category: debouncedFilters.category }),
     ...(debouncedFilters.brand && { brand: debouncedFilters.brand }),
-    ...(debouncedFilters.minPrice && {
-      minPrice: debouncedFilters.minPrice,
-    }),
-    ...(debouncedFilters.maxPrice && {
-      maxPrice: debouncedFilters.maxPrice,
-    }),
   }).toString();
 
   const { data, isLoading, error, mutate } = useSWR(
@@ -229,7 +237,7 @@ export default function ProductsPage() {
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setDeleteId(product._id.toString())}
+                onClick={() => setDeleteId(product.slug)}
                 className="text-red-600"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -254,7 +262,8 @@ export default function ProductsPage() {
     <div>
       <div className="space-y-6">
         {/* Filters */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Name filter */}
           <Input
             placeholder="Search name"
             className="border px-3 py-2 rounded w-96"
@@ -265,45 +274,57 @@ export default function ProductsPage() {
             }}
           />
 
-          <Input
-            type="number"
-            placeholder="Min price"
-            className="border px-3 py-2 rounded w-32"
-            value={filters.minPrice}
-            onChange={(e) => {
-              setFilters((f) => ({ ...f, minPrice: e.target.value }));
+          {/* Category filter */}
+          <Select
+            value={filters.category}
+            onValueChange={(value) => {
+              setFilters((f) => ({ ...f, category: value }));
               setPage(1);
             }}
-          />
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              {categoriesData?.data?.map((cat) => (
+                <SelectItem key={cat.slug} value={cat.slug}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          <Input
-            type="number"
-            placeholder="Max price"
-            className="border px-3 py-2 rounded w-32"
-            value={filters.maxPrice}
-            onChange={(e) => {
-              setFilters((f) => ({ ...f, maxPrice: e.target.value }));
+          {/* Brand filter */}
+          <Select
+            value={filters.brand}
+            onValueChange={(value) => {
+              setFilters((f) => ({ ...f, brand: value }));
               setPage(1);
             }}
-          />
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="All Brands" />
+            </SelectTrigger>
+            <SelectContent>
+              {brandsData?.data?.map((brand: IBrand) => (
+                <SelectItem key={brand.slug} value={brand.slug}>
+                  {brand.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
+          {/* Reset button */}
           <Button
             variant="ghost"
             onClick={() => {
-              setFilters({
-                name: "",
-                category: "",
-                brand: "",
-                minPrice: "",
-                maxPrice: "",
-              });
+              setFilters({ name: "", category: "", brand: "" });
               setPage(1);
             }}
           >
             Reset
           </Button>
         </div>
-
         {isLoading ? (
           <Loader />
         ) : (
