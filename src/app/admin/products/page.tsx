@@ -259,9 +259,10 @@ export default function ProductsPage() {
             placeholder="Search name"
             className="border px-3 py-2 rounded w-96"
             value={filters.name}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, name: e.target.value }))
-            }
+            onChange={(e) => {
+              setFilters((f) => ({ ...f, name: e.target.value }));
+              setPage(1);
+            }}
           />
 
           <Input
@@ -269,9 +270,10 @@ export default function ProductsPage() {
             placeholder="Min price"
             className="border px-3 py-2 rounded w-32"
             value={filters.minPrice}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, minPrice: e.target.value }))
-            }
+            onChange={(e) => {
+              setFilters((f) => ({ ...f, minPrice: e.target.value }));
+              setPage(1);
+            }}
           />
 
           <Input
@@ -279,14 +281,11 @@ export default function ProductsPage() {
             placeholder="Max price"
             className="border px-3 py-2 rounded w-32"
             value={filters.maxPrice}
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, maxPrice: e.target.value }))
-            }
+            onChange={(e) => {
+              setFilters((f) => ({ ...f, maxPrice: e.target.value }));
+              setPage(1);
+            }}
           />
-
-          <Button variant="outline" onClick={() => setPage(1)}>
-            Apply
-          </Button>
 
           <Button
             variant="ghost"

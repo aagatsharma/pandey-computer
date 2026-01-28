@@ -104,7 +104,7 @@ export async function GET(req: Request) {
       .populate("subCategory", "name slug")
       .populate("brand", "name slug logo")
       .populate("subBrand", "name slug")
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit);
 
