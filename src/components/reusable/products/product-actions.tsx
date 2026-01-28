@@ -15,8 +15,7 @@ export function ProductActions({ product }: ProductActionsProps) {
   const [quantity, setQuantity] = useState(1);
   const { cart, addToCart, removeFromCart, updateQuantity } = useCartStore();
 
-  const { price, quantity: stock } = product;
-  const inStock = stock > 0;
+  const { price, stock: inStock } = product;
 
   const cartItem = cart.find((item) => item._id === String(product._id));
   const isInCart = !!cartItem;
@@ -43,7 +42,6 @@ export function ProductActions({ product }: ProductActionsProps) {
         toast.success("Cart updated");
       }
     } else {
-      // Add to cart
       addToCart({
         _id: String(product._id),
         name: product.name,
@@ -51,7 +49,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         price: product.price,
         image: product.images?.[0] || "/placeholder.png",
         quantity: quantity,
-        maxQuantity: stock,
+        maxQuantity: 4,
       });
       toast.success("Added to cart");
     }
@@ -115,8 +113,8 @@ export function ProductActions({ product }: ProductActionsProps) {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => setQuantity(Math.min(stock, quantity + 1))}
-              disabled={quantity >= stock}
+              onClick={() => setQuantity(quantity + 1)}
+              disabled={quantity >= 4}
             >
               +
             </Button>

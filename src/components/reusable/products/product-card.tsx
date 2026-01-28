@@ -14,12 +14,11 @@ export function ProductCard({ product }: { product: IProduct }) {
     price,
     originalPrice,
     images,
-    quantity,
+    stock: inStock,
     category,
     brand,
   } = product;
   const image = images && images.length > 0 ? images[0] : "/placeholder.png";
-  const inStock = quantity && quantity > 0;
 
   const { cart, addToCart, removeFromCart } = useCartStore();
   const cartItem = cart.find((item) => item._id === String(product._id));
@@ -44,7 +43,7 @@ export function ProductCard({ product }: { product: IProduct }) {
         price,
         image,
         quantity: 1,
-        maxQuantity: quantity,
+        maxQuantity: 4,
       });
       toast.success("Item added to cart");
     }

@@ -186,6 +186,22 @@ export default function ProductsPage() {
       },
     },
     {
+      accessorKey: "stock",
+      header: "In Stock",
+      cell: ({ row }) => {
+        const stock = row.getValue("stock") as boolean;
+        return (
+          <div>
+            {stock ? (
+              <span className="text-green-600 font-semibold">Yes</span>
+            ) : (
+              <span className="text-gray-400">No</span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "hotDeals",
       header: "Hot Deals",
       cell: ({ row }) => {
@@ -260,8 +276,13 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-2">
         {/* Filters */}
+        <div className="flex w-full justify-end">
+          <Button onClick={() => router.push("/admin/products/add")}>
+            Add Product
+          </Button>
+        </div>
         <div className="flex flex-wrap gap-3 items-center">
           {/* Name filter */}
           <Input
@@ -328,13 +349,15 @@ export default function ProductsPage() {
         {isLoading ? (
           <Loader />
         ) : (
-          <DataTable
-            columns={columns}
-            data={products}
-            page={pagination.page}
-            totalPages={pagination.totalPages}
-            onPageChange={setPage}
-          />
+          <div className="mt-4">
+            <DataTable
+              columns={columns}
+              data={products}
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              onPageChange={setPage}
+            />
+          </div>
         )}
 
         {/* Table */}

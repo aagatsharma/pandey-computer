@@ -129,7 +129,7 @@ export default async function ProductPage({
                 -{discount}%
               </Badge>
             )}
-            {product.quantity === 0 && (
+            {!product.stock && (
               <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-2xl">
                 <span className="text-white font-bold text-2xl">
                   Out of Stock
@@ -168,7 +168,7 @@ export default async function ProductPage({
 
             {/* Stock */}
             <div className="mb-6">
-              {product.quantity && product.quantity > 0 ? (
+              {product.stock ? (
                 <span className="text-green-600 font-semibold flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-600 rounded-full"></span>In
                   Stock

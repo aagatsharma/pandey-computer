@@ -11,7 +11,6 @@ export default function AddProductPage() {
     keyFeatures?: string[];
     price: number;
     originalPrice?: number;
-    quantity?: number;
     category?: string;
     subCategory?: string;
     brand?: string;

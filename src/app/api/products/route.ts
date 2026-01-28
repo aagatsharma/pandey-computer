@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
       brand,
       subBrand,
       images,
-      quantity,
+      stock,
       hotDeals,
       topSelling,
     } = body;
@@ -183,7 +183,7 @@ export async function POST(req: NextRequest) {
       brand: brand || undefined,
       subBrand: subBrand || undefined,
       images: images || [],
-      quantity: quantity || 0,
+      stock: stock || false,
       hotDeals: hotDeals || false,
       topSelling: topSelling || false,
     });
@@ -222,7 +222,7 @@ export async function PUT(req: NextRequest) {
       brand,
       subBrand,
       images,
-      quantity,
+      stock,
       hotDeals,
       topSelling,
     } = body;
@@ -264,7 +264,7 @@ export async function PUT(req: NextRequest) {
         brand: brand || undefined,
         subBrand: subBrand || undefined,
         images: images || [],
-        quantity: quantity || 0,
+        stock: stock || false,
         hotDeals: hotDeals || false,
         topSelling: topSelling || false,
       },

@@ -34,7 +34,6 @@ const formSchema = z.object({
     .number()
     .min(0, "Original price must be positive")
     .optional(),
-  quantity: z.number().min(0, "Quantity must be positive").optional(),
   category: z.string().optional(),
   subCategory: z.string().optional(),
   brand: z.string().optional(),
@@ -42,6 +41,7 @@ const formSchema = z.object({
   images: z.any().optional(),
   hotDeals: z.boolean().optional(),
   topSelling: z.boolean().optional(),
+  stock: z.boolean().optional(),
   specs: z.string().optional(),
 });
 
@@ -53,10 +53,10 @@ interface ProductFormProps {
     keyFeatures?: string[];
     price: number;
     originalPrice?: number;
-    quantity?: number;
     category?: string;
     subCategory?: string;
     brand?: string;
+    stock?: boolean;
     subBrand?: string;
     images: string[];
     hotDeals?: boolean;
@@ -92,13 +92,13 @@ export default function ProductForm({
       keyFeatures: "",
       price: 0,
       originalPrice: 0,
-      quantity: 0,
       category: "",
       subCategory: "",
       brand: "",
       subBrand: "",
       images: undefined,
       hotDeals: false,
+      stock: false,
       topSelling: false,
       specs: "",
     },
@@ -169,13 +169,13 @@ export default function ProductForm({
         keyFeatures: editData.keyFeatures?.join("\n") || "",
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
-        quantity: editData.quantity || 0,
         category: categoryId,
         subCategory: subCategoryId,
         brand: brandId,
         subBrand: subBrandId,
         hotDeals: editData.hotDeals || false,
         topSelling: editData.topSelling || false,
+        stock: editData.stock || false,
         specs: "",
         images: undefined,
       });
@@ -187,7 +187,6 @@ export default function ProductForm({
         keyFeatures: "",
         price: 0,
         originalPrice: 0,
-        quantity: 0,
 
         category: "",
         subCategory: "",
@@ -196,6 +195,7 @@ export default function ProductForm({
         images: undefined,
         hotDeals: false,
         topSelling: false,
+        stock: false,
         specs: "",
       });
       setPreviews([]);
@@ -244,7 +244,6 @@ export default function ProductForm({
           : [],
         price: data.price,
         originalPrice: data.originalPrice || undefined,
-        quantity: data.quantity || 0,
         category: data.category || undefined,
         subCategory: data.subCategory || undefined,
         brand: data.brand || undefined,
@@ -252,6 +251,7 @@ export default function ProductForm({
         images: imageUrls,
         hotDeals: data.hotDeals || false,
         topSelling: data.topSelling || false,
+        stock: data.stock || false,
         specs: Object.keys(specsObject).length > 0 ? specsObject : undefined,
       });
 
@@ -345,27 +345,6 @@ export default function ProductForm({
               )}
             />
           </div>
-
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantity</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    {...field}
-                    {...form.register("quantity", {
-                      setValueAs: (value: string) => parseFloat(value),
-                    })}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
@@ -620,6 +599,24 @@ export default function ProductForm({
                   </div>
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="stock"
+            render={({ field }) => (
+              <FormItem className="flex items-center space-x-2">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={field.onChange}
+                    className="h-4 w-4"
+                  />
+                </FormControl>
+                <FormLabel className="mt-0!">In Stock</FormLabel>
               </FormItem>
             )}
           />

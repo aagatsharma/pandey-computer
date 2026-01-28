@@ -25,7 +25,7 @@ export interface IProduct extends Document {
   images: string[];
 
   // Status
-  quantity: number;
+  stock: boolean;
   hotDeals?: boolean;
   topSelling?: boolean;
 
@@ -88,10 +88,9 @@ const ProductSchema = new Schema<IProduct>(
     },
 
     // Status
-    quantity: {
-      type: Number,
-      default: 0,
-      min: 0,
+    stock: {
+      type: Boolean,
+      default: false,
     },
     hotDeals: {
       type: Boolean,
