@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2, Plus } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
@@ -29,14 +29,48 @@ import Image from "next/image";
 import Loader from "@/components/loader";
 import { IBrand } from "@/lib/models/Brand";
 import { ICategory } from "@/lib/models/Category";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export default function ProductsPage() {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data, mutate, isLoading, error } = useSWR("/api/products", fetcher);
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
-  const products = data?.data || [];
+  // filters
+  const [filters, setFilters] = useState({
+    name: "",
+    category: "",
+    brand: "",
+    minPrice: "",
+    maxPrice: "",
+  });
+
+  const debouncedFilters = useDebounce(filters, 500);
+
+  const query = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(debouncedFilters.name && { name: debouncedFilters.name }),
+    ...(debouncedFilters.category && { category: debouncedFilters.category }),
+    ...(debouncedFilters.brand && { brand: debouncedFilters.brand }),
+    ...(debouncedFilters.minPrice && {
+      minPrice: debouncedFilters.minPrice,
+    }),
+    ...(debouncedFilters.maxPrice && {
+      maxPrice: debouncedFilters.maxPrice,
+    }),
+  }).toString();
+
+  const { data, isLoading, error, mutate } = useSWR(
+    `/api/products?${query}`,
+    fetcher,
+  );
+
+  const products: IProduct[] = data?.data ?? [];
+  const pagination = data?.pagination;
 
   const handleDelete = async (id: string) => {
     try {
@@ -208,10 +242,6 @@ export default function ProductsPage() {
     },
   ];
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   if (error) {
     return (
       <div className="text-center py-12 text-red-500">
@@ -222,18 +252,73 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Products</h1>
-          <p className="text-gray-500 mt-1">Manage your products</p>
-        </div>
-        <Button onClick={() => router.push("/admin/products/add")}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Product
-        </Button>
-      </div>
+      <div className="space-y-6">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3">
+          <Input
+            placeholder="Search name"
+            className="border px-3 py-2 rounded w-96"
+            value={filters.name}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, name: e.target.value }))
+            }
+          />
 
-      <DataTable columns={columns} data={products} />
+          <Input
+            type="number"
+            placeholder="Min price"
+            className="border px-3 py-2 rounded w-32"
+            value={filters.minPrice}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, minPrice: e.target.value }))
+            }
+          />
+
+          <Input
+            type="number"
+            placeholder="Max price"
+            className="border px-3 py-2 rounded w-32"
+            value={filters.maxPrice}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, maxPrice: e.target.value }))
+            }
+          />
+
+          <Button variant="outline" onClick={() => setPage(1)}>
+            Apply
+          </Button>
+
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setFilters({
+                name: "",
+                category: "",
+                brand: "",
+                minPrice: "",
+                maxPrice: "",
+              });
+              setPage(1);
+            }}
+          >
+            Reset
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <DataTable
+            columns={columns}
+            data={products}
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={setPage}
+          />
+        )}
+
+        {/* Table */}
+      </div>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

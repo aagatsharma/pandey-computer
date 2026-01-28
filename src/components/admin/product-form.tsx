@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { IProduct } from "@/lib/models/Product";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z
@@ -200,6 +201,18 @@ export default function ProductForm({
       setPreviews([]);
     }
   }, [editData, form]);
+
+  const makePrimaryImage = (index: number) => {
+    setPreviews((prev) => {
+      if (index === 0) return prev;
+
+      const newPreviews = [...prev];
+      const [selected] = newPreviews.splice(index, 1);
+      newPreviews.unshift(selected);
+
+      return newPreviews;
+    });
+  };
 
   const handleSubmit = async (data: FormValues) => {
     try {
@@ -579,14 +592,27 @@ export default function ProductForm({
                         {previews.map((preview, index) => (
                           <div
                             key={index}
-                            className="relative w-full h-24 rounded-lg overflow-hidden border"
+                            onClick={() => makePrimaryImage(index)}
+                            className={cn(
+                              "relative w-full aspect-square rounded-lg overflow-hidden border cursor-pointer",
+                              index === 0
+                                ? "ring-2 ring-primary"
+                                : "hover:ring-2 hover:ring-gray-300",
+                            )}
                           >
                             <Image
                               src={preview}
                               alt={`Preview ${index + 1}`}
                               fill
+                              sizes="(max-width: 768px) 50vw, 25vw"
                               className="object-cover"
                             />
+
+                            {index === 0 && (
+                              <div className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded">
+                                Primary
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
