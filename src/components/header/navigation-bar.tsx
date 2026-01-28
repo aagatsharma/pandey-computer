@@ -150,11 +150,13 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
+      // scrolling down → collapse
       if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
-        // scrolling down
         setIsCollapsed(true);
-      } else {
-        // scrolling up
+      }
+
+      // scrolling up → expand
+      if (currentScrollY < lastScrollY.current) {
         setIsCollapsed(false);
       }
 
@@ -274,7 +276,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
       <nav
         className={`bg-primary text-white hidden lg:block
     transition-all duration-300 ease-in-out
-    ${isCollapsed ? "max-h-0 opacity-0" : "opacity-100"}
+    ${isCollapsed ? "max-h-0 opacity-0" : "max-h-12 opacity-100"}
   `}
       >
         <div className="max-w-7xl mx-auto relative">
