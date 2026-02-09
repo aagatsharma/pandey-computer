@@ -39,7 +39,7 @@ const HomeWallpaperSchema = new Schema<IHomeWallpaper>(
         type: Number,
         default: 1,
         min: 1,
-        max: 2,
+        max: 4,
       },
       rows: {
         type: Number,
@@ -49,7 +49,7 @@ const HomeWallpaperSchema = new Schema<IHomeWallpaper>(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.HomeWallpaper ||

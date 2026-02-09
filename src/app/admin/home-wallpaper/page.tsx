@@ -63,7 +63,10 @@ export default function HomeWallpaperPage() {
     gridSpan: { cols: 1, rows: 1 },
   });
 
-  const { data, mutate, isLoading, error } = useSWR("/api/home-wallpaper", fetcher);
+  const { data, mutate, isLoading, error } = useSWR(
+    "/api/home-wallpaper",
+    fetcher,
+  );
 
   const wallpapers = data?.data || [];
 
@@ -80,7 +83,7 @@ export default function HomeWallpaperPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(
-          editData ? { ...formData, id: editData._id } : formData
+          editData ? { ...formData, id: editData._id } : formData,
         ),
       });
 
@@ -238,7 +241,11 @@ export default function HomeWallpaperPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading wallpapers</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading wallpapers
+      </div>
+    );
   }
 
   return (
@@ -365,12 +372,12 @@ export default function HomeWallpaperPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="cols">Grid Columns (1-2)</Label>
+                <Label htmlFor="cols">Grid Columns (1-4)</Label>
                 <Input
                   id="cols"
                   type="number"
                   min="1"
-                  max="2"
+                  max="4"
                   value={formData.gridSpan.cols}
                   onChange={(e) =>
                     setFormData({

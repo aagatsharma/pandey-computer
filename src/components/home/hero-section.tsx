@@ -63,13 +63,22 @@ export default async function HeroSection() {
             const cols = wallpaper.gridSpan?.cols || 1;
             const rows = wallpaper.gridSpan?.rows || 1;
 
+            const colSpanClass =
+              cols === 4
+                ? "lg:col-span-4 md:col-span-2"
+                : cols === 3
+                  ? "lg:col-span-3 md:col-span-2"
+                  : cols === 2
+                    ? "md:col-span-2"
+                    : "";
+
+            const rowSpanClass = rows === 2 ? "md:row-span-2" : "";
+
             return (
               <Link
                 key={wallpaper._id}
                 href={wallpaper.route}
-                className={`relative overflow-hidden rounded-2xl group transition-all duration-300 shadow-lg hover:shadow-xl ${
-                  cols === 2 ? "md:col-span-2" : ""
-                } ${rows === 2 ? "md:row-span-2" : ""}`}
+                className={`relative overflow-hidden rounded-2xl group transition-all duration-300 shadow-lg hover:shadow-xl ${colSpanClass} ${rowSpanClass}`}
               >
                 <Image
                   src={wallpaper.image}
