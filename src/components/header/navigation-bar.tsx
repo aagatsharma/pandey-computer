@@ -145,28 +145,26 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
   const topLevelItems = menuData.filter((item) => item.level === 1);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const lastScrollY = useRef(0);
+  const HIDE_THRESHOLD = 120; // Scroll down past this to hide
+  const SHOW_THRESHOLD = 50; // Scroll up above this to show
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // scrolling down → collapse
-      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+      // Use different thresholds to prevent glitch loop
+      if (!isCollapsed && currentScrollY > HIDE_THRESHOLD) {
+        // Currently showing, hide when scrolled past HIDE_THRESHOLD
         setIsCollapsed(true);
-      }
-
-      // scrolling up → expand
-      if (currentScrollY < lastScrollY.current) {
+      } else if (isCollapsed && currentScrollY < SHOW_THRESHOLD) {
+        // Currently hidden, show when scrolled above SHOW_THRESHOLD
         setIsCollapsed(false);
       }
-
-      lastScrollY.current = currentScrollY;
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isCollapsed]);
 
   return (
     <header className="w-full bg-muted sticky top-0 z-50 shadow-sm">
