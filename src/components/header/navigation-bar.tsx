@@ -14,6 +14,7 @@ import {
   MapPin,
 } from "lucide-react";
 import CartIcon from "./cart-icon";
+import WishlistIcon from "./wishlist-icon";
 
 interface NavbarItem {
   _id: string;
@@ -255,9 +256,26 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
               </form>
             </div>
 
-            {/* Right Side: Cart & Mobile Menu */}
+            {/* Right Side: Wishlist, Cart & Mobile Menu */}
             <div className="flex items-center gap-4">
-              <CartIcon />
+              <Link
+                href="/wishlist"
+                className="text-foreground hover:text-primary transition-colors flex items-center gap-2"
+              >
+                <WishlistIcon />
+                <span className="hidden lg:inline text-sm font-medium">
+                  My Wishlist
+                </span>
+              </Link>
+              <Link
+                href="/cart"
+                className="text-foreground hover:text-primary transition-colors flex items-center gap-2"
+              >
+                <CartIcon />
+                <span className="hidden lg:inline text-sm font-medium">
+                  Shopping Cart
+                </span>
+              </Link>
 
               {/* Mobile Menu Button */}
               <button

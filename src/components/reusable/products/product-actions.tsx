@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2, RefreshCw } from "lucide-react";
+import { ShoppingCart, Trash2, RefreshCw, Heart } from "lucide-react";
 import { IProduct } from "@/lib/models/Product";
 import { useCartStore } from "@/store/cart-store";
+import { useWishlistStore } from "@/store/wishlist-store";
 import { toast } from "sonner";
 
 interface ProductActionsProps {
@@ -14,12 +15,16 @@ interface ProductActionsProps {
 export function ProductActions({ product }: ProductActionsProps) {
   const [quantity, setQuantity] = useState(1);
   const { cart, addToCart, removeFromCart, updateQuantity } = useCartStore();
+  const { wishlist, addToWishlist, removeFromWishlist } = useWishlistStore();
 
   const { price, stock: inStock } = product;
 
   const cartItem = cart.find((item) => item._id === String(product._id));
   const isInCart = !!cartItem;
   const cartQuantity = cartItem ? cartItem.quantity : 0;
+  const isInWishlist = wishlist.some(
+    (item) => item._id === String(product._id),
+  );
 
   useEffect(() => {
     if (cartQuantity > 0) {
@@ -53,6 +58,22 @@ export function ProductActions({ product }: ProductActionsProps) {
         maxQuantity: 4,
       });
       toast.success("Added to cart");
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist) {
+      removeFromWishlist(String(product._id));
+      toast.error("Removed from wishlist");
+    } else {
+      addToWishlist({
+        _id: String(product._id),
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        image: product.images?.[0] || "/placeholder.png",
+      });
+      toast.success("Added to wishlist");
     }
   };
 
@@ -126,7 +147,7 @@ export function ProductActions({ product }: ProductActionsProps) {
       <p className="my-4 text-gray-500">**Price is inclusive of VAT**</p>
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col gap-4">
         <Button
           size="lg"
           className="text-base w-full"
@@ -136,6 +157,18 @@ export function ProductActions({ product }: ProductActionsProps) {
         >
           <Icon className="mr-2 h-5 w-5" />
           {buttonConfig.text}
+        </Button>
+
+        <Button
+          size="lg"
+          variant={isInWishlist ? "default" : "outline"}
+          className="text-base w-full"
+          onClick={handleWishlistToggle}
+        >
+          <Heart
+            className={`mr-2 h-5 w-5 ${isInWishlist ? "fill-current" : ""}`}
+          />
+          {isInWishlist ? "In Wishlist" : "Add to Wishlist"}
         </Button>
       </div>
     </div>
