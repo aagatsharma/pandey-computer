@@ -304,7 +304,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                 {/* Top Level */}
                 <Link
                   href={`/shop?${menu.type}=${menu.slug}`}
-                  className="flex items-center h-12 px-3 text-sm font-medium transition-colors whitespace-nowrap hover:bg-white hover:text-primary"
+                  className="flex items-center h-12 px-3 text-sm font-medium transition-colors whitespace-nowrap hover:bg-white hover:text-primary group-hover:bg-white group-hover:text-primary"
                 >
                   {menu.label}
                   <ChevronDown className="ml-1 size-4 group-hover:rotate-180 transition-transform duration-300" />
