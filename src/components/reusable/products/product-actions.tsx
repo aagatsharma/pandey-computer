@@ -118,7 +118,7 @@ export function ProductActions({ product }: ProductActionsProps) {
     <div>
       {/* Quantity Selector */}
       {inStock && (
-        <div className="mb-8">
+        <div className="mb-4">
           <label className="block text-sm font-semibold mb-2">Quantity</label>
           <div className="flex items-center gap-3">
             <Button
@@ -144,7 +144,7 @@ export function ProductActions({ product }: ProductActionsProps) {
         </div>
       )}
 
-      <p className="my-4 text-gray-500">**Price is inclusive of VAT**</p>
+      <p className="mb-8 text-gray-500">**Price is inclusive of VAT**</p>
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-4">

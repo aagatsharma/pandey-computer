@@ -129,13 +129,6 @@ export default async function ProductPage({
                 -{discount}%
               </Badge>
             )}
-            {!product.stock && (
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <span className="text-white font-bold text-2xl">
-                  Out of Stock
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Product Info */}
@@ -150,13 +143,13 @@ export default async function ProductPage({
                 .filter(Boolean)
                 .join(" > ")}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
               {product.name}
             </h1>
 
             {/* Price */}
-            <div className="flex items-baseline flex-wrap gap-4 mb-8">
-              <span className="text-2xl text-primary font-medium">
+            <div className="flex items-baseline flex-wrap gap-4 mb-4">
+              <span className="text-xl text-primary font-medium">
                 Rs.{product.price.toLocaleString()}
               </span>
               {product.originalPrice && (
