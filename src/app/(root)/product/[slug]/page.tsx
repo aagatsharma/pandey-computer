@@ -15,6 +15,7 @@ import "@/lib/models/SubBrand";
 
 import { Types } from "mongoose";
 import { GoDotFill } from "react-icons/go";
+import { FaWhatsapp, FaFacebook } from "react-icons/fa";
 
 export const revalidate = 3600; // 1 hour caching for SEO/performance
 
@@ -175,6 +176,35 @@ export default async function ProductPage({
             </div>
 
             <ProductActions product={product} />
+
+            {/* Share Buttons */}
+            <div className="flex items-center gap-3 my-6">
+              <span className="text-base font-medium text-muted-foreground">
+                Share:
+              </span>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Check out ${product.name} - Rs.${product.price.toLocaleString()} at ${process.env.NEXT_PUBLIC_BASE_URL || "https://pandeycomputer.com"}/product/${product.slug}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
+              >
+                <FaWhatsapp className="size-5" />
+                <span className="text-sm font-medium">WhatsApp</span>
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  `${process.env.NEXT_PUBLIC_BASE_URL || "https://pandeycomputer.com"}/product/${product.slug}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              >
+                <FaFacebook className="size-5" />
+                <span className="text-sm font-medium">Facebook</span>
+              </a>
+            </div>
 
             {/* Key Features */}
             {product?.keyFeatures && product.keyFeatures?.length > 0 && (
