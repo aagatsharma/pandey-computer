@@ -80,7 +80,7 @@ export function ProductCard({ product }: { product: IProduct }) {
           {/* Bottom aligned */}
           <div className="mt-auto flex items-center justify-between">
             <div>
-              <span className="text-xl font-bold">
+              <span className="text-xl font-bold text-primary">
                 Rs.{price.toLocaleString()}
               </span>
               {originalPrice && (
