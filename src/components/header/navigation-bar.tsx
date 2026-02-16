@@ -1,20 +1,19 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
-  Search,
   Menu,
   X,
   ChevronDown,
   ChevronRight,
-  CircleArrowRight,
   Phone,
   MapPin,
 } from "lucide-react";
 import CartIcon from "./cart-icon";
 import WishlistIcon from "./wishlist-icon";
+import SearchBar from "./search-bar";
 
 interface NavbarItem {
   _id: string;
@@ -125,21 +124,7 @@ const MobileMenuItem = ({
 
 export default function NavigationBar({ menuData }: NavigationBarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/shop?name=${encodeURIComponent(searchQuery.trim())}`);
-      setIsMobileMenuOpen(false);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-  };
 
   // Filter only level 1 items (top-level navigation)
   const topLevelItems = menuData.filter((item) => item.level === 1);
@@ -221,37 +206,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl hidden md:block">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  name="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for products..."
-                  className="w-full px-4 py-2.5 pl-10 pr-20 border border-input rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <Search className="h-5 w-5 text-muted-foreground" />
-                </div>
-
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={clearSearch}
-                      className="p-1 hover:bg-accent rounded-full transition-colors"
-                    >
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  )}
-                  <button
-                    type="submit"
-                    className="p-1 hover:bg-accent rounded-full transition-colors text-primary"
-                  >
-                    <CircleArrowRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </form>
+              <SearchBar />
             </div>
 
             {/* Right Side: Wishlist, Cart & Mobile Menu */}
@@ -400,37 +355,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
           <div className="flex-1 overflow-y-auto">
             <div className="p-4 space-y-4">
               {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  name="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for products..."
-                  className="w-full px-4 py-2.5 pl-10 pr-20 border border-input rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <Search className="h-5 w-5 text-muted-foreground" />
-                </div>
-
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={clearSearch}
-                      className="p-1 hover:bg-accent rounded-full transition-colors"
-                    >
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  )}
-                  <button
-                    type="submit"
-                    className="p-1 hover:bg-accent rounded-full transition-colors text-primary"
-                  >
-                    <CircleArrowRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </form>
+              <SearchBar />
 
               {/* Navigation Links */}
               <nav>
