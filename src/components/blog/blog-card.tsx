@@ -9,7 +9,7 @@ export function BlogCard({ blog }: { blog: IBlog }) {
     <Link href={`/blogs/${slug}`}>
       <Card className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg hover:border-primary transition-all duration-300 group py-0 gap-0">
         {image && (
-          <div className="relative w-full h-48 overflow-hidden">
+          <div className="relative w-full h-32 md:h-48 overflow-hidden">
             <Image
               src={image}
               alt={title}
@@ -18,11 +18,11 @@ export function BlogCard({ blog }: { blog: IBlog }) {
             />
           </div>
         )}
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-card-foreground line-clamp-2 group-hover:text-primary transition-colors">
+        <CardContent className="p-3 md:p-6">
+          <h3 className="text-sm md:text-lg font-semibold text-card-foreground line-clamp-2 group-hover:text-primary transition-colors mb-1 md:mb-2">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-3">
+          <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 md:line-clamp-3">
             {excerpt}
           </p>
         </CardContent>

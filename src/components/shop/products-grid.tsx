@@ -18,7 +18,7 @@ export function ProductsGrid({
 }: ProductsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
         {Array.from({ length: 12 }).map((_, index) => (
           <ProductSkeleton key={index} />
         ))}
@@ -38,7 +38,7 @@ export function ProductsGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
       {products.map((product) => (
         <ProductCard key={product.slug} product={product} />
       ))}

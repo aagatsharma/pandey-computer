@@ -51,7 +51,7 @@ export function ProductCard({ product }: { product: IProduct }) {
 
   return (
     <Link href={`/product/${slug}`} className="block h-full">
-      <div className="group bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all h-full flex flex-col">
+      <div className="group bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 hover:shadow-md transition-all h-full flex flex-col">
         {/* Image */}
         <div className="relative w-full aspect-4/3 overflow-hidden">
           <Image
@@ -61,30 +61,30 @@ export function ProductCard({ product }: { product: IProduct }) {
             className="object-contain transition-transform duration-300 group-hover:scale-105"
           />
           {discount > 0 && (
-            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+            <div className="absolute top-1 right-1 md:top-2 md:right-2 bg-red-500 text-white text-[10px] md:text-xs font-semibold px-1.5 py-0.5 md:px-2 md:py-1 rounded">
               -{discount}%
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="p-4 flex flex-col flex-1">
-          <div className="text-xs text-muted-foreground uppercase mb-2">
+        <div className="p-2 md:p-4 flex flex-col flex-1">
+          <div className="text-[10px] md:text-xs text-muted-foreground uppercase mb-1 md:mb-2 truncate">
             {category?.name || brand?.name || ""}
           </div>
 
-          <h3 className="font-semibold text-sm leading-tight line-clamp-3 mb-3 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-xs md:text-sm leading-tight line-clamp-2 md:line-clamp-3 mb-2 md:mb-3 group-hover:text-primary transition-colors">
             {name}
           </h3>
 
           {/* Bottom aligned */}
-          <div className="mt-auto flex items-center justify-between">
-            <div>
-              <span className="text-xl font-bold text-primary">
+          <div className="mt-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+            <div className="flex flex-col md:flex-row md:items-baseline">
+              <span className="text-sm md:text-xl font-bold text-primary">
                 Rs.{price.toLocaleString()}
               </span>
               {originalPrice && (
-                <span className="text-xs text-muted-foreground line-through ml-2">
+                <span className="text-[10px] md:text-xs text-muted-foreground line-through md:ml-2">
                   Rs.{originalPrice.toLocaleString()}
                 </span>
               )}
@@ -95,15 +95,20 @@ export function ProductCard({ product }: { product: IProduct }) {
                 size="sm"
                 variant={isInCart ? "destructive" : "secondary"}
                 onClick={handleToggleCart}
+                className="h-7 w-7 md:h-8 md:w-8 p-0"
               >
                 {isInCart ? (
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3 md:h-4 md:w-4" />
                 ) : (
-                  <ShoppingCart className="h-4 w-4" />
+                  <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
                 )}
               </Button>
             ) : (
-              <Button size="sm" disabled>
+              <Button
+                size="sm"
+                disabled
+                className="h-7 text-[10px] md:h-8 md:text-xs"
+              >
                 Sold Out
               </Button>
             )}

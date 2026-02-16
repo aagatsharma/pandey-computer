@@ -16,7 +16,7 @@ interface BlogsCarouselProps {
 
 export function BlogsCarousel({ blogs }: BlogsCarouselProps) {
   return (
-    <div className="relative px-2 sm:px-0">
+    <div className="relative px-2 sm:px-0 pb-2">
       <Carousel
         opts={{
           align: "start",
@@ -24,11 +24,11 @@ export function BlogsCarousel({ blogs }: BlogsCarouselProps) {
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-2 md:-ml-4 pb-1">
           {blogs.map((blog) => (
             <CarouselItem
               key={blog.slug}
-              className="pl-2 md:pl-4 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+              className="pl-2 md:pl-4 basis-1/2 lg:basis-1/3 xl:basis-1/4 mb-1"
             >
               <BlogCard blog={blog} />
             </CarouselItem>
