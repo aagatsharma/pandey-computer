@@ -101,9 +101,13 @@ export default async function ProductPage({
   const product = await getProduct(slug);
   if (!product) notFound();
 
-  const relatedProducts = product.categories && product.categories.length > 0
-    ? await getRelatedProducts(product.categories[0]._id, product._id.toString())
-    : [];
+  const relatedProducts =
+    product.categories && product.categories.length > 0
+      ? await getRelatedProducts(
+          product.categories[0]._id,
+          product._id.toString(),
+        )
+      : [];
 
   const discount = product.originalPrice
     ? Math.round(

@@ -64,14 +64,18 @@ const ProductSchema = new Schema<IProduct>(
       type: [String],
       default: [],
     },
-    categories: [{
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-    }],
-    subCategories: [{
-      type: Schema.Types.ObjectId,
-      ref: "SubCategory",
-    }],
+    categories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
+    subCategories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "SubCategory",
+      },
+    ],
     brand: {
       type: Schema.Types.ObjectId,
       ref: "Brand",

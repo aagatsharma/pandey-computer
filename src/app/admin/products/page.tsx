@@ -99,60 +99,45 @@ export default function ProductsPage() {
 
   const columns: ColumnDef<IProduct>[] = [
     {
-      accessorKey: "images",
-      header: "Image",
+      accessorKey: "product",
+      header: "Product",
       cell: ({ row }) => {
-        const images = row.getValue("images") as string[];
-        if (!images || images.length === 0) {
-          return (
-            <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-              N/A
-            </div>
-          );
-        }
+        const images = row.original.images as string[] | undefined;
+        const name = row.original.name as string;
+
         return (
-          <div className="relative w-12 h-12 rounded overflow-hidden">
-            <Image
-              src={images[0]}
-              alt={row.original.name}
-              fill
-              className="object-cover"
-            />
+          <div className="flex gap-2 max-w-[600px]">
+            {images && images.length > 0 && (
+              <div className="relative w-12 h-12 shrink-0 rounded overflow-hidden">
+                <Image
+                  src={images[0]}
+                  alt={row.original.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
+            <span>{name}</span>
           </div>
         );
       },
     },
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
+
     {
       accessorKey: "price",
       header: "Price",
       cell: ({ row }) => {
         const price = row.getValue("price") as number;
-        return <div>Rs. {price.toFixed(2)}</div>;
-      },
-    },
-    {
-      accessorKey: "originalPrice",
-      header: "Original Price",
-      cell: ({ row }) => {
-        const originalPrice = row.getValue("originalPrice") as
-          | number
-          | undefined;
-        if (!originalPrice) return <div>-</div>;
-        return <div>Rs. {originalPrice.toFixed(2)}</div>;
-      },
-    },
-    {
-      accessorKey: "quantity",
-      header: "Stock",
-      cell: ({ row }) => {
-        const quantity = row.getValue("quantity") as number;
+        const originalPrice = row.original.originalPrice as number | undefined;
         return (
-          <div className={quantity > 0 ? "text-green-600" : "text-red-600"}>
-            {quantity}
+          <div className="flex flex-col gap-2">
+            Rs. {price.toFixed(2)}
+            {originalPrice && (
+              <p className="block">
+                Rs.
+                <span className="line-through">{`${originalPrice.toFixed(2)}`}</span>
+              </p>
+            )}
           </div>
         );
       },
@@ -162,7 +147,13 @@ export default function ProductsPage() {
       header: "Categories",
       cell: ({ row }) => {
         const categories = row.getValue("categories") as ICategory[] | null;
-        return <div>{categories && categories.length > 0 ? categories.map(c => c.name).join(", ") : "-"}</div>;
+        return (
+          <div>
+            {categories && categories.length > 0
+              ? categories.map((c) => c.name).join(", ")
+              : "-"}
+          </div>
+        );
       },
     },
     {

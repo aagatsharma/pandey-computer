@@ -109,11 +109,12 @@ export default function ProductForm({
   const watchedBrand = form.watch("brand");
 
   // Filter sub-categories by selected categories (compare as strings)
-  const filteredSubCategories = watchedCategories && watchedCategories.length > 0
-    ? subCategories.filter((subCat: any) => 
-        watchedCategories.includes(String(subCat.category))
-      )
-    : [];
+  const filteredSubCategories =
+    watchedCategories && watchedCategories.length > 0
+      ? subCategories.filter((subCat: any) =>
+          watchedCategories.includes(String(subCat.category)),
+        )
+      : [];
 
   // Filter sub-brands by selected brand
   const filteredSubBrands = watchedBrand
@@ -131,10 +132,10 @@ export default function ProductForm({
 
       // Handle categories array
       const categoryIds = editData.categories
-        ? editData.categories.map((cat: any) => 
+        ? editData.categories.map((cat: any) =>
             typeof cat === "object" && "_id" in cat
               ? cat._id?.toString()
-              : String(cat)
+              : String(cat),
           )
         : [];
 
@@ -143,7 +144,7 @@ export default function ProductForm({
         ? editData.subCategories.map((subCat: any) =>
             typeof subCat === "object" && "_id" in subCat
               ? subCat._id?.toString()
-              : String(subCat)
+              : String(subCat),
           )
         : [];
 
@@ -246,8 +247,14 @@ export default function ProductForm({
           : [],
         price: data.price,
         originalPrice: data.originalPrice || undefined,
-        categories: data.categories && data.categories.length > 0 ? data.categories : undefined,
-        subCategories: data.subCategories && data.subCategories.length > 0 ? data.subCategories : undefined,
+        categories:
+          data.categories && data.categories.length > 0
+            ? data.categories
+            : undefined,
+        subCategories:
+          data.subCategories && data.subCategories.length > 0
+            ? data.subCategories
+            : undefined,
         brand: data.brand || undefined,
         subBrand: data.subBrand || undefined,
         images: imageUrls,
@@ -365,7 +372,9 @@ export default function ProductForm({
                   <FormControl>
                     <div className="border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white">
                       {categories.length === 0 ? (
-                        <p className="text-sm text-gray-500">No categories available</p>
+                        <p className="text-sm text-gray-500">
+                          No categories available
+                        </p>
                       ) : (
                         categories.map(
                           (category: { _id: string; name: string }) => (
@@ -376,25 +385,45 @@ export default function ProductForm({
                               <input
                                 type="checkbox"
                                 value={category._id}
-                                checked={field.value?.includes(category._id) || false}
+                                checked={
+                                  field.value?.includes(category._id) || false
+                                }
                                 onChange={(e) => {
                                   const currentValues = field.value || [];
                                   let newValues;
-                                  
+
                                   if (e.target.checked) {
-                                    newValues = [...currentValues, category._id];
+                                    newValues = [
+                                      ...currentValues,
+                                      category._id,
+                                    ];
                                   } else {
-                                    newValues = currentValues.filter((id) => id !== category._id);
-                                    
+                                    newValues = currentValues.filter(
+                                      (id) => id !== category._id,
+                                    );
+
                                     // Remove subcategories that belong to this category
-                                    const currentSubCategories = form.getValues("subCategories") || [];
-                                    const validSubCategories = currentSubCategories.filter((subCatId) => {
-                                      const subCat = subCategories.find((sc: any) => sc._id === subCatId);
-                                      return subCat && String(subCat.category) !== category._id;
-                                    });
-                                    form.setValue("subCategories", validSubCategories);
+                                    const currentSubCategories =
+                                      form.getValues("subCategories") || [];
+                                    const validSubCategories =
+                                      currentSubCategories.filter(
+                                        (subCatId) => {
+                                          const subCat = subCategories.find(
+                                            (sc: any) => sc._id === subCatId,
+                                          );
+                                          return (
+                                            subCat &&
+                                            String(subCat.category) !==
+                                              category._id
+                                          );
+                                        },
+                                      );
+                                    form.setValue(
+                                      "subCategories",
+                                      validSubCategories,
+                                    );
                                   }
-                                  
+
                                   field.onChange(newValues);
                                 }}
                                 className="rounded border-gray-300"
@@ -425,14 +454,22 @@ export default function ProductForm({
                     )}
                   </FormLabel>
                   <FormControl>
-                    <div className={cn(
-                      "border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white",
-                      (!watchedCategories || watchedCategories.length === 0) && "bg-gray-50"
-                    )}>
-                      {(!watchedCategories || watchedCategories.length === 0) ? (
-                        <p className="text-sm text-gray-500">Select categories first</p>
+                    <div
+                      className={cn(
+                        "border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white",
+                        (!watchedCategories ||
+                          watchedCategories.length === 0) &&
+                          "bg-gray-50",
+                      )}
+                    >
+                      {!watchedCategories || watchedCategories.length === 0 ? (
+                        <p className="text-sm text-gray-500">
+                          Select categories first
+                        </p>
                       ) : filteredSubCategories.length === 0 ? (
-                        <p className="text-sm text-gray-500">No subcategories available for selected categories</p>
+                        <p className="text-sm text-gray-500">
+                          No subcategories available for selected categories
+                        </p>
                       ) : (
                         filteredSubCategories.map(
                           (subCat: { _id: string; name: string }) => (
@@ -443,14 +480,21 @@ export default function ProductForm({
                               <input
                                 type="checkbox"
                                 value={subCat._id}
-                                checked={field.value?.includes(subCat._id) || false}
+                                checked={
+                                  field.value?.includes(subCat._id) || false
+                                }
                                 onChange={(e) => {
                                   const currentValues = field.value || [];
                                   if (e.target.checked) {
-                                    field.onChange([...currentValues, subCat._id]);
+                                    field.onChange([
+                                      ...currentValues,
+                                      subCat._id,
+                                    ]);
                                   } else {
                                     field.onChange(
-                                      currentValues.filter((id) => id !== subCat._id)
+                                      currentValues.filter(
+                                        (id) => id !== subCat._id,
+                                      ),
                                     );
                                   }
                                 }}
