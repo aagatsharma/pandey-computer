@@ -1,5 +1,3 @@
-export const revalidate = 86400; // 24 hours, blogs rarely change
-
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import dbConnect from "@/lib/mongoose";
@@ -13,6 +11,44 @@ async function getBlog(slug: string): Promise<IBlog | null> {
   return JSON.parse(JSON.stringify(blog)) as IBlog;
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const blog = await getBlog(slug);
+
+  if (!blog) return { title: "Blog Not Found" };
+
+  // Extract plain text from HTML content for description
+  const description = blog.content.replace(/<[^>]*>/g, "").slice(0, 160);
+
+  return {
+    title: blog.title,
+    description,
+    keywords: ["tech blog", "computer news", "gaming", "pokhara", "nepal"],
+    authors: [{ name: "Pandey Computer" }],
+    openGraph: {
+      title: blog.title,
+      description: description.slice(0, 200),
+      type: "article",
+      publishedTime: blog.createdAt,
+      modifiedTime: blog.updatedAt,
+      authors: ["Pandey Computer"],
+      siteName: "Pandey Computer",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.title,
+      description: description.slice(0, 200),
+    },
+    alternates: {
+      canonical: `/blogs/${slug}`,
+    },
+  };
+}
+
 export default async function BlogPage({
   params,
 }: {
@@ -23,8 +59,32 @@ export default async function BlogPage({
 
   if (!blog) notFound();
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: blog.title,
+    datePublished: blog.createdAt,
+    dateModified: blog.updatedAt || blog.createdAt,
+    author: {
+      "@type": "Organization",
+      name: "Pandey Computer",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Pandey Computer",
+    },
+    description: blog.content.replace(/<[^>]*>/g, "").slice(0, 160),
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       <article>
         {/* Featured Image - Full Width with Title Overlay */}
         <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">

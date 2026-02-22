@@ -17,8 +17,6 @@ import { Types } from "mongoose";
 import { GoDotFill } from "react-icons/go";
 import { FaWhatsapp, FaFacebook } from "react-icons/fa";
 
-export const revalidate = 3600; // 1 hour caching for SEO/performance
-
 async function getProduct(slug: string) {
   await dbConnect();
 
@@ -59,13 +57,37 @@ export async function generateMetadata({
   const product = await getProduct(slug);
   if (!product) return { title: "Product Not Found" };
 
+  const description = product.specs
+    ? `${product.name} - ${Object.values(product.specs).slice(0, 3).join(", ")}. Available at Pandey Computer, Pokhara.`
+    : `Buy ${product.name} at best price in Pokhara. Available at Pandey Computer.`;
+
+  const keywords = [
+    product.name,
+    product.category?.name,
+    product.brand?.name,
+    "pokhara",
+    "nepal",
+    "computer store",
+    "gaming",
+  ].filter(Boolean);
+
   return {
-    title: `${product.name} | Pandey Computer`,
-    description: product.specs ? Object.values(product.specs).join(", ") : "",
+    title: product.name,
+    description: description.slice(0, 160),
+    keywords,
     openGraph: {
       title: product.name,
-      images:
-        product.images && product.images.length > 0 ? [product.images[0]] : [],
+      description: description.slice(0, 200),
+      type: "website",
+      siteName: "Pandey Computer",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: description.slice(0, 200),
+    },
+    alternates: {
+      canonical: `/product/${slug}`,
     },
   };
 }
@@ -93,8 +115,41 @@ export default async function ProductPage({
     ? Object.entries(product.specs).map(([k, v]) => `${k}: ${v}`)
     : [];
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: specsArray.join(", ") || product.name,
+    brand: product.brand?.name
+      ? {
+          "@type": "Brand",
+          name: product.brand.name,
+        }
+      : undefined,
+    offers: {
+      "@type": "Offer",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/product/${slug}`,
+      priceCurrency: "NPR",
+      price: product.price,
+      availability: product.stock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      seller: {
+        "@type": "Organization",
+        name: "Pandey Computer",
+      },
+    },
+  };
+
   return (
     <div>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       {/* Breadcrumb */}
       <div className="bg-muted py-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

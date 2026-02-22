@@ -47,7 +47,11 @@ interface FilterData {
   subBrands: SubBrandOption[];
 }
 
-export function ShopClient() {
+interface ShopClientProps {
+  initialFilterData?: FilterData;
+}
+
+export function ShopClient({ initialFilterData }: ShopClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -117,10 +121,13 @@ export function ShopClient() {
     return () => clearTimeout(timer);
   }, [maxPrice]);
 
-  // Fetch filter options
+  // Fetch filter options (use initial data if available)
   const { data: filterData } = useSWR<{ data: FilterData }>(
     "/api/products/filters",
     fetcher,
+    {
+      fallbackData: initialFilterData ? { data: initialFilterData } : undefined,
+    },
   );
 
   // Build query params for API

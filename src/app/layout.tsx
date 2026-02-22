@@ -102,7 +102,11 @@ const univiaPro = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
+  title: {
+    default: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    template: "%s | Pandey Computer",
+  },
   description:
     "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware. Best prices and expert service in Pokhara, Nepal.",
   keywords: [
@@ -121,6 +125,52 @@ export const metadata: Metadata = {
     "gaming peripherals pokhara",
     "pc components pokhara",
   ],
+  authors: [{ name: "Pandey Computer" }],
+  creator: "Pandey Computer",
+  publisher: "Pandey Computer",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    description:
+      "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware.",
+    siteName: "Pandey Computer",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Pandey Computer - Gaming and PC Store",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    description:
+      "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({

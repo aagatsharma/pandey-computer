@@ -10,7 +10,6 @@ interface NavbarItem {
   type: "category" | "brand" | "subCategory" | "subBrand";
   children?: NavbarItem[];
 }
-export const revalidate = 3600;
 
 async function getNavbarItems() {
   await dbConnect();
