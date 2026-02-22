@@ -1,0 +1,16 @@
+# Product Import CSV Template
+# Instructions:
+# - categoryNames: Multiple categories separated by comma (e.g., "Electronics,Gaming")
+# - subCategoryNames: Multiple subcategories separated by comma (e.g., "Laptops,Gaming Laptops")
+# - keyFeatures: Features separated by pipe | (e.g., "Feature 1|Feature 2|Feature 3")
+# - specs: Key-value pairs separated by pipe, format "Key:Value" (e.g., "Processor:Intel i7|RAM:16GB")
+# - images: Image URLs separated by pipe | (e.g., "url1.jpg|url2.jpg")
+# - stock, hotDeals, topSelling: Use true or false
+# - originalPrice: Leave empty if no discount
+#
+name,price,originalPrice,stock,hotDeals,topSelling,categoryNames,subCategoryNames,brandName,subBrandName,keyFeatures,specs,images
+Gaming Laptop Pro,125000,150000,true,true,false,"Electronics,Gaming","Laptops,Gaming Laptops",Dell,Alienware,"High Performance|RGB Keyboard|Advanced Cooling","Processor:Intel i7 12th Gen|RAM:16GB DDR5|Storage:1TB NVMe SSD|Graphics:RTX 4060 8GB|Display:15.6 inch FHD 144Hz",https://example.com/image1.jpg|https://example.com/image2.jpg
+Wireless Mouse,2500,3000,true,false,true,Electronics,Peripherals,Logitech,,"Ergonomic Design|Wireless Connectivity|Long Battery Life","DPI:1600|Buttons:6|Battery:AA|Connectivity:2.4GHz Wireless",https://example.com/mouse.jpg
+Office Chair Premium,15000,18000,false,false,false,Furniture,Office Chairs,IKEA,,"Adjustable Height|Lumbar Support|360 Degree Swivel","Material:Mesh|Weight Capacity:120kg|Height:Adjustable|Warranty:2 Years",https://example.com/chair1.jpg|https://example.com/chair2.jpg
+4K Monitor,35000,,true,true,true,Electronics,Monitors,Samsung,,"Ultra HD Resolution|HDR Support|Low Blue Light","Size:27 inch|Resolution:3840x2160|Refresh Rate:60Hz|Panel:IPS|Ports:HDMI 2.0 x2 DisplayPort x1",https://example.com/monitor.jpg
+Mechanical Keyboard,8500,10000,true,false,true,"Electronics,Gaming",Peripherals,Corsair,,"RGB Backlit|Cherry MX Switches|Programmable Keys","Switch Type:Cherry MX Red|Layout:Full Size|Cable:Braided USB-C|RGB:Per-Key",https://example.com/keyboard.jpg

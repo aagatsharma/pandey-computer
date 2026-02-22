@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { MoreHorizontal, Pencil, Trash2, Download, Upload, FileDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
@@ -38,10 +38,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function ProductsPage() {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: brandsData } = useSWR<{ data: IBrand[] }>(
     "/api/brands",
@@ -95,6 +99,94 @@ export default function ProductsPage() {
     } catch (error) {
       console.error("Error deleting product:", error);
     }
+  };
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      
+      // Build query with current filters and page
+      const exportQuery = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(debouncedFilters.name && { name: debouncedFilters.name }),
+        ...(debouncedFilters.category && { category: debouncedFilters.category }),
+        ...(debouncedFilters.brand && { brand: debouncedFilters.brand }),
+      }).toString();
+      
+      const response = await fetch(`/api/products/csv?${exportQuery}`);
+      
+      if (!response.ok) {
+        throw new Error("Failed to export products");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `products-page${page}-${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      const count = products.length;
+      toast.success(`Exported ${count} product${count !== 1 ? 's' : ''} from page ${page}`);
+    } catch (error) {
+      console.error("Error exporting products:", error);
+      toast.error("Failed to export products");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsImporting(true);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/products/csv", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to import products");
+      }
+
+      toast.success(
+        `Import completed: ${result.results.success} succeeded, ${result.results.failed} failed`
+      );
+      
+      if (result.results.errors.length > 0) {
+        console.error("Import errors:", result.results.errors);
+      }
+
+      mutate();
+    } catch (error: unknown) {
+      console.error("Error importing products:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to import products");
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleDownloadSample = () => {
+    const a = document.createElement("a");
+    a.href = "/sample-products.csv";
+    a.download = "sample-products.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const columns: ColumnDef<IProduct>[] = [
@@ -268,8 +360,44 @@ export default function ProductsPage() {
   return (
     <div>
       <div className="flex flex-col gap-2">
-        {/* Filters */}
-        <div className="flex w-full justify-end">
+        {/* Action Buttons */}
+        <div className="flex w-full justify-between items-center gap-2 flex-wrap">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {isExporting ? "Exporting..." : "Export CSV"}
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isImporting}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {isImporting ? "Importing..." : "Import CSV"}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              onClick={handleDownloadSample}
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Download Sample
+            </Button>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleImport}
+            />
+          </div>
+          
           <Button onClick={() => router.push("/admin/products/add")}>
             Add Product
           </Button>
