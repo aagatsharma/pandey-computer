@@ -21,8 +21,8 @@ async function getProduct(slug: string) {
   await dbConnect();
 
   const product = await Product.findOne({ slug })
-    .populate("category", "name slug")
-    .populate("subCategory", "name slug")
+    .populate("categories", "name slug")
+    .populate("subCategories", "name slug")
     .populate("brand", "name slug logo")
     .populate("subBrand", "name slug")
     .lean();
@@ -37,10 +37,10 @@ async function getRelatedProducts(
   await dbConnect();
 
   const products = await Product.find({
-    category: categoryId,
+    categories: categoryId,
     _id: { $ne: currentProductId },
   })
-    .populate("category", "name slug")
+    .populate("categories", "name slug")
     .populate("brand", "name slug logo")
     .limit(4)
     .lean();
