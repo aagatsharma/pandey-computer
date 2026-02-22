@@ -16,8 +16,8 @@ export interface IProduct extends Document {
   specs?: Record<string, string>;
   keyFeatures?: string[];
 
-  category?: ICategory;
-  subCategory?: ISubCategory;
+  categories?: ICategory[];
+  subCategories?: ISubCategory[];
   brand?: IBrand;
   subBrand?: ISubBrand;
 
@@ -64,14 +64,14 @@ const ProductSchema = new Schema<IProduct>(
       type: [String],
       default: [],
     },
-    category: {
+    categories: [{
       type: Schema.Types.ObjectId,
       ref: "Category",
-    },
-    subCategory: {
+    }],
+    subCategories: [{
       type: Schema.Types.ObjectId,
       ref: "SubCategory",
-    },
+    }],
     brand: {
       type: Schema.Types.ObjectId,
       ref: "Brand",

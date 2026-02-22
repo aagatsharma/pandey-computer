@@ -12,10 +12,7 @@ async function getProduct(): Promise<IProduct[]> {
     await dbConnect();
 
     const products = await Product.find({ hotDeals: true })
-      .populate("category")
-      .populate("subCategory")
       .populate("brand")
-      .populate("subBrand")
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();

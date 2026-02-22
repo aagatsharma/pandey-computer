@@ -15,7 +15,7 @@ export function ProductCard({ product }: { product: IProduct }) {
     originalPrice,
     images,
     stock: inStock,
-    category,
+    categories,
     brand,
   } = product;
   const image = images && images.length > 0 ? images[0] : "/placeholder.png";
@@ -70,7 +70,7 @@ export function ProductCard({ product }: { product: IProduct }) {
         {/* Content */}
         <div className="p-2 md:p-4 flex flex-col flex-1">
           <div className="text-[10px] md:text-xs text-muted-foreground uppercase mb-1 md:mb-2 truncate">
-            {category?.name || brand?.name || ""}
+            {brand?.name || ""}
           </div>
 
           <h3 className="font-semibold text-xs md:text-sm leading-tight line-clamp-2 md:line-clamp-3 mb-2 md:mb-3 group-hover:text-primary transition-colors">

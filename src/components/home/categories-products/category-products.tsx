@@ -16,11 +16,8 @@ async function getLatestProducts({
   try {
     await dbConnect();
 
-    const products = await Product.find({ category: category._id })
-      .populate("category")
-      .populate("subCategory")
+    const products = await Product.find({ categories: category._id })
       .populate("brand")
-      .populate("subBrand")
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();

@@ -17,6 +17,7 @@ async function getHomePageCategories(): Promise<ICategory[]> {
 
 export default async function ProductByCategories() {
   const categories = await getHomePageCategories();
+  console.log("CATEGORIES", categories);
 
   if (categories.length === 0) {
     return null;

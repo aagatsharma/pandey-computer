@@ -63,7 +63,7 @@ export async function generateMetadata({
 
   const keywords = [
     product.name,
-    product.category?.name,
+    product.categories?.[0]?.name,
     product.brand?.name,
     "pokhara",
     "nepal",
@@ -101,8 +101,8 @@ export default async function ProductPage({
   const product = await getProduct(slug);
   if (!product) notFound();
 
-  const relatedProducts = product.category
-    ? await getRelatedProducts(product.category._id, product._id.toString())
+  const relatedProducts = product.categories && product.categories.length > 0
+    ? await getRelatedProducts(product.categories[0]._id, product._id.toString())
     : [];
 
   const discount = product.originalPrice
@@ -190,14 +190,7 @@ export default async function ProductPage({
           {/* Product Info */}
           <div className="flex flex-col">
             <div className="text-sm text-primary font-semibold uppercase tracking-wide mb-2">
-              {[
-                product.category?.name,
-                product.brand?.name ||
-                  product.subBrand?.name ||
-                  product.subCategory?.name,
-              ]
-                .filter(Boolean)
-                .join(" > ")}
+              {product.brand?.name || product.subBrand?.name || ""}
             </div>
             <h1 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
               {product.name}

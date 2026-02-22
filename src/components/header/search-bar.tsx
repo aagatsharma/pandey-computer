@@ -174,11 +174,9 @@ export default function SearchBar() {
                         </span>
                       )}
                     </div>
-                    {(product.category || product.brand) && (
+                    {product.brand && (
                       <div className="text-xs text-muted-foreground mt-0.5">
-                        {[product.category?.name, product.brand?.name]
-                          .filter(Boolean)
-                          .join(" • ")}
+                        {product.brand?.name}
                       </div>
                     )}
                   </div>

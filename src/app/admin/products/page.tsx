@@ -158,11 +158,11 @@ export default function ProductsPage() {
       },
     },
     {
-      accessorKey: "category",
-      header: "Category",
+      accessorKey: "categories",
+      header: "Categories",
       cell: ({ row }) => {
-        const category = row.getValue("category") as ICategory | null;
-        return <div>{category?.name || "-"}</div>;
+        const categories = row.getValue("categories") as ICategory[] | null;
+        return <div>{categories && categories.length > 0 ? categories.map(c => c.name).join(", ") : "-"}</div>;
       },
     },
     {

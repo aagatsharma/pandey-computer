@@ -34,8 +34,8 @@ const formSchema = z.object({
     .number()
     .min(0, "Original price must be positive")
     .optional(),
-  category: z.string().optional(),
-  subCategory: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+  subCategories: z.array(z.string()).optional(),
   brand: z.string().optional(),
   subBrand: z.string().optional(),
   images: z.any().optional(),
@@ -53,8 +53,8 @@ interface ProductFormProps {
     keyFeatures?: string[];
     price: number;
     originalPrice?: number;
-    category?: string;
-    subCategory?: string;
+    categories?: string[];
+    subCategories?: string[];
     brand?: string;
     stock?: boolean;
     subBrand?: string;
@@ -92,8 +92,8 @@ export default function ProductForm({
       keyFeatures: "",
       price: 0,
       originalPrice: 0,
-      category: "",
-      subCategory: "",
+      categories: [],
+      subCategories: [],
       brand: "",
       subBrand: "",
       images: undefined,
@@ -105,13 +105,15 @@ export default function ProductForm({
   });
 
   // Watch form values for dependent filtering
-  const watchedCategory = form.watch("category");
+  const watchedCategories = form.watch("categories");
   const watchedBrand = form.watch("brand");
 
-  // Filter sub-categories by selected category
-  const filteredSubCategories = watchedCategory
-    ? subCategories.filter((subCat: any) => subCat.category === watchedCategory)
-    : subCategories;
+  // Filter sub-categories by selected categories (compare as strings)
+  const filteredSubCategories = watchedCategories && watchedCategories.length > 0
+    ? subCategories.filter((subCat: any) => 
+        watchedCategories.includes(String(subCat.category))
+      )
+    : [];
 
   // Filter sub-brands by selected brand
   const filteredSubBrands = watchedBrand
@@ -127,23 +129,23 @@ export default function ProductForm({
           }))
         : [{ key: "", value: "" }];
 
-      const categoryId =
-        editData.category &&
-        typeof editData.category === "object" &&
-        "_id" in editData.category
-          ? (editData.category as any)._id?.toString()
-          : editData.category
-            ? String(editData.category)
-            : "";
+      // Handle categories array
+      const categoryIds = editData.categories
+        ? editData.categories.map((cat: any) => 
+            typeof cat === "object" && "_id" in cat
+              ? cat._id?.toString()
+              : String(cat)
+          )
+        : [];
 
-      const subCategoryId =
-        editData.subCategory &&
-        typeof editData.subCategory === "object" &&
-        "_id" in editData.subCategory
-          ? (editData.subCategory as any)._id?.toString()
-          : editData.subCategory
-            ? String(editData.subCategory)
-            : "";
+      // Handle subcategories array
+      const subCategoryIds = editData.subCategories
+        ? editData.subCategories.map((subCat: any) =>
+            typeof subCat === "object" && "_id" in subCat
+              ? subCat._id?.toString()
+              : String(subCat)
+          )
+        : [];
 
       const brandId =
         editData.brand &&
@@ -169,8 +171,8 @@ export default function ProductForm({
         keyFeatures: editData.keyFeatures?.join("\n") || "",
         price: editData.price,
         originalPrice: editData.originalPrice || 0,
-        category: categoryId,
-        subCategory: subCategoryId,
+        categories: categoryIds,
+        subCategories: subCategoryIds,
         brand: brandId,
         subBrand: subBrandId,
         hotDeals: editData.hotDeals || false,
@@ -188,8 +190,8 @@ export default function ProductForm({
         price: 0,
         originalPrice: 0,
 
-        category: "",
-        subCategory: "",
+        categories: [],
+        subCategories: [],
         brand: "",
         subBrand: "",
         images: undefined,
@@ -244,8 +246,8 @@ export default function ProductForm({
           : [],
         price: data.price,
         originalPrice: data.originalPrice || undefined,
-        category: data.category || undefined,
-        subCategory: data.subCategory || undefined,
+        categories: data.categories && data.categories.length > 0 ? data.categories : undefined,
+        subCategories: data.subCategories && data.subCategories.length > 0 ? data.subCategories : undefined,
         brand: data.brand || undefined,
         subBrand: data.subBrand || undefined,
         images: imageUrls,
@@ -349,31 +351,60 @@ export default function ProductForm({
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="category"
+              name="categories"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>
+                    Categories (Select Multiple)
+                    {field.value && field.value.length > 0 && (
+                      <span className="ml-2 text-xs text-primary font-normal">
+                        ({field.value.length} selected)
+                      </span>
+                    )}
+                  </FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        // Auto-clear sub-category when category changes
-                        if (e.target.value !== field.value) {
-                          form.setValue("subCategory", "");
-                        }
-                      }}
-                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
-                    >
-                      <option value="">Select category</option>
-                      {categories.map(
-                        (category: { _id: string; name: string }) => (
-                          <option key={category._id} value={category._id}>
-                            {category.name}
-                          </option>
-                        ),
+                    <div className="border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white">
+                      {categories.length === 0 ? (
+                        <p className="text-sm text-gray-500">No categories available</p>
+                      ) : (
+                        categories.map(
+                          (category: { _id: string; name: string }) => (
+                            <label
+                              key={category._id}
+                              className="flex items-center space-x-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-1"
+                            >
+                              <input
+                                type="checkbox"
+                                value={category._id}
+                                checked={field.value?.includes(category._id) || false}
+                                onChange={(e) => {
+                                  const currentValues = field.value || [];
+                                  let newValues;
+                                  
+                                  if (e.target.checked) {
+                                    newValues = [...currentValues, category._id];
+                                  } else {
+                                    newValues = currentValues.filter((id) => id !== category._id);
+                                    
+                                    // Remove subcategories that belong to this category
+                                    const currentSubCategories = form.getValues("subCategories") || [];
+                                    const validSubCategories = currentSubCategories.filter((subCatId) => {
+                                      const subCat = subCategories.find((sc: any) => sc._id === subCatId);
+                                      return subCat && String(subCat.category) !== category._id;
+                                    });
+                                    form.setValue("subCategories", validSubCategories);
+                                  }
+                                  
+                                  field.onChange(newValues);
+                                }}
+                                className="rounded border-gray-300"
+                              />
+                              <span className="text-sm">{category.name}</span>
+                            </label>
+                          ),
+                        )
                       )}
-                    </select>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -382,29 +413,55 @@ export default function ProductForm({
 
             <FormField
               control={form.control}
-              name="subCategory"
+              name="subCategories"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Sub Category</FormLabel>
+                  <FormLabel>
+                    Sub Categories (Select Multiple)
+                    {field.value && field.value.length > 0 && (
+                      <span className="ml-2 text-xs text-primary font-normal">
+                        ({field.value.length} selected)
+                      </span>
+                    )}
+                  </FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      disabled={!watchedCategory}
-                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="">
-                        {watchedCategory
-                          ? "Select sub category"
-                          : "Select category first"}
-                      </option>
-                      {filteredSubCategories.map(
-                        (subCat: { _id: string; name: string }) => (
-                          <option key={subCat._id} value={subCat._id}>
-                            {subCat.name}
-                          </option>
-                        ),
+                    <div className={cn(
+                      "border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white",
+                      (!watchedCategories || watchedCategories.length === 0) && "bg-gray-50"
+                    )}>
+                      {(!watchedCategories || watchedCategories.length === 0) ? (
+                        <p className="text-sm text-gray-500">Select categories first</p>
+                      ) : filteredSubCategories.length === 0 ? (
+                        <p className="text-sm text-gray-500">No subcategories available for selected categories</p>
+                      ) : (
+                        filteredSubCategories.map(
+                          (subCat: { _id: string; name: string }) => (
+                            <label
+                              key={subCat._id}
+                              className="flex items-center space-x-2 py-1 cursor-pointer hover:bg-gray-50 rounded px-1"
+                            >
+                              <input
+                                type="checkbox"
+                                value={subCat._id}
+                                checked={field.value?.includes(subCat._id) || false}
+                                onChange={(e) => {
+                                  const currentValues = field.value || [];
+                                  if (e.target.checked) {
+                                    field.onChange([...currentValues, subCat._id]);
+                                  } else {
+                                    field.onChange(
+                                      currentValues.filter((id) => id !== subCat._id)
+                                    );
+                                  }
+                                }}
+                                className="rounded border-gray-300"
+                              />
+                              <span className="text-sm">{subCat.name}</span>
+                            </label>
+                          ),
+                        )
                       )}
-                    </select>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -19,8 +19,8 @@ export async function GET(req: Request) {
     const id = searchParams.get("id");
     if (id) {
       const product = await Product.findById(id)
-        .populate("category", "name slug")
-        .populate("subCategory", "name slug")
+        .populate("categories", "name slug")
+        .populate("subCategories", "name slug")
         .populate("brand", "name slug logo")
         .populate("subBrand", "name slug");
 
@@ -60,14 +60,14 @@ export async function GET(req: Request) {
 
     if (categorySlug) {
       const cat = await Category.findOne({ slug: categorySlug }).select("_id");
-      if (cat) filter.category = cat._id;
+      if (cat) filter.categories = { $in: [cat._id] };
     }
 
     if (subCategorySlug) {
       const subCat = await SubCategory.findOne({
         slug: subCategorySlug,
       }).select("_id");
-      if (subCat) filter.subCategory = subCat._id;
+      if (subCat) filter.subCategories = { $in: [subCat._id] };
     }
 
     if (brandSlug) {
@@ -100,8 +100,8 @@ export async function GET(req: Request) {
 
     // Fetch products with pagination and populate references
     const data = await Product.find(filter)
-      .populate("category", "name slug")
-      .populate("subCategory", "name slug")
+      .populate("categories", "name slug")
+      .populate("subCategories", "name slug")
       .populate("brand", "name slug logo")
       .populate("subBrand", "name slug")
       .sort({ updatedAt: -1 })
@@ -144,9 +144,8 @@ export async function POST(req: NextRequest) {
       price,
       originalPrice,
       specs,
-
-      category,
-      subCategory,
+      categories,
+      subCategories,
       brand,
       subBrand,
       images,
@@ -178,8 +177,8 @@ export async function POST(req: NextRequest) {
       price,
       originalPrice: originalPrice || undefined,
       specs: specs || undefined,
-      category: category || undefined,
-      subCategory: subCategory || undefined,
+      categories: categories || [],
+      subCategories: subCategories || [],
       brand: brand || undefined,
       subBrand: subBrand || undefined,
       images: images || [],
@@ -221,8 +220,8 @@ export async function PUT(req: NextRequest) {
       price,
       originalPrice,
       specs,
-      category,
-      subCategory,
+      categories,
+      subCategories,
       brand,
       subBrand,
       images,
@@ -263,8 +262,8 @@ export async function PUT(req: NextRequest) {
         price,
         originalPrice: originalPrice || undefined,
         specs: specs || undefined,
-        category: category || undefined,
-        subCategory: subCategory || undefined,
+        categories: categories || [],
+        subCategories: subCategories || [],
         brand: brand || undefined,
         subBrand: subBrand || undefined,
         images: images || [],

@@ -20,8 +20,8 @@ export default function EditProductPage() {
     price: number;
     originalPrice?: number;
     stock?: boolean;
-    category?: string;
-    subCategory?: string;
+    categories?: string[];
+    subCategories?: string[];
     brand?: string;
     subBrand?: string;
     images: string[];
