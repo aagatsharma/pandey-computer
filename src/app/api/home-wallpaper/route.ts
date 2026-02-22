@@ -1,6 +1,7 @@
 import HomeWallpaper from "@/lib/models/HomeWallpaper";
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: Request) {
   try {
@@ -13,7 +14,7 @@ export async function GET(req: Request) {
     console.error("Error fetching wallpapers:", error);
     return NextResponse.json(
       { error: "Failed to fetch wallpapers" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -28,21 +29,21 @@ export async function POST(req: NextRequest) {
     if (!title) {
       return NextResponse.json(
         { message: "Title is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!image) {
       return NextResponse.json(
         { message: "Image URL is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!route) {
       return NextResponse.json(
         { message: "Route is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,9 +55,12 @@ export async function POST(req: NextRequest) {
       gridSpan: gridSpan || { cols: 1, rows: 1 },
     });
 
+    // Revalidate home page
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Wallpaper created successfully", data: wallpaper },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -65,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -80,28 +84,28 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "Wallpaper ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!title) {
       return NextResponse.json(
         { message: "Title is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!image) {
       return NextResponse.json(
         { message: "Image URL is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!route) {
       return NextResponse.json(
         { message: "Route is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -114,19 +118,22 @@ export async function PUT(req: NextRequest) {
         order: order || 1,
         gridSpan: gridSpan || { cols: 1, rows: 1 },
       },
-      { new: true }
+      { new: true },
     );
 
     if (!wallpaper) {
       return NextResponse.json(
         { message: "Wallpaper not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
+    // Revalidate home page
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Wallpaper updated successfully", data: wallpaper },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -135,7 +142,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -150,7 +157,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "Wallpaper ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -159,13 +166,16 @@ export async function DELETE(req: NextRequest) {
     if (!wallpaper) {
       return NextResponse.json(
         { message: "Wallpaper not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
+    // Revalidate home page
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Wallpaper deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -174,7 +184,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

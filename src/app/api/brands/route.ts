@@ -2,6 +2,7 @@ import Brand from "@/lib/models/Brand";
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching blogs:", error);
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     if (!name) {
       return NextResponse.json(
         { message: "Brand name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -50,9 +51,14 @@ export async function POST(req: NextRequest) {
       logo,
     });
 
+    // Revalidate brand-related pages
+    revalidatePath("/brands");
+    revalidatePath("/shop");
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Brand created successfully", data: brand },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -61,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -76,14 +82,14 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "Brand ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!name) {
       return NextResponse.json(
         { message: "Brand name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -96,16 +102,21 @@ export async function PUT(req: NextRequest) {
         slug,
         logo,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!brand) {
       return NextResponse.json({ message: "Brand not found" }, { status: 404 });
     }
 
+    // Revalidate brand-related pages
+    revalidatePath("/brands");
+    revalidatePath("/shop");
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Brand updated successfully", data: brand },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -114,7 +125,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -129,7 +140,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "Brand ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -139,9 +150,14 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "Brand not found" }, { status: 404 });
     }
 
+    // Revalidate brand-related pages
+    revalidatePath("/brands");
+    revalidatePath("/shop");
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Brand deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -150,7 +166,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

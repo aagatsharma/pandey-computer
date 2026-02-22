@@ -1,10 +1,11 @@
 import NavbarItem from "@/lib/models/NavbarItem";
 import dbConnect from "@/lib/mongoose";
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const id = (await params).id;
   try {
@@ -25,7 +26,7 @@ export async function PUT(
       if (!parentItem) {
         return Response.json(
           { error: "Parent item not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -37,7 +38,7 @@ export async function PUT(
               currentItem.level - 1
             } parent`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -47,7 +48,7 @@ export async function PUT(
         if (checkParent.parent.toString() === id) {
           return Response.json(
             { error: "Cannot create circular reference" },
-            { status: 400 }
+            { status: 400 },
           );
         }
         checkParent = await NavbarItem.findById(checkParent.parent);
@@ -78,26 +79,29 @@ export async function PUT(
         parent: parent || null,
         order,
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!navbarItem) {
       return Response.json({ error: "Navbar item not found" }, { status: 404 });
     }
 
+    // Revalidate all pages that use navigation
+    revalidatePath("/", "layout");
+
     return Response.json({ data: navbarItem });
   } catch (error) {
     console.error(error);
     return Response.json(
       { error: "Failed to update navbar item" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const id = (await params).id;
   try {
@@ -128,12 +132,15 @@ export async function DELETE(
     await deleteChildren(id);
     await NavbarItem.findByIdAndDelete(id);
 
+    // Revalidate all pages that use navigation
+    revalidatePath("/", "layout");
+
     return Response.json({ message: "Navbar item deleted successfully" });
   } catch (error) {
     console.error(error);
     return Response.json(
       { error: "Failed to delete navbar item" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -10,7 +10,7 @@ export async function GET() {
 
     const data = await SubCategory.find().populate(
       "category",
-      "name slug logo"
+      "name slug logo",
     );
 
     return new Response(
@@ -20,7 +20,7 @@ export async function GET() {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching SubCategory:", error);
@@ -29,7 +29,7 @@ export async function GET() {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 }
@@ -45,14 +45,14 @@ export async function POST(req: NextRequest) {
     if (!name) {
       return NextResponse.json(
         { message: "SubCategory name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!category_slug) {
       return NextResponse.json(
         { message: "Category slug is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     if (!category) {
       return NextResponse.json(
         { message: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "SubCategory created successfully", data },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -99,21 +99,21 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "SubCategory ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!name) {
       return NextResponse.json(
         { message: "SubCategory name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!category_slug) {
       return NextResponse.json(
         { message: "Category slug is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -122,7 +122,7 @@ export async function PUT(req: NextRequest) {
     if (!category) {
       return NextResponse.json(
         { message: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -135,19 +135,19 @@ export async function PUT(req: NextRequest) {
         slug,
         category: category._id,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!data) {
       return NextResponse.json(
         { message: "SubCategory not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "SubCategory updated successfully", data },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -156,7 +156,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -171,7 +171,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "SubCategory ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -180,13 +180,13 @@ export async function DELETE(req: NextRequest) {
     if (!data) {
       return NextResponse.json(
         { message: "SubCategory not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "SubCategory deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -195,7 +195,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

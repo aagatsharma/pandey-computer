@@ -1,5 +1,6 @@
 import Blog from "@/lib/models/Blog";
 import dbConnect from "@/lib/mongoose";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: Request) {
   try {
@@ -36,7 +37,7 @@ export async function GET(req: Request) {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching blogs:", error);
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -78,23 +79,16 @@ export async function POST(req: Request) {
       image,
     });
 
+    // Revalidate blog pages
+    revalidatePath("/blogs");
+    revalidatePath("/");
+
     return new Response(JSON.stringify({ data: blog }), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating blog:", error);
-
-    // Handle duplicate slug error
-    if (error.code === 11000) {
-      return new Response(
-        JSON.stringify({ error: "A blog with this title already exists" }),
-        {
-          status: 409,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
 
     return new Response(JSON.stringify({ error: "Failed to create blog" }), {
       status: 500,

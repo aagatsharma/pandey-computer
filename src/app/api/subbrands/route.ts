@@ -17,7 +17,7 @@ export async function GET() {
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching SubBrand:", error);
@@ -39,14 +39,14 @@ export async function POST(req: NextRequest) {
     if (!name) {
       return NextResponse.json(
         { message: "SubBrand name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!brand_slug) {
       return NextResponse.json(
         { message: "Brand slug is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "SubBrand created successfully", data },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -90,21 +90,21 @@ export async function PUT(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "SubBrand ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!name) {
       return NextResponse.json(
         { message: "SubBrand name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!brand_slug) {
       return NextResponse.json(
         { message: "Brand slug is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -123,19 +123,19 @@ export async function PUT(req: NextRequest) {
         slug,
         brand: brand._id,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!data) {
       return NextResponse.json(
         { message: "SubBrand not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "SubBrand updated successfully", data },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -144,7 +144,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -159,7 +159,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) {
       return NextResponse.json(
         { message: "SubBrand ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -168,13 +168,13 @@ export async function DELETE(req: NextRequest) {
     if (!data) {
       return NextResponse.json(
         { message: "SubBrand not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { message: "SubBrand deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -183,7 +183,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Unknown error occurred" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -187,7 +187,11 @@ export async function POST(req: NextRequest) {
       hotDeals: hotDeals || false,
       topSelling: topSelling || false,
     });
-    await revalidatePath(`/product/${slug}`);
+
+    // Revalidate product-related pages
+    revalidatePath(`/product/${slug}`);
+    revalidatePath("/shop");
+    revalidatePath("/");
 
     return NextResponse.json(
       { message: "Product created successfully", data: product },
@@ -277,7 +281,11 @@ export async function PUT(req: NextRequest) {
         { status: 404 },
       );
     }
-    await revalidatePath(`/product/${slug}`);
+
+    // Revalidate product-related pages
+    revalidatePath(`/product/${slug}`);
+    revalidatePath("/shop");
+    revalidatePath("/");
 
     return NextResponse.json(
       { message: "Product updated successfully", data: product },
@@ -317,7 +325,11 @@ export async function DELETE(req: NextRequest) {
         { status: 404 },
       );
     }
-    await revalidatePath(`/product/${product.slug}`);
+
+    // Revalidate product-related pages
+    revalidatePath(`/product/${product.slug}`);
+    revalidatePath("/shop");
+    revalidatePath("/");
 
     return NextResponse.json(
       { message: "Product deleted successfully" },

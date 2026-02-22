@@ -4,6 +4,7 @@ import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
 import SubBrand from "@/lib/models/SubBrand";
 import dbConnect from "@/lib/mongoose";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: Request) {
   try {
@@ -70,7 +71,7 @@ export async function GET(req: Request) {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 }
@@ -90,7 +91,7 @@ export async function POST(req: Request) {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -107,7 +108,7 @@ export async function POST(req: Request) {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -119,7 +120,7 @@ export async function POST(req: Request) {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -132,7 +133,7 @@ export async function POST(req: Request) {
           {
             status: 404,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       }
 
@@ -145,7 +146,7 @@ export async function POST(req: Request) {
           {
             status: 400,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       }
     } else if (level > 1) {
@@ -157,7 +158,7 @@ export async function POST(req: Request) {
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -187,7 +188,7 @@ export async function POST(req: Request) {
         {
           status: 404,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -212,6 +213,9 @@ export async function POST(req: Request) {
       });
     }
 
+    // Revalidate all pages that use navigation
+    revalidatePath("/", "layout");
+
     return new Response(JSON.stringify({ data: navbarItem }), {
       status: 201,
       headers: { "Content-Type": "application/json" },
@@ -223,7 +227,7 @@ export async function POST(req: Request) {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     );
   }
 }

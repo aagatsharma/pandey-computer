@@ -2,6 +2,7 @@ import Category from "@/lib/models/Category";
 import dbConnect from "@/lib/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -50,6 +51,11 @@ export async function POST(req: NextRequest) {
       logo,
       showInHomepage,
     });
+
+    // Revalidate category-related pages
+    revalidatePath("/categories");
+    revalidatePath("/shop");
+    revalidatePath("/");
 
     return NextResponse.json(
       { message: "Category created successfully", data: category },
@@ -108,6 +114,11 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Revalidate category-related pages
+    revalidatePath("/categories");
+    revalidatePath("/shop");
+    revalidatePath("/");
+
     return NextResponse.json(
       { message: "Category updated successfully", data: category },
       { status: 200 },
@@ -146,6 +157,11 @@ export async function DELETE(req: NextRequest) {
         { status: 404 },
       );
     }
+
+    // Revalidate category-related pages
+    revalidatePath("/categories");
+    revalidatePath("/shop");
+    revalidatePath("/");
 
     return NextResponse.json(
       { message: "Category deleted successfully" },
