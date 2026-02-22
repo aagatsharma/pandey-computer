@@ -35,7 +35,7 @@ export function BrandsCarousel({ brands }: BrandsCarouselProps) {
       ]}
       className="w-full"
     >
-      <CarouselContent className="-ml-2 md:-ml-4">
+      <CarouselContent className="-ml-2 md:-ml-4 p-1">
         {brands.map((brand) => (
           <CarouselItem
             key={brand.slug}

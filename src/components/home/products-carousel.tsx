@@ -25,7 +25,7 @@ export function ProductsCarousel({ products }: ProductsCarouselProps) {
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2 md:-ml-4 pb-1">
+        <CarouselContent className="-ml-2 md:-ml-4 p-1">
           {products.map((product) => (
             <CarouselItem
               key={product.slug}
