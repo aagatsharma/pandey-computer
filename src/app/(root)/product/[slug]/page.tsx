@@ -166,7 +166,7 @@ export default async function ProductPage({
               Shop
             </Link>
             <span>/</span>
-            <span className="text-foreground">{product.name}</span>
+            <span className="text-foreground line-clamp-1">{product.name}</span>
           </div>
         </div>
       </div>
