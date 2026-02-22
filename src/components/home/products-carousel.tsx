@@ -8,6 +8,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselDots,
 } from "@/components/ui/carousel";
 
 interface ProductsCarouselProps {
@@ -36,6 +37,7 @@ export function ProductsCarousel({ products }: ProductsCarouselProps) {
         </CarouselContent>
         <CarouselPrevious className="-left-2 sm:-left-4 lg:-left-12 h-10 w-10 max-md:hidden" />
         <CarouselNext className="-right-2 sm:-right-4 lg:-right-12 h-10 w-10 max-md:hidden" />
+        <CarouselDots className="md:hidden" />
       </Carousel>
     </div>
   );

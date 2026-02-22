@@ -8,6 +8,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselDots,
 } from "../ui/carousel";
 import { ICategory } from "@/lib/models/Category";
 import AutoScroll from "embla-carousel-auto-scroll";
@@ -63,6 +64,7 @@ export function CategoriesCarousel({ categories }: CategoriesCarouselProps) {
       </CarouselContent>
       <CarouselPrevious className="-left-3 lg:-left-12 size-10 max-md:hidden" />
       <CarouselNext className="-right-3 lg:-right-12 size-10 max-md:hidden" />
+      <CarouselDots className="md:hidden" />
     </Carousel>
   );
 }
