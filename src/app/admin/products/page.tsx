@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { MoreHorizontal, Pencil, Trash2, Download, Upload, FileDown } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Download,
+  Upload,
+  FileDown,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
@@ -104,18 +111,20 @@ export default function ProductsPage() {
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      
+
       // Build query with current filters and page
       const exportQuery = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
         ...(debouncedFilters.name && { name: debouncedFilters.name }),
-        ...(debouncedFilters.category && { category: debouncedFilters.category }),
+        ...(debouncedFilters.category && {
+          category: debouncedFilters.category,
+        }),
         ...(debouncedFilters.brand && { brand: debouncedFilters.brand }),
       }).toString();
-      
+
       const response = await fetch(`/api/products/csv?${exportQuery}`);
-      
+
       if (!response.ok) {
         throw new Error("Failed to export products");
       }
@@ -129,9 +138,11 @@ export default function ProductsPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       const count = products.length;
-      toast.success(`Exported ${count} product${count !== 1 ? 's' : ''} from page ${page}`);
+      toast.success(
+        `Exported ${count} product${count !== 1 ? "s" : ""} from page ${page}`,
+      );
     } catch (error) {
       console.error("Error exporting products:", error);
       toast.error("Failed to export products");
@@ -161,9 +172,9 @@ export default function ProductsPage() {
       }
 
       toast.success(
-        `Import completed: ${result.results.success} succeeded, ${result.results.failed} failed`
+        `Import completed: ${result.results.success} succeeded, ${result.results.failed} failed`,
       );
-      
+
       if (result.results.errors.length > 0) {
         console.error("Import errors:", result.results.errors);
       }
@@ -171,7 +182,9 @@ export default function ProductsPage() {
       mutate();
     } catch (error: unknown) {
       console.error("Error importing products:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to import products");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to import products",
+      );
     } finally {
       setIsImporting(false);
       if (fileInputRef.current) {
@@ -371,7 +384,7 @@ export default function ProductsPage() {
               <Download className="mr-2 h-4 w-4" />
               {isExporting ? "Exporting..." : "Export CSV"}
             </Button>
-            
+
             <Button
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
@@ -380,15 +393,12 @@ export default function ProductsPage() {
               <Upload className="mr-2 h-4 w-4" />
               {isImporting ? "Importing..." : "Import CSV"}
             </Button>
-            
-            <Button
-              variant="ghost"
-              onClick={handleDownloadSample}
-            >
+
+            <Button variant="ghost" onClick={handleDownloadSample}>
               <FileDown className="mr-2 h-4 w-4" />
               Download Sample
             </Button>
-            
+
             <input
               ref={fileInputRef}
               type="file"
@@ -397,7 +407,7 @@ export default function ProductsPage() {
               onChange={handleImport}
             />
           </div>
-          
+
           <Button onClick={() => router.push("/admin/products/add")}>
             Add Product
           </Button>

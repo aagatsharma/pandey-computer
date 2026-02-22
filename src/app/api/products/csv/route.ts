@@ -71,53 +71,53 @@ export async function GET(req: NextRequest) {
     ];
 
     // Create CSV rows
-    const rows = products.map((product: { 
-      name: string;
-      price: number;
-      originalPrice?: number;
-      stock: boolean;
-      hotDeals?: boolean;
-      topSelling?: boolean;
-      categories?: { name: string }[];
-      subCategories?: { name: string }[];
-      brand?: { name: string };
-      subBrand?: { name: string };
-      keyFeatures?: string[];
-      specs?: Record<string, string>;
-      images?: string[];
-    }) => {
-      const categoryNames = product.categories
-        ?.map((c) => c.name)
-        .join(",") || "";
-      const subCategoryNames = product.subCategories
-        ?.map((sc) => sc.name)
-        .join(",") || "";
-      const brandName = product.brand?.name || "";
-      const subBrandName = product.subBrand?.name || "";
-      const keyFeatures = product.keyFeatures?.join("|") || "";
-      const specs = product.specs
-        ? Object.entries(product.specs)
-            .map(([k, v]) => `${k}:${v}`)
-            .join("|")
-        : "";
-      const images = product.images?.join("|") || "";
+    const rows = products.map(
+      (product: {
+        name: string;
+        price: number;
+        originalPrice?: number;
+        stock: boolean;
+        hotDeals?: boolean;
+        topSelling?: boolean;
+        categories?: { name: string }[];
+        subCategories?: { name: string }[];
+        brand?: { name: string };
+        subBrand?: { name: string };
+        keyFeatures?: string[];
+        specs?: Record<string, string>;
+        images?: string[];
+      }) => {
+        const categoryNames =
+          product.categories?.map((c) => c.name).join(",") || "";
+        const subCategoryNames =
+          product.subCategories?.map((sc) => sc.name).join(",") || "";
+        const brandName = product.brand?.name || "";
+        const subBrandName = product.subBrand?.name || "";
+        const keyFeatures = product.keyFeatures?.join("|") || "";
+        const specs = product.specs
+          ? Object.entries(product.specs)
+              .map(([k, v]) => `${k}:${v}`)
+              .join("|")
+          : "";
+        const images = product.images?.join("|") || "";
 
-      return [
-        `"${product.name}"`,
-        product.price,
-        product.originalPrice || "",
-        product.stock,
-        product.hotDeals || false,
-        product.topSelling || false,
-        `"${categoryNames}"`,
-        `"${subCategoryNames}"`,
-        `"${brandName}"`,
-        `"${subBrandName}"`,
-        `"${keyFeatures}"`,
-        `"${specs}"`,
-        `"${images}"`,
-      ].join(",");
-    });
+        return [
+          `"${product.name}"`,
+          product.price,
+          product.originalPrice || "",
+          product.stock,
+          product.hotDeals || false,
+          product.topSelling || false,
+          `"${categoryNames}"`,
+          `"${subCategoryNames}"`,
+          `"${brandName}"`,
+          `"${subBrandName}"`,
+          `"${keyFeatures}"`,
+          `"${specs}"`,
+          `"${images}"`,
+        ].join(",");
+      },
+    );
 
     const csv = [headers.join(","), ...rows].join("\n");
 
@@ -132,7 +132,7 @@ export async function GET(req: NextRequest) {
     console.error("Error exporting products:", error);
     return NextResponse.json(
       { message: "Failed to export products" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { message: "No file provided" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
     if (lines.length < 2) {
       return NextResponse.json(
         { message: "CSV file is empty or invalid" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
               });
             }
             return cat._id;
-          })
+          }),
         );
 
         // Parse subcategories
@@ -215,14 +215,14 @@ export async function POST(req: NextRequest) {
               });
             }
             return subCat?._id;
-          })
+          }),
         );
 
         // Parse brand
         let brandId;
         if (row.brandName) {
           let brand = await Brand.findOne({ name: row.brandName }).select(
-            "_id"
+            "_id",
           );
           if (!brand) {
             brand = await Brand.create({
@@ -274,7 +274,7 @@ export async function POST(req: NextRequest) {
 
         // Create product
         const slug = slugify(row.name, { lower: true, strict: true });
-        
+
         // Check if product already exists
         const existing = await Product.findOne({ slug });
         if (existing) {
@@ -321,7 +321,9 @@ export async function POST(req: NextRequest) {
         results.success++;
       } catch (error: unknown) {
         results.failed++;
-        results.errors.push(`Row ${i + 1}: ${error instanceof Error ? error.message : "Unknown error"}`);
+        results.errors.push(
+          `Row ${i + 1}: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
     }
 
@@ -330,13 +332,16 @@ export async function POST(req: NextRequest) {
         message: "Import completed",
         results,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     console.error("Error importing products:", error);
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Failed to import products" },
-      { status: 500 }
+      {
+        message:
+          error instanceof Error ? error.message : "Failed to import products",
+      },
+      { status: 500 },
     );
   }
 }
