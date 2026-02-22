@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -130,20 +130,38 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
   const topLevelItems = menuData.filter((item) => item.level === 1);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const HIDE_THRESHOLD = 120; // Scroll down past this to hide
-  const SHOW_THRESHOLD = 50; // Scroll up above this to show
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    let lastKnownScrollPosition = 0;
 
-      // Use different thresholds to prevent glitch loop
-      if (!isCollapsed && currentScrollY > HIDE_THRESHOLD) {
-        // Currently showing, hide when scrolled past HIDE_THRESHOLD
-        setIsCollapsed(true);
-      } else if (isCollapsed && currentScrollY < SHOW_THRESHOLD) {
-        // Currently hidden, show when scrolled above SHOW_THRESHOLD
-        setIsCollapsed(false);
+    const handleScroll = () => {
+      lastKnownScrollPosition = window.scrollY;
+
+      if (!ticking.current) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = lastKnownScrollPosition;
+          const scrollDifference = currentScrollY - lastScrollY.current;
+
+          // Only toggle if scrolled more than 50px in one direction
+          // AND we're past the minimum scroll threshold
+          if (currentScrollY < 80) {
+            // Always show when near top
+            setIsCollapsed(false);
+          } else if (scrollDifference > 50 && !isCollapsed) {
+            // Scrolled down significantly, hide navbar
+            setIsCollapsed(true);
+          } else if (scrollDifference < -50 && isCollapsed) {
+            // Scrolled up significantly, show navbar
+            setIsCollapsed(false);
+          }
+
+          lastScrollY.current = currentScrollY;
+          ticking.current = false;
+        });
+
+        ticking.current = true;
       }
     };
 
@@ -152,7 +170,7 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
   }, [isCollapsed]);
 
   return (
-    <header className="w-full bg-muted sticky top-0 z-50 shadow-sm">
+    <header className="w-full bg-muted sticky top-0 z-50 shadow-sm overflow-x-hidden">
       {/* Section 1: Top Info Bar */}
       <div
         className={`border-b overflow-hidden transition-all duration-300 ease-in-out
@@ -245,13 +263,13 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
 
       {/* Section 3: Navigation Menu (Desktop) */}
       <nav
-        className={`bg-primary text-white hidden lg:block
+        className={`bg-primary text-white hidden lg:block overflow-hidden
     transition-all duration-300 ease-in-out
     ${isCollapsed ? "max-h-0 opacity-0" : "max-h-12 opacity-100"}
   `}
       >
         <div className="max-w-7xl mx-auto relative">
-          <div className="flex items-center h-12 gap-1">
+          <div className="flex items-center h-12 gap-1 overflow-x-auto scrollbar-hide">
             {topLevelItems.map((menu) => (
               <div key={menu._id} className="group">
                 {/* Top Level */}
@@ -268,11 +286,11 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                   className="absolute left-0 right-0 top-12
                               bg-white text-gray-800 shadow-2xl border-t-2 border-red-600
                               opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                              transition-all duration-200 z-50"
+                              transition-all duration-200 z-50 max-h-[80vh] overflow-y-auto"
                 >
-                  <div className="p-6">
+                  <div className="p-6 overflow-x-hidden">
                     <div
-                      className="grid gap-4 text-sm w-full"
+                      className="grid gap-4 text-sm w-full overflow-x-auto"
                       style={{
                         gridTemplateColumns: `repeat(${Math.min(
                           menu.children?.length || 0,
@@ -306,7 +324,8 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
                                       ? `${section.type}=${section.slug}&${item.type}=${item.slug}`
                                       : `${menu.type}=${menu.slug}&${section.type}=${section.slug}&${item.type}=${item.slug}`
                                   }`}
-                                  className="block text-gray-700 hover:text-red-600 hover:translate-x-1 transition-all duration-150 w-fit"
+                                  className="block text-gray-700 hover:text-red-600 hover:translate-x-1 transition-all duration-150 w-fit truncate max-w-full"
+                                  title={item.label}
                                 >
                                   {item.label}
                                 </Link>
@@ -326,9 +345,9 @@ export default function NavigationBar({ menuData }: NavigationBarProps) {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="fixed inset-0 z-50 bg-background lg:hidden flex flex-col animate-in slide-in-from-right duration-300 overflow-hidden">
           {/* Mobile Menu Header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-4 border-b shrink-0">
             <Link
               href="/"
               className="flex items-center"
