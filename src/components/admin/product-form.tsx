@@ -4,7 +4,7 @@
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { imageToBase64 } from "@/lib/image-base64";
+import { uploadToCloudinary } from "@/lib/image-base64";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -73,6 +73,7 @@ export default function ProductForm({
   editData,
 }: ProductFormProps) {
   const [previews, setPreviews] = useState<string[]>([]);
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([
     { key: "", value: "" },
@@ -183,6 +184,7 @@ export default function ProductForm({
         images: undefined,
       });
       setPreviews(editData.images || []);
+      setNewImageFiles([]);
     } else {
       setSpecs([{ key: "", value: "" }]);
       form.reset({
@@ -202,6 +204,7 @@ export default function ProductForm({
         specs: "",
       });
       setPreviews([]);
+      setNewImageFiles([]);
     }
   }, [editData, form]);
 
@@ -217,16 +220,31 @@ export default function ProductForm({
     });
   };
 
+  // Number of existing (already-uploaded) previews so we can map index → File
+  const existingPreviewCount = previews.length - newImageFiles.length;
+
+  const deleteImage = (index: number) => {
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+    // If this preview corresponds to a newly added file, remove that file too
+    const fileIndex = index - existingPreviewCount;
+    if (fileIndex >= 0) {
+      setNewImageFiles((prev) => prev.filter((_, i) => i !== fileIndex));
+    }
+  };
+
   const handleSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      let imageUrls = previews;
+      // Start with existing (already-uploaded) URLs
+      const existingUrls = previews.slice(0, existingPreviewCount);
+      let imageUrls: string[] = existingUrls;
 
-      if (data.images && data.images.length > 0) {
-        const uploadPromises = Array.from(data.images as FileList).map(
-          (file: File) => imageToBase64(file),
+      if (newImageFiles.length > 0) {
+        const uploadPromises = newImageFiles.map((file) =>
+          uploadToCloudinary(file, "pandey-computer/products"),
         );
-        imageUrls = await Promise.all(uploadPromises);
+        const uploadedUrls = await Promise.all(uploadPromises);
+        imageUrls = [...existingUrls, ...uploadedUrls];
       }
 
       // Parse specs from the state array
@@ -266,6 +284,7 @@ export default function ProductForm({
 
       form.reset();
       setPreviews([]);
+      setNewImageFiles([]);
       setSpecs([{ key: "", value: "" }]);
     } catch (error) {
       console.error("Error saving product:", error);
@@ -650,18 +669,21 @@ export default function ProductForm({
                       onChange={(e) => {
                         const files = e.target.files;
                         if (files && files.length > 0) {
-                          onChange(files);
-                          const newPreviews: string[] = [];
-                          Array.from(files).forEach((file) => {
+                          const addedFiles = Array.from(files);
+                          setNewImageFiles((prev) => [...prev, ...addedFiles]);
+                          addedFiles.forEach((file) => {
                             const reader = new FileReader();
                             reader.onloadend = () => {
-                              newPreviews.push(reader.result as string);
-                              if (newPreviews.length === files.length) {
-                                setPreviews(newPreviews);
-                              }
+                              setPreviews((prev) => [
+                                ...prev,
+                                reader.result as string,
+                              ]);
                             };
                             reader.readAsDataURL(file);
                           });
+                          // Reset input so the same file can be re-added if needed
+                          e.target.value = "";
+                          onChange(undefined);
                         }
                       }}
                       {...field}
@@ -672,9 +694,8 @@ export default function ProductForm({
                         {previews.map((preview, index) => (
                           <div
                             key={index}
-                            onClick={() => makePrimaryImage(index)}
                             className={cn(
-                              "relative w-full aspect-square rounded-lg overflow-hidden border cursor-pointer",
+                              "relative w-full aspect-square rounded-lg overflow-hidden border",
                               index === 0
                                 ? "ring-2 ring-primary"
                                 : "hover:ring-2 hover:ring-gray-300",
@@ -685,14 +706,25 @@ export default function ProductForm({
                               alt={`Preview ${index + 1}`}
                               fill
                               sizes="(max-width: 768px) 50vw, 25vw"
-                              className="object-cover"
+                              className="object-cover cursor-pointer"
+                              onClick={() => makePrimaryImage(index)}
                             />
-
                             {index === 0 && (
-                              <div className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded">
+                              <div className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded pointer-events-none">
                                 Primary
                               </div>
                             )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteImage(index);
+                              }}
+                              className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5"
+                              title="Remove image"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
                           </div>
                         ))}
                       </div>

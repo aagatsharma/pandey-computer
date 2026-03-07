@@ -3,7 +3,7 @@
 import { Upload, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
-import { imageToBase64 } from "@/lib/image-base64";
+import { uploadToCloudinary } from "@/lib/image-base64";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -60,7 +60,7 @@ export default function AdminForm({
 
   const handleSubmit = async (data: FormValues) => {
     try {
-      const imageUrl = await imageToBase64(data.logo);
+      const imageUrl = await uploadToCloudinary(data.logo);
       await onSubmit({ name: data.name, logo: imageUrl });
       form.reset();
       setPreview(null);

@@ -3,7 +3,7 @@
 import { Loader2, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { imageToBase64 } from "@/lib/image-base64";
+import { uploadToCloudinary } from "@/lib/image-base64";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -94,7 +94,10 @@ export default function BlogForm({
       let imageUrl = preview;
 
       if (imageInputType === "upload" && data.image) {
-        imageUrl = await imageToBase64(data.image as File);
+        imageUrl = await uploadToCloudinary(
+          data.image as File,
+          "pandey-computer/blogs",
+        );
       }
 
       await onSubmit({
@@ -126,8 +129,7 @@ export default function BlogForm({
       return;
     }
 
-    const base64 = await imageToBase64(file);
-    setPreview(base64);
+    setPreview(URL.createObjectURL(file));
   };
 
   return (

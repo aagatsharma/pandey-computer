@@ -3,7 +3,7 @@
 import { X, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { imageToBase64 } from "@/lib/image-base64";
+import { uploadToCloudinary } from "@/lib/image-base64";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -72,7 +72,9 @@ export default function BrandModalForm({
         logo: editData.logo || "",
       });
       setPreview(editData.logo || null);
-      setImageInputType(editData.logo?.startsWith("data:") ? "upload" : "url");
+      setImageInputType(
+        editData.logo && !editData.logo.startsWith("http") ? "upload" : "url",
+      );
     } else {
       form.reset({
         name: "",
@@ -83,18 +85,18 @@ export default function BrandModalForm({
     }
   }, [editData, form]);
 
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+
   const handleSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
       let imageUrl = data.logo || "";
 
-      // If upload type and there's a file selected, it's already base64 in the form
-      if (
-        imageInputType === "upload" &&
-        preview &&
-        preview.startsWith("data:")
-      ) {
-        imageUrl = preview;
+      if (imageInputType === "upload" && pendingFile) {
+        imageUrl = await uploadToCloudinary(
+          pendingFile,
+          "pandey-computer/brands",
+        );
       }
 
       await onSubmit({
@@ -104,6 +106,7 @@ export default function BrandModalForm({
       });
       form.reset();
       setPreview(null);
+      setPendingFile(null);
       onOpenChange(false);
     } catch (error) {
       console.error("Error saving brand:", error);
@@ -192,12 +195,13 @@ export default function BrandModalForm({
                         <Input
                           type="file"
                           accept="image/*"
-                          onChange={async (e) => {
+                          disabled={isSubmitting}
+                          onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const base64 = await imageToBase64(file);
-                              setPreview(base64);
-                              field.onChange(base64);
+                              setPendingFile(file);
+                              setPreview(URL.createObjectURL(file));
+                              field.onChange(file.name);
                             }
                           }}
                         />

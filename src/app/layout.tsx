@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
-import { Toaster } from "sonner";
-import NextProgress from "@/components/top-loader";
+import Providers from "@/components/providers";
 
 const univiaPro = localFont({
   src: [
@@ -181,9 +180,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${univiaPro.variable} font-sans antialiased`}>
-        <NextProgress />
-        {children}
-        <Toaster richColors position="top-center" />
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

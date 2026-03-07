@@ -55,7 +55,7 @@ export async function GET(req: Request) {
 
     // Name search with regex
     if (name) {
-      filter.name = { $regex: name, $options: "i" };
+      filter.name = { $regex: name.split(" ").join("|"), $options: "i" };
     }
 
     if (categorySlug) {

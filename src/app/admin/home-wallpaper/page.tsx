@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MoreHorizontal, Pencil, Trash2, Plus, Upload } from "lucide-react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
-import { imageToBase64 } from "@/lib/image-base64";
+import { uploadToCloudinary } from "@/lib/image-base64";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -164,8 +164,8 @@ export default function HomeWallpaperPage() {
 
     try {
       setIsUploading(true);
-      const base64 = await imageToBase64(file);
-      setFormData({ ...formData, image: base64 });
+      const url = await uploadToCloudinary(file, "pandey-computer/wallpapers");
+      setFormData({ ...formData, image: url });
     } catch (error) {
       console.error("Error converting image:", error);
       alert("Failed to process image");
