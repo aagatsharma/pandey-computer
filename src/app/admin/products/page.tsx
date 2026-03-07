@@ -482,8 +482,8 @@ export default function ProductsPage() {
             <DataTable
               columns={columns}
               data={products}
-              page={pagination.page}
-              totalPages={pagination.totalPages}
+              page={pagination?.page ?? 1}
+              totalPages={pagination?.totalPages ?? 1}
               onPageChange={setPage}
             />
           </div>
