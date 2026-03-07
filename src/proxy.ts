@@ -10,8 +10,8 @@ export function proxy(request: NextRequest) {
       const authValue = basicAuth.split(" ")[1];
       const [user, pwd] = atob(authValue).split(":");
 
-      const validUser = process.env.ADMIN_USERNAME || "admin";
-      const validPassword = process.env.ADMIN_PASSWORD || "admin123";
+      const validUser = process.env.ADMIN_USERNAME;
+      const validPassword = process.env.ADMIN_PASSWORD;
 
       if (user === validUser && pwd === validPassword) {
         return NextResponse.next();
