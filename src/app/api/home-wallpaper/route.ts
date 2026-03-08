@@ -9,15 +9,7 @@ export async function GET(req: Request) {
 
     const wallpapers = await HomeWallpaper.find().sort({ order: 1 }).lean();
 
-    return NextResponse.json(
-      { data: wallpapers },
-      {
-        status: 200,
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        },
-      },
-    );
+    return NextResponse.json({ data: wallpapers });
   } catch (error) {
     console.error("Error fetching wallpapers:", error);
     return NextResponse.json(

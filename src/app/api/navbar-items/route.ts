@@ -4,9 +4,10 @@ import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
 import SubBrand from "@/lib/models/SubBrand";
 import dbConnect from "@/lib/mongoose";
+import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     await dbConnect();
 
@@ -44,13 +45,7 @@ export async function GET(req: Request) {
         item.children = level2Children;
       }
 
-      return new Response(JSON.stringify({ data: level1Items }), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        },
-      });
+      return NextResponse.json({ data: level1Items });
     }
 
     // Default behavior: return flat list
@@ -63,26 +58,17 @@ export async function GET(req: Request) {
       .populate("parent", "label")
       .sort({ level: 1, order: 1 });
 
-    return new Response(JSON.stringify({ data: items }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-      },
-    });
+    return NextResponse.json({ data: items });
   } catch (error) {
     console.error("Error fetching navbar items:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch navbar items" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+    return NextResponse.json(
+      { error: "Failed to fetch navbar items" },
+      { status: 500 },
     );
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
@@ -90,14 +76,9 @@ export async function POST(req: Request) {
     const { type, referenceId, parent, order, level } = body;
 
     if (!type || !referenceId || !level) {
-      return new Response(
-        JSON.stringify({
-          error: "Type, referenceId, and level are required",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+      return NextResponse.json(
+        { error: "Type, referenceId, and level are required" },
+        { status: 400 },
       );
     }
 
@@ -107,26 +88,16 @@ export async function POST(req: Request) {
       type !== "category" &&
       type !== "brand"
     ) {
-      return new Response(
-        JSON.stringify({
-          error: "Level 1 and Level 2 items can only be category or brand",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+      return NextResponse.json(
+        { error: "Level 1 and Level 2 items can only be category or brand" },
+        { status: 400 },
       );
     }
 
     if (level === 3 && type !== "subCategory" && type !== "subBrand") {
-      return new Response(
-        JSON.stringify({
-          error: "Level 3 items can only be subCategory or subBrand",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+      return NextResponse.json(
+        { error: "Level 3 items can only be subCategory or subBrand" },
+        { status: 400 },
       );
     }
 
@@ -134,37 +105,26 @@ export async function POST(req: Request) {
     if (parent) {
       const parentItem = await NavbarItem.findById(parent);
       if (!parentItem) {
-        return new Response(
-          JSON.stringify({ error: "Parent item not found" }),
-          {
-            status: 404,
-            headers: { "Content-Type": "application/json" },
-          },
+        return NextResponse.json(
+          { error: "Parent item not found" },
+          { status: 404 },
         );
       }
 
       // Parent should be one level lower
       if (parentItem.level !== level - 1) {
-        return new Response(
-          JSON.stringify({
-            error: `Level ${level} items must have a Level ${level - 1} parent`,
-          }),
+        return NextResponse.json(
           {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
+            error: `Level ${level} items must have a Level ${level - 1} parent`,
           },
+          { status: 400 },
         );
       }
     } else if (level > 1) {
       // Level 2 and 3 should have a parent (though optional in schema)
-      return new Response(
-        JSON.stringify({
-          error: `Level ${level} items should have a parent`,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+      return NextResponse.json(
+        { error: `Level ${level} items should have a parent` },
+        { status: 400 },
       );
     }
 
@@ -189,12 +149,9 @@ export async function POST(req: Request) {
     }
 
     if (!modelRef) {
-      return new Response(
-        JSON.stringify({ error: "Referenced item not found" }),
-        {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        },
+      return NextResponse.json(
+        { error: "Referenced item not found" },
+        { status: 404 },
       );
     }
 
@@ -222,18 +179,12 @@ export async function POST(req: Request) {
     // Revalidate all pages that use navigation
     revalidatePath("/", "layout");
 
-    return new Response(JSON.stringify({ data: navbarItem }), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ data: navbarItem }, { status: 201 });
   } catch (error) {
     console.error("Error creating navbar item:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to create navbar item" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+    return NextResponse.json(
+      { error: "Failed to create navbar item" },
+      { status: 500 },
     );
   }
 }

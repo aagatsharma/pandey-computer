@@ -37,12 +37,7 @@ export async function GET() {
     await dbConnect();
     // Sort by createdAt desc (newest first)
     const orders = await Order.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(
-      { success: true, data: orders },
-      {
-        headers: { "Cache-Control": "no-store" },
-      },
-    );
+    return NextResponse.json({ success: true, data: orders });
   } catch (error) {
     console.error("Error fetching orders:", error);
     return NextResponse.json(

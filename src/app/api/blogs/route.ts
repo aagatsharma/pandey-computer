@@ -1,8 +1,9 @@
 import Blog from "@/lib/models/Blog";
 import dbConnect from "@/lib/mongoose";
+import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
@@ -24,34 +25,25 @@ export async function GET(req: Request) {
       .skip(skip)
       .limit(limit);
 
-    return new Response(
-      JSON.stringify({
-        data,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
+    return NextResponse.json({
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-    );
+    });
   } catch (error) {
     console.error("Error fetching blogs:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch blogs" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(
+      { error: "Failed to fetch blogs" },
+      { status: 500 },
+    );
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
@@ -59,12 +51,9 @@ export async function POST(req: Request) {
     const { title, excerpt, content, image } = body;
 
     if (!title || !content) {
-      return new Response(
-        JSON.stringify({ error: "Title and content are required" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
+      return NextResponse.json(
+        { error: "Title and content are required" },
+        { status: 400 },
       );
     }
 
@@ -86,16 +75,12 @@ export async function POST(req: Request) {
     revalidatePath("/blogs");
     revalidatePath("/");
 
-    return new Response(JSON.stringify({ data: blog }), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ data: blog }, { status: 201 });
   } catch (error) {
     console.error("Error creating blog:", error);
-
-    return new Response(JSON.stringify({ error: "Failed to create blog" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(
+      { error: "Failed to create blog" },
+      { status: 500 },
+    );
   }
 }

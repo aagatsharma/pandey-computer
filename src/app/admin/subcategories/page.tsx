@@ -5,10 +5,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import useSWR, { mutate } from "swr";
+import useSWRMutation from "swr/mutation";
 import { useState } from "react";
 import SubCategoryModalForm from "@/components/admin/subcategory-modal-form";
 import { ISubCategory } from "@/lib/models/SubCategory";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher, sendRequest, putRequest, deleteRequest } from "@/lib/fetcher";
 import { ICategory } from "@/lib/models/Category";
 import Image from "next/image";
 import {
@@ -36,22 +37,25 @@ export default function SubCategoriesPage() {
   const [editData, setEditData] = useState<ISubCategory | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const { trigger: createSubCategory } = useSWRMutation(
+    "/api/subcategories",
+    sendRequest,
+  );
+  const { trigger: updateSubCategory } = useSWRMutation(
+    "/api/subcategories",
+    putRequest,
+  );
+
   const handleSubmit = async (formData: {
     id?: string;
     name: string;
     category_slug: string;
   }) => {
-    const method = formData.id ? "PUT" : "POST";
-    const response = await fetch("/api/subcategories", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok)
-      throw new Error(
-        `Failed to ${formData.id ? "update" : "create"} subcategory`
-      );
+    if (formData.id) {
+      await updateSubCategory(formData);
+    } else {
+      await createSubCategory(formData);
+    }
     mutate("/api/subcategories");
   };
 
@@ -62,14 +66,19 @@ export default function SubCategoriesPage() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
-    const response = await fetch(`/api/subcategories?id=${deleteId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) throw new Error("Failed to delete subcategory");
-    mutate("/api/subcategories");
+    const idToDelete = deleteId;
     setDeleteId(null);
+    mutate(
+      "/api/subcategories",
+      (current: { data: ISubCategory[] } | undefined) => ({
+        data: (current?.data ?? []).filter(
+          (s) => s._id.toString() !== idToDelete,
+        ),
+      }),
+      false,
+    );
+    await deleteRequest(`/api/subcategories?id=${idToDelete}`);
+    mutate("/api/subcategories");
   };
 
   const handleModalClose = (open: boolean) => {
@@ -156,7 +165,11 @@ export default function SubCategoriesPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading sub categories</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading sub categories
+      </div>
+    );
   }
 
   return (
@@ -204,9 +217,7 @@ export default function SubCategoriesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-
       <DataTable columns={columns} data={subcategories} />
-
     </div>
   );
 }

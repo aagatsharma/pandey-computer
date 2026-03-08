@@ -10,24 +10,13 @@ export async function GET() {
 
     const data = await Category.find();
 
-    return new Response(
-      JSON.stringify({
-        data,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        },
-      },
-    );
+    return NextResponse.json({ data });
   } catch (error) {
     console.error("Error fetching Category:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch Category" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(
+      { error: "Failed to fetch Category" },
+      { status: 500 },
+    );
   }
 }
 

@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { fetcher, deleteRequest } from "@/lib/fetcher";
+import axios from "axios";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,12 +94,24 @@ export default function ProductsPage() {
 
   const handleDelete = async (id: string) => {
     try {
+      mutate(
+        (
+          current:
+            | { data: IProduct[]; pagination: typeof pagination }
+            | undefined,
+        ) => ({
+          ...current,
+          data: (current?.data ?? []).filter((p) => p._id.toString() !== id),
+        }),
+        false,
+      );
+      setDeleteId(null);
       await deleteRequest(`/api/products?id=${id}`);
       toast.success("Product deleted successfully");
       mutate();
-      setDeleteId(null);
     } catch (error) {
       console.error("Error deleting product:", error);
+      mutate();
       toast.error("Failed to delete product");
     }
   };
@@ -118,13 +131,11 @@ export default function ProductsPage() {
         ...(debouncedFilters.brand && { brand: debouncedFilters.brand }),
       }).toString();
 
-      const response = await fetch(`/api/products/csv?${exportQuery}`);
+      const response = await axios.get(`/api/products/csv?${exportQuery}`, {
+        responseType: "blob",
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to export products");
-      }
-
-      const blob = await response.blob();
+      const blob = new Blob([response.data]);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -155,16 +166,8 @@ export default function ProductsPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/products/csv", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to import products");
-      }
+      const response = await axios.post("/api/products/csv", formData);
+      const result = response.data;
 
       toast.success(
         `Import completed: ${result.results.success} succeeded, ${result.results.failed} failed`,

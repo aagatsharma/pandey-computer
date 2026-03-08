@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { set } from "mongoose";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,8 +35,14 @@ export function DataTable<TData, TValue>({
   totalPages,
   onPageChange,
 }: DataTableProps<TData, TValue>) {
+  const [tableData, setTableData] = React.useState(data);
+
+  React.useEffect(() => {
+    setTableData(data);
+  }, [data]);
+
   const table = useReactTable({
-    data,
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true, // 🔥 IMPORTANT

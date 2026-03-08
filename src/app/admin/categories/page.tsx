@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import useSWR, { mutate } from "swr";
+import useSWRMutation from "swr/mutation";
 import { useState } from "react";
 import CategoryModalForm from "@/components/admin/category-modal-form";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher, sendRequest, putRequest, deleteRequest } from "@/lib/fetcher";
 import Loader from "@/components/loader";
 import { ICategory } from "@/lib/models/Category";
 import {
@@ -35,23 +36,26 @@ export default function CategoriesPage() {
   const [editData, setEditData] = useState<ICategory | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const { trigger: createCategory } = useSWRMutation(
+    "/api/categories",
+    sendRequest,
+  );
+  const { trigger: updateCategory } = useSWRMutation(
+    "/api/categories",
+    putRequest,
+  );
+
   const handleSubmit = async (formData: {
     id?: string;
     name: string;
     logo: string;
     showInHomepage?: boolean;
   }) => {
-    const method = formData.id ? "PUT" : "POST";
-    const response = await fetch("/api/categories", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok)
-      throw new Error(
-        `Failed to ${formData.id ? "update" : "create"} category`,
-      );
+    if (formData.id) {
+      await updateCategory(formData);
+    } else {
+      await createCategory(formData);
+    }
     mutate("/api/categories");
   };
 
@@ -62,14 +66,19 @@ export default function CategoriesPage() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
-    const response = await fetch(`/api/categories?id=${deleteId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) throw new Error("Failed to delete category");
-    mutate("/api/categories");
+    const idToDelete = deleteId;
     setDeleteId(null);
+    mutate(
+      "/api/categories",
+      (current: { data: ICategory[] } | undefined) => ({
+        data: (current?.data ?? []).filter(
+          (c) => c._id.toString() !== idToDelete,
+        ),
+      }),
+      false,
+    );
+    await deleteRequest(`/api/categories?id=${idToDelete}`);
+    mutate("/api/categories");
   };
 
   const handleModalClose = (open: boolean) => {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher, deleteRequest } from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
@@ -31,21 +31,26 @@ export default function BlogsPage() {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data, mutate, isLoading, error } = useSWR("/api/blogs?limit=1000", fetcher);
+  const { data, mutate, isLoading, error } = useSWR(
+    "/api/blogs?limit=1000",
+    fetcher,
+  );
   const blogs = data?.data || [];
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/blogs/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) throw new Error("Failed to delete blog");
-
-      mutate();
+      mutate(
+        (current: { data: IBlog[] } | undefined) => ({
+          data: (current?.data ?? []).filter((b) => b._id.toString() !== id),
+        }),
+        false,
+      );
       setDeleteId(null);
+      await deleteRequest(`/api/blogs/${id}`);
+      mutate();
     } catch (error) {
       console.error("Error deleting blog:", error);
+      mutate();
       alert("Failed to delete blog");
     }
   };
@@ -110,7 +115,9 @@ export default function BlogsPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading blogs</div>;
+    return (
+      <div className="text-center py-12 text-red-500">Error loading blogs</div>
+    );
   }
 
   return (

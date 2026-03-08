@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
 import { revalidatePath } from "next/cache";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
@@ -25,19 +25,13 @@ export async function GET(req: Request) {
         .populate("subBrand", "name slug");
 
       if (!product) {
-        return new Response(JSON.stringify({ error: "Product not found" }), {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        });
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404 },
+        );
       }
 
-      return new Response(JSON.stringify({ data: [product] }), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
-      });
+      return NextResponse.json({ data: [product] });
     }
 
     // Query parameters
@@ -111,30 +105,21 @@ export async function GET(req: Request) {
       .skip(skip)
       .limit(limit);
 
-    return new Response(
-      JSON.stringify({
-        data,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
+    return NextResponse.json({
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-    );
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch products" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 },
+    );
   }
 }
 

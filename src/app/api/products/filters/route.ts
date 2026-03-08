@@ -3,6 +3,7 @@ import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
 import SubBrand from "@/lib/models/SubBrand";
 import dbConnect from "@/lib/mongoose";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -18,31 +19,26 @@ export async function GET() {
       SubBrand.find().select("_id name slug brand").sort({ name: 1 }).lean(),
     ]);
 
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         data: {
           categories,
           subCategories,
           brands,
           subBrands,
         },
-      }),
+      },
       {
-        status: 200,
         headers: {
-          "Content-Type": "application/json",
           "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
         },
       },
     );
   } catch (error) {
     console.error("Error fetching filter options:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch filter options" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+    return NextResponse.json(
+      { error: "Failed to fetch filter options" },
+      { status: 500 },
     );
   }
 }

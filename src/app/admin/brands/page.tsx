@@ -5,10 +5,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 import { useState } from "react";
 import BrandModalForm from "@/components/admin/brand-modal-form";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher, sendRequest, putRequest, deleteRequest } from "@/lib/fetcher";
 import Loader from "@/components/loader";
 import { IBrand } from "@/lib/models/Brand";
 import {
@@ -27,29 +28,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function BrandsPage() {
-  const { data, error, isLoading } = useSWR("/api/brands", fetcher);
-  const brands = data?.data || [];
+  const { data, error, isLoading, mutate } = useSWR("/api/brands", fetcher);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState<IBrand | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { trigger: createBrand } = useSWRMutation("/api/brands", sendRequest);
+  const { trigger: updateBrand } = useSWRMutation("/api/brands", putRequest);
 
   const handleSubmit = async (formData: {
     id?: string;
     name: string;
     logo: string;
   }) => {
-    const method = formData.id ? "PUT" : "POST";
-    const response = await fetch("/api/brands", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok)
-      throw new Error(`Failed to ${formData.id ? "update" : "create"} brand`);
-    mutate("/api/brands");
+    if (formData.id) {
+      await updateBrand(formData);
+    } else {
+      await createBrand(formData);
+    }
   };
 
   const handleEdit = (brand: IBrand) => {
@@ -59,14 +58,25 @@ export default function BrandsPage() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
-    const response = await fetch(`/api/brands?id=${deleteId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) throw new Error("Failed to delete brand");
-    mutate("/api/brands");
+    const idToDelete = deleteId;
     setDeleteId(null);
+    // Optimistically remove the brand from local cache immediately
+    mutate(
+      (current: { data: IBrand[] } | undefined) => ({
+        data: (current?.data ?? []).filter(
+          (b) => b._id.toString() !== idToDelete,
+        ),
+      }),
+      false,
+    );
+    const result = await deleteRequest(`/api/brands?id=${idToDelete}`);
+    if (result) {
+      mutate();
+      toast.success("Brand deleted successfully");
+    } else {
+      mutate();
+      toast.error("Failed to delete brand");
+    }
   };
 
   const handleModalClose = (open: boolean) => {
@@ -148,7 +158,9 @@ export default function BrandsPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading brands</div>;
+    return (
+      <div className="text-center py-12 text-red-500">Error loading brands</div>
+    );
   }
 
   return (
@@ -192,9 +204,7 @@ export default function BrandsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-
-      <DataTable columns={columns} data={brands} />
-
+      <DataTable columns={columns} data={data?.data || []} />
     </div>
   );
 }

@@ -1,10 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import useSWRMutation from "swr/mutation";
+import { sendRequest } from "@/lib/fetcher";
 import ProductForm from "@/components/admin/product-form";
 
 export default function AddProductPage() {
   const router = useRouter();
+  const { trigger: createProduct } = useSWRMutation(
+    "/api/products",
+    sendRequest,
+  );
 
   const handleSubmit = async (formData: {
     name: string;
@@ -21,16 +27,7 @@ export default function AddProductPage() {
     specs?: Record<string, string>;
   }) => {
     try {
-      const response = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) throw new Error("Failed to create product");
-
+      await createProduct(formData);
       router.push("/admin/products");
     } catch (error) {
       console.error("Error creating product:", error);

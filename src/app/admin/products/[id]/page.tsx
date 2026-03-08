@@ -2,7 +2,8 @@
 
 import { useRouter, useParams } from "next/navigation";
 import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
+import useSWRMutation from "swr/mutation";
+import { fetcher, putRequest } from "@/lib/fetcher";
 import ProductForm from "@/components/admin/product-form";
 import Loader from "@/components/loader";
 
@@ -13,6 +14,11 @@ export default function EditProductPage() {
 
   const { data, isLoading } = useSWR(`/api/products?id=${id}`, fetcher);
   const product = data?.data?.[0];
+
+  const { trigger: updateProduct } = useSWRMutation(
+    "/api/products",
+    putRequest,
+  );
 
   const handleSubmit = async (formData: {
     name: string;
@@ -30,16 +36,7 @@ export default function EditProductPage() {
     specs?: Record<string, string>;
   }) => {
     try {
-      const response = await fetch(`/api/products`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...formData, id }),
-      });
-
-      if (!response.ok) throw new Error("Failed to update product");
-
+      await updateProduct({ ...formData, id });
       router.push("/admin/products");
     } catch (error) {
       console.error("Error updating product:", error);

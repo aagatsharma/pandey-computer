@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { MoreHorizontal, Pencil, Trash2, Plus, Upload } from "lucide-react";
 import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
+import useSWRMutation from "swr/mutation";
+import { fetcher, sendRequest, putRequest, deleteRequest } from "@/lib/fetcher";
 import { uploadToCloudinary } from "@/lib/image-base64";
 import {
   DropdownMenu,
@@ -70,27 +71,24 @@ export default function HomeWallpaperPage() {
 
   const wallpapers = data?.data || [];
 
+  const { trigger: createWallpaper } = useSWRMutation(
+    "/api/home-wallpaper",
+    sendRequest,
+  );
+  const { trigger: updateWallpaper } = useSWRMutation(
+    "/api/home-wallpaper",
+    putRequest,
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const url = editData ? "/api/home-wallpaper" : "/api/home-wallpaper";
-      const method = editData ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          editData ? { ...formData, id: editData._id } : formData,
-        ),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save wallpaper");
+      if (editData) {
+        await updateWallpaper({ ...formData, id: editData._id });
+      } else {
+        await createWallpaper(formData);
       }
-
       mutate();
       handleCloseModal();
     } catch (error) {
@@ -103,14 +101,7 @@ export default function HomeWallpaperPage() {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(`/api/home-wallpaper?id=${deleteId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete wallpaper");
-      }
-
+      await deleteRequest(`/api/home-wallpaper?id=${deleteId}`);
       mutate();
       setDeleteId(null);
     } catch (error) {

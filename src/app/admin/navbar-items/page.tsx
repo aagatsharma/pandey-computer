@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
+import useSWRMutation from "swr/mutation";
+import { fetcher, sendRequest, putRequest, deleteRequest } from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";
 import {
   MoreHorizontal,
@@ -43,10 +44,18 @@ export default function NavbarItemsPage() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   // Fetch nested hierarchy from API
-  const { data, mutate, isLoading, error } = useSWR("/api/navbar-items?nested=true", fetcher);
+  const { data, mutate, isLoading, error } = useSWR(
+    "/api/navbar-items?nested=true",
+    fetcher,
+  );
   const hierarchyData = useMemo<NavbarItemWithChildren[]>(
     () => data?.data || [],
-    [data]
+    [data],
+  );
+
+  const { trigger: createNavbarItem } = useSWRMutation(
+    "/api/navbar-items",
+    sendRequest,
   );
 
   const toggleExpand = (id: string) => {
@@ -71,20 +80,20 @@ export default function NavbarItemsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/navbar-items/${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        mutate();
-        setDeleteId(null);
-      } else {
-        const error = await response.json();
-        console.error("Error deleting navbar item:", error);
-        alert(error.error || "Failed to delete navbar item");
-      }
+      mutate(
+        (current: { data: NavbarItemWithChildren[] } | undefined) => ({
+          data: (current?.data ?? []).filter(
+            (item) => item._id.toString() !== id,
+          ),
+        }),
+        false,
+      );
+      setDeleteId(null);
+      await deleteRequest(`/api/navbar-items/${id}`);
+      mutate();
     } catch (error) {
       console.error("Error deleting navbar item:", error);
+      mutate();
       alert("Failed to delete navbar item");
     }
   };
@@ -98,27 +107,13 @@ export default function NavbarItemsPage() {
     level: number;
   }) => {
     try {
-      const url = data.id
-        ? `/api/navbar-items/${data.id}`
-        : "/api/navbar-items";
-      const method = data.id ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        mutate();
-        handleModalClose();
+      if (data.id) {
+        await putRequest(`/api/navbar-items/${data.id}`, { arg: data });
       } else {
-        const error = await response.json();
-        console.error("Error saving navbar item:", error);
-        alert(error.error || "Failed to save navbar item");
+        await createNavbarItem(data);
       }
+      mutate();
+      handleModalClose();
     } catch (error) {
       console.error("Error saving navbar item:", error);
       alert("Failed to save navbar item");
@@ -136,8 +131,9 @@ export default function NavbarItemsPage() {
 
     return (
       <span
-        className={`px-2 py-1 rounded-full text-xs font-medium ${colorMap[type] || "bg-gray-100 text-gray-800"
-          }`}
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          colorMap[type] || "bg-gray-100 text-gray-800"
+        }`}
       >
         {type}
       </span>
@@ -228,7 +224,11 @@ export default function NavbarItemsPage() {
   }
 
   if (error) {
-    return <div className="text-center py-12 text-red-500">Error loading navbar items</div>;
+    return (
+      <div className="text-center py-12 text-red-500">
+        Error loading navbar items
+      </div>
+    );
   }
 
   return (
@@ -252,7 +252,7 @@ export default function NavbarItemsPage() {
         ) : (
           <div>
             {hierarchyData.map((item: NavbarItemWithChildren) =>
-              renderItem(item, 0)
+              renderItem(item, 0),
             )}
           </div>
         )}

@@ -5,7 +5,8 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import useSWR, { mutate } from "swr";
-import { fetcher } from "@/lib/fetcher";
+import useSWRMutation from "swr/mutation";
+import { fetcher, putRequest } from "@/lib/fetcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,6 +52,10 @@ interface IOrderWithSearch extends IOrder {
 export default function AdminOrdersPage() {
   const { data, error, isLoading } = useSWR("/api/orders", fetcher);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { trigger: updateOrderStatus } = useSWRMutation(
+    "/api/orders",
+    putRequest,
+  );
 
   if (isLoading) {
     return <Loader />;
@@ -64,14 +69,7 @@ export default function AdminOrdersPage() {
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch("/api/orders", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update status");
-
+      await updateOrderStatus({ id, status: newStatus });
       toast.success("Order status updated");
       mutate("/api/orders");
     } catch (error) {

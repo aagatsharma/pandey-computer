@@ -5,10 +5,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import useSWR, { mutate } from "swr";
+import useSWRMutation from "swr/mutation";
 import { useState } from "react";
 import SubBrandModalForm from "@/components/admin/subbrand-modal-form";
 import { ISubBrand } from "@/lib/models/SubBrand";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher, sendRequest, putRequest, deleteRequest } from "@/lib/fetcher";
 import Image from "next/image";
 import { IBrand } from "@/lib/models/Brand";
 import {
@@ -36,22 +37,25 @@ export default function SubBrandsPage() {
   const [editData, setEditData] = useState<ISubBrand | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const { trigger: createSubBrand } = useSWRMutation(
+    "/api/subbrands",
+    sendRequest,
+  );
+  const { trigger: updateSubBrand } = useSWRMutation(
+    "/api/subbrands",
+    putRequest,
+  );
+
   const handleSubmit = async (formData: {
     id?: string;
     name: string;
     brand_slug: string;
   }) => {
-    const method = formData.id ? "PUT" : "POST";
-    const response = await fetch("/api/subbrands", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok)
-      throw new Error(
-        `Failed to ${formData.id ? "update" : "create"} subbrand`,
-      );
+    if (formData.id) {
+      await updateSubBrand(formData);
+    } else {
+      await createSubBrand(formData);
+    }
     mutate("/api/subbrands");
   };
 
@@ -62,14 +66,19 @@ export default function SubBrandsPage() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-
-    const response = await fetch(`/api/subbrands?id=${deleteId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) throw new Error("Failed to delete subbrand");
-    mutate("/api/subbrands");
+    const idToDelete = deleteId;
     setDeleteId(null);
+    mutate(
+      "/api/subbrands",
+      (current: { data: ISubBrand[] } | undefined) => ({
+        data: (current?.data ?? []).filter(
+          (s) => s._id.toString() !== idToDelete,
+        ),
+      }),
+      false,
+    );
+    await deleteRequest(`/api/subbrands?id=${idToDelete}`);
+    mutate("/api/subbrands");
   };
 
   const handleModalClose = (open: boolean) => {

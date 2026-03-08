@@ -1,6 +1,6 @@
 import Blog from "@/lib/models/Blog";
 import dbConnect from "@/lib/mongoose";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export async function GET(
@@ -14,20 +14,16 @@ export async function GET(
     const blog = await Blog.findOne({ slug });
 
     if (!blog) {
-      return Response.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    return Response.json(
-      { data: blog },
-      {
-        headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
-      },
-    );
+    return NextResponse.json({ data: blog });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Failed to fetch blog" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch blog" },
+      { status: 500 },
+    );
   }
 }
 
@@ -43,7 +39,7 @@ export async function PUT(
     const { title, excerpt, content, image } = body;
 
     if (!title || !content) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Title and content are required" },
         { status: 400 },
       );
@@ -68,7 +64,7 @@ export async function PUT(
     );
 
     if (!blog) {
-      return Response.json({ error: "Blog not found" }, { status: 404 });
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
     // Revalidate blog pages
@@ -77,11 +73,14 @@ export async function PUT(
     revalidatePath(`/blogs/${newSlug}`);
     revalidatePath("/");
 
-    return Response.json({ data: blog });
+    return NextResponse.json({ data: blog });
   } catch (error) {
     console.error(error);
 
-    return Response.json({ error: "Failed to update blog" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update blog" },
+      { status: 500 },
+    );
   }
 }
 
@@ -96,7 +95,7 @@ export async function DELETE(
     const blog = await Blog.findOneAndDelete({ slug }); // Query by slug field
 
     if (!blog) {
-      return Response.json({ error: "Blog not found" }, { status: 404 });
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
     // Revalidate blog pages
@@ -104,9 +103,12 @@ export async function DELETE(
     revalidatePath(`/blogs/${slug}`);
     revalidatePath("/");
 
-    return Response.json({ message: "Blog deleted successfully" });
+    return NextResponse.json({ message: "Blog deleted successfully" });
   } catch (error) {
     console.error(error);
-    return Response.json({ error: "Failed to delete blog" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete blog" },
+      { status: 500 },
+    );
   }
 }

@@ -2,7 +2,8 @@
 
 import { useRouter, useParams } from "next/navigation";
 import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
+import useSWRMutation from "swr/mutation";
+import { fetcher, putRequest } from "@/lib/fetcher";
 import BlogForm from "@/components/admin/blog-form";
 import Loader from "@/components/loader";
 
@@ -14,6 +15,11 @@ export default function EditBlogPage() {
   const { data, isLoading } = useSWR(`/api/blogs/${slug}`, fetcher);
   const blog = data?.data;
 
+  const { trigger: updateBlog } = useSWRMutation(
+    `/api/blogs/${slug}`,
+    putRequest,
+  );
+
   const handleSubmit = async (formData: {
     title: string;
     excerpt?: string;
@@ -21,14 +27,7 @@ export default function EditBlogPage() {
     image?: string;
   }) => {
     try {
-      const response = await fetch(`/api/blogs/${slug}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) throw new Error("Failed to update blog");
-
+      await updateBlog(formData);
       router.push("/admin/blogs");
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -37,9 +36,7 @@ export default function EditBlogPage() {
   };
 
   if (isLoading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   if (!blog) {

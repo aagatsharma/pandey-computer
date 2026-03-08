@@ -1,10 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import useSWRMutation from "swr/mutation";
+import { sendRequest } from "@/lib/fetcher";
 import BlogForm from "@/components/admin/blog-form";
 
 export default function AddBlogPage() {
   const router = useRouter();
+  const { trigger: createBlog } = useSWRMutation("/api/blogs", sendRequest);
 
   const handleSubmit = async (data: {
     title: string;
@@ -13,14 +16,7 @@ export default function AddBlogPage() {
     image?: string;
   }) => {
     try {
-      const response = await fetch("/api/blogs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) throw new Error("Failed to create blog");
-
+      await createBlog(data);
       router.push("/admin/blogs");
     } catch (error) {
       console.error("Error creating blog:", error);

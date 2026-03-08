@@ -10,24 +10,13 @@ export async function GET() {
 
     const data = await SubBrand.find().populate("brand", "name slug logo");
 
-    return new Response(
-      JSON.stringify({
-        data,
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        },
-      },
-    );
+    return NextResponse.json({ data });
   } catch (error) {
     console.error("Error fetching SubBrand:", error);
-    return new Response(JSON.stringify({ error: "Failed to fetch SubBrand" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(
+      { error: "Failed to fetch SubBrand" },
+      { status: 500 },
+    );
   }
 }
 

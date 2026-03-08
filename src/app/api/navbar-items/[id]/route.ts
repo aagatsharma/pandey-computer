@@ -1,6 +1,6 @@
 import NavbarItem from "@/lib/models/NavbarItem";
 import dbConnect from "@/lib/mongoose";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 export async function PUT(
@@ -17,14 +17,17 @@ export async function PUT(
     // Get the current item to check if parent is changing
     const currentItem = await NavbarItem.findById(id);
     if (!currentItem) {
-      return Response.json({ error: "Navbar item not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Navbar item not found" },
+        { status: 404 },
+      );
     }
 
     // Validate parent-level relationship if parent is being set
     if (parent) {
       const parentItem = await NavbarItem.findById(parent);
       if (!parentItem) {
-        return Response.json(
+        return NextResponse.json(
           { error: "Parent item not found" },
           { status: 404 },
         );
@@ -32,7 +35,7 @@ export async function PUT(
 
       // Parent should be one level lower
       if (parentItem.level !== currentItem.level - 1) {
-        return Response.json(
+        return NextResponse.json(
           {
             error: `Level ${currentItem.level} items must have a Level ${
               currentItem.level - 1
@@ -46,7 +49,7 @@ export async function PUT(
       let checkParent = parentItem;
       while (checkParent.parent) {
         if (checkParent.parent.toString() === id) {
-          return Response.json(
+          return NextResponse.json(
             { error: "Cannot create circular reference" },
             { status: 400 },
           );
@@ -83,16 +86,19 @@ export async function PUT(
     );
 
     if (!navbarItem) {
-      return Response.json({ error: "Navbar item not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Navbar item not found" },
+        { status: 404 },
+      );
     }
 
     // Revalidate all pages that use navigation
     revalidatePath("/", "layout");
 
-    return Response.json({ data: navbarItem });
+    return NextResponse.json({ data: navbarItem });
   } catch (error) {
     console.error(error);
-    return Response.json(
+    return NextResponse.json(
       { error: "Failed to update navbar item" },
       { status: 500 },
     );
@@ -110,7 +116,10 @@ export async function DELETE(
     const navbarItem = await NavbarItem.findById(id);
 
     if (!navbarItem) {
-      return Response.json({ error: "Navbar item not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Navbar item not found" },
+        { status: 404 },
+      );
     }
 
     // Remove from parent's children array
@@ -135,10 +144,10 @@ export async function DELETE(
     // Revalidate all pages that use navigation
     revalidatePath("/", "layout");
 
-    return Response.json({ message: "Navbar item deleted successfully" });
+    return NextResponse.json({ message: "Navbar item deleted successfully" });
   } catch (error) {
     console.error(error);
-    return Response.json(
+    return NextResponse.json(
       { error: "Failed to delete navbar item" },
       { status: 500 },
     );
