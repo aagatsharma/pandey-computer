@@ -14,10 +14,6 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
 
-    // Query parameters for filtering and pagination
-    const page = parseInt(searchParams?.get("page") || "") || 1;
-    const limit = parseInt(searchParams?.get("limit") || "") || 10;
-
     // Filter parameters
     const name = searchParams.get("name");
     const categorySlug = searchParams.get("category");
@@ -40,18 +36,15 @@ export async function GET(req: NextRequest) {
       if (brandDoc) filter.brand = brandDoc._id;
     }
 
-    // Calculate skip/offset for pagination
-    const skip = (page - 1) * limit;
-
-    const products = await Product.find(filter)
+    const productQuery = Product.find(filter)
       .populate("categories", "name")
       .populate("subCategories", "name")
       .populate("brand", "name")
       .populate("subBrand", "name")
       .sort({ updatedAt: -1 })
-      .skip(skip)
-      .limit(limit)
       .lean();
+
+    const products = await productQuery;
 
     // Create CSV header
     const headers = [
@@ -88,9 +81,9 @@ export async function GET(req: NextRequest) {
         images?: string[];
       }) => {
         const categoryNames =
-          product.categories?.map((c) => c.name).join(",") || "";
+          product.categories?.map((c) => c.name).join("|") || "";
         const subCategoryNames =
-          product.subCategories?.map((sc) => sc.name).join(",") || "";
+          product.subCategories?.map((sc) => sc.name).join("|") || "";
         const brandName = product.brand?.name || "";
         const subBrandName = product.subBrand?.name || "";
         const keyFeatures = product.keyFeatures?.join("|") || "";
@@ -102,20 +95,22 @@ export async function GET(req: NextRequest) {
         const images = product.images?.join("|") || "";
 
         return [
-          `"${product.name}"`,
+          product.name,
           product.price,
-          product.originalPrice || "",
+          product.originalPrice ?? "",
           product.stock,
-          product.hotDeals || false,
-          product.topSelling || false,
-          `"${categoryNames}"`,
-          `"${subCategoryNames}"`,
-          `"${brandName}"`,
-          `"${subBrandName}"`,
-          `"${keyFeatures}"`,
-          `"${specs}"`,
-          `"${images}"`,
-        ].join(",");
+          product.hotDeals ?? false,
+          product.topSelling ?? false,
+          categoryNames,
+          subCategoryNames,
+          brandName,
+          subBrandName,
+          keyFeatures,
+          specs,
+          images,
+        ]
+          .map((value) => escapeCSVField(value))
+          .join(",");
       },
     );
 
@@ -182,10 +177,7 @@ export async function POST(req: NextRequest) {
         });
 
         // Parse categories
-        const categoryNames = row.categoryNames
-          .split(",")
-          .map((n: string) => n.trim())
-          .filter(Boolean);
+        const categoryNames = splitMultiValue(row.categoryNames);
         const categories = await Promise.all(
           categoryNames.map(async (name: string) => {
             let cat = await Category.findOne({ name }).select("_id");
@@ -200,10 +192,7 @@ export async function POST(req: NextRequest) {
         );
 
         // Parse subcategories
-        const subCategoryNames = row.subCategoryNames
-          .split(",")
-          .map((n: string) => n.trim())
-          .filter(Boolean);
+        const subCategoryNames = splitMultiValue(row.subCategoryNames);
         const subCategories = await Promise.all(
           subCategoryNames.map(async (name: string) => {
             let subCat = await SubCategory.findOne({ name }).select("_id");
@@ -356,7 +345,13 @@ function parseCSVLine(line: string): string[] {
     const char = line[i];
 
     if (char === '"') {
-      inQuotes = !inQuotes;
+      const nextChar = line[i + 1];
+      if (inQuotes && nextChar === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
     } else if (char === "," && !inQuotes) {
       values.push(current);
       current = "";
@@ -367,4 +362,17 @@ function parseCSVLine(line: string): string[] {
 
   values.push(current);
   return values;
+}
+
+function escapeCSVField(value: unknown): string {
+  const normalized = String(value ?? "");
+  const escaped = normalized.replace(/"/g, '""');
+  return `"${escaped}"`;
+}
+
+function splitMultiValue(value: string): string[] {
+  return value
+    .split(/[|,]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }

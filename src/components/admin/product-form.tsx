@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { FileDown, Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { uploadToCloudinary } from "@/lib/image-base64";
@@ -22,6 +22,7 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { IProduct } from "@/lib/models/Product";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z
@@ -75,6 +76,8 @@ export default function ProductForm({
   const [previews, setPreviews] = useState<string[]>([]);
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImportingSpecs, setIsImportingSpecs] = useState(false);
+  const [isDownloadingSpecSample, setIsDownloadingSpecSample] = useState(false);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([
     { key: "", value: "" },
   ]);
@@ -291,6 +294,108 @@ export default function ProductForm({
       throw error;
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const parseCSVLine = (line: string): string[] => {
+    const values: string[] = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+
+      if (char === '"') {
+        const nextChar = line[i + 1];
+        if (inQuotes && nextChar === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === "," && !inQuotes) {
+        values.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+
+    values.push(current);
+    return values;
+  };
+
+  const handleImportSpecifications = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsImportingSpecs(true);
+      const text = await file.text();
+      const lines = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      if (lines.length < 2) {
+        toast.error("Specification CSV is empty or invalid");
+        return;
+      }
+
+      const header = parseCSVLine(lines[0]).map((col) =>
+        col.trim().toLowerCase(),
+      );
+      const keyIndex = header.findIndex((col) =>
+        ["key", "spec", "specification", "name"].includes(col),
+      );
+      const valueIndex = header.findIndex((col) =>
+        ["value", "specvalue", "spec_value", "description"].includes(col),
+      );
+
+      if (keyIndex === -1 || valueIndex === -1) {
+        toast.error("CSV must include key and value headers");
+        return;
+      }
+
+      const importedSpecs = lines
+        .slice(1)
+        .map((line) => parseCSVLine(line))
+        .map((row) => ({
+          key: (row[keyIndex] || "").trim(),
+          value: (row[valueIndex] || "").trim(),
+        }))
+        .filter((spec) => spec.key && spec.value);
+
+      if (importedSpecs.length === 0) {
+        toast.error("No valid specifications found in file");
+        return;
+      }
+
+      setSpecs(importedSpecs);
+      toast.success(
+        `Imported ${importedSpecs.length} specification${importedSpecs.length !== 1 ? "s" : ""}`,
+      );
+    } catch (error) {
+      console.error("Error importing specifications:", error);
+      toast.error("Failed to import specifications");
+    } finally {
+      setIsImportingSpecs(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleDownloadSpecificationSample = async () => {
+    try {
+      setIsDownloadingSpecSample(true);
+      window.open("/sample-specifications.csv", "_blank");
+      toast.success("Sample specification file downloaded");
+    } catch (error) {
+      console.error("Error downloading specification sample:", error);
+      toast.error("Failed to download specification sample");
+    } finally {
+      setIsDownloadingSpecSample(false);
     }
   };
 
@@ -597,7 +702,42 @@ export default function ProductForm({
           </div>
 
           <div className="space-y-3">
-            <FormLabel>Specifications</FormLabel>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <FormLabel>Specifications</FormLabel>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    document.getElementById("specification-file-input")?.click()
+                  }
+                  disabled={isImportingSpecs}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {isImportingSpecs ? "Importing..." : "Import Specification"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDownloadSpecificationSample}
+                  disabled={isDownloadingSpecSample}
+                >
+                  <FileDown className="h-4 w-4 mr-2" />
+                  {isDownloadingSpecSample
+                    ? "Downloading..."
+                    : "Download Sample Specification"}
+                </Button>
+                <input
+                  id="specification-file-input"
+                  type="file"
+                  accept=".csv"
+                  className="hidden"
+                  onChange={handleImportSpecifications}
+                />
+              </div>
+            </div>
             {specs.map((spec, index) => (
               <div key={index} className="grid grid-cols-12 gap-2">
                 <Input

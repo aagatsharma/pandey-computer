@@ -53,6 +53,7 @@ export default function ProductsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isDownloadingSample, setIsDownloadingSample] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: brandsData } = useSWR<{ data: IBrand[] }>(
@@ -120,10 +121,8 @@ export default function ProductsPage() {
     try {
       setIsExporting(true);
 
-      // Build query with current filters and page
+      // Build query with current filters (export all matching records)
       const exportQuery = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
         ...(debouncedFilters.name && { name: debouncedFilters.name }),
         ...(debouncedFilters.category && {
           category: debouncedFilters.category,
@@ -139,16 +138,13 @@ export default function ProductsPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `products-page${page}-${Date.now()}.csv`;
+      a.download = `products-all-${Date.now()}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      const count = products.length;
-      toast.success(
-        `Exported ${count} product${count !== 1 ? "s" : ""} from page ${page}`,
-      );
+      toast.success("Exported all matching products to CSV");
     } catch (error) {
       console.error("Error exporting products:", error);
       toast.error("Failed to export products");
@@ -191,13 +187,17 @@ export default function ProductsPage() {
     }
   };
 
-  const handleDownloadSample = () => {
-    const a = document.createElement("a");
-    a.href = "/sample-products.csv";
-    a.download = "sample-products.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleDownloadSample = async () => {
+    try {
+      setIsDownloadingSample(true);
+      window.open("/sample-products.csv", "_blank");
+      toast.success("Sample file downloaded");
+    } catch (error) {
+      console.error("Error downloading sample:", error);
+      toast.error("Failed to download sample");
+    } finally {
+      setIsDownloadingSample(false);
+    }
   };
 
   const columns: ColumnDef<IProduct>[] = [
@@ -392,9 +392,13 @@ export default function ProductsPage() {
               {isImporting ? "Importing..." : "Import CSV"}
             </Button>
 
-            <Button variant="ghost" onClick={handleDownloadSample}>
+            <Button
+              variant="ghost"
+              onClick={handleDownloadSample}
+              disabled={isDownloadingSample}
+            >
               <FileDown className="mr-2 h-4 w-4" />
-              Download Sample
+              {isDownloadingSample ? "Downloading..." : "Download Sample"}
             </Button>
 
             <input
