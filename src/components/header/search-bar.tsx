@@ -32,12 +32,12 @@ export default function SearchBar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const debouncedSearch = useDebounce(searchQuery, 500);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Use SWR to fetch search results
   const { data, isLoading } = useSWR<{ data: Product[] }>(
     debouncedSearch.trim()
-      ? `/api/products?name=${encodeURIComponent(debouncedSearch)}&limit=8`
+      ? `/api/products/search?name=${encodeURIComponent(debouncedSearch)}&limit=8`
       : null,
     fetcher,
     {
