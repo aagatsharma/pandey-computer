@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import SearchBar from "./search-bar";
 import MobileMenuItem from "./mobile-menu-item";
 
 interface NavbarItem {
@@ -54,10 +53,7 @@ export default function MobileMenu({
 
       {/* Mobile Menu Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="p-4 space-y-4">
-          {/* Mobile Search */}
-          <SearchBar />
-
+        <div className="p-4">
           {/* Navigation Links */}
           <nav>
             <ul className="space-y-1">

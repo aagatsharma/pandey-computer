@@ -29,7 +29,7 @@ export default function LogoAndSearchBar({
           </Link>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-2xl hidden md:block">
+          <div className="flex-1 max-w-2xl hidden lg:block">
             <SearchBar />
           </div>
 
@@ -63,6 +63,10 @@ export default function LogoAndSearchBar({
               <Menu className="h-6 w-6" />
             </button>
           </div>
+        </div>
+
+        <div className="mt-4 lg:hidden">
+          <SearchBar />
         </div>
       </div>
     </div>
