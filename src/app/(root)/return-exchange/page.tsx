@@ -1,5 +1,31 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { defaultOgImage } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Return & Exchange Policy",
+  description:
+    "Review Pandey Computer's return and exchange policy, including eligibility, refund process, and warranty support.",
+  alternates: {
+    canonical: "/return-exchange",
+  },
+  openGraph: {
+    title: "Return & Exchange Policy | Pandey Computer",
+    description:
+      "Review return, exchange, and refund details for purchases from Pandey Computer.",
+    type: "website",
+    url: "/return-exchange",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Return & Exchange Policy | Pandey Computer",
+    description:
+      "Review return, exchange, and refund details for purchases from Pandey Computer.",
+    images: [defaultOgImage.url],
+  },
+};
 
 export default function ReturnExchange() {
   return (
@@ -230,7 +256,7 @@ export default function ReturnExchange() {
             </p>
             <div className="mt-4 text-zinc-600">
               <p>Email: pandeycomputer7@gmail.com</p>
-              <p>Phone:  061-585498 , 9856035498</p>
+              <p>Phone: 061-585498 , 9856035498</p>
               <p>Address: Newroad, Pokhara</p>
             </div>
           </section>

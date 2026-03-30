@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import HeroSection from "@/components/home/hero-section";
 // import LatestBlogs from "@/components/home/latest-blogs";
 import LatestProducts from "@/components/home/latest-products";
@@ -6,8 +7,9 @@ import PopularBrandsSection from "@/components/home/popular-brands-section";
 import ProductByCategories from "@/components/home/categories-products/product-by-categories";
 import HotDeals from "@/components/home/hot-deals";
 import TopSelling from "@/components/home/top-selling";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
   description:
     "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware. Best prices and expert service in Pokhara, Nepal.",
@@ -16,6 +18,15 @@ export const metadata = {
     description:
       "Pokhara's premier destination for gaming laptops, PC accessories, and custom builds.",
     type: "website",
+    url: "/",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    description:
+      "Pokhara's premier destination for gaming laptops, PC accessories, and custom builds.",
+    images: [defaultOgImage.url],
   },
   alternates: {
     canonical: "/",

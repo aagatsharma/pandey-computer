@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   FaMapMarkerAlt,
   FaPhone,
@@ -7,11 +8,30 @@ import {
   FaInstagram,
   FaWhatsapp,
 } from "react-icons/fa";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Contact Us - Pandey Computer | Get in Touch",
   description:
     "Contact Pandey Computer in Pokhara for gaming laptops, PC accessories, and custom builds. Visit our store, call us, or send us a message.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact Us - Pandey Computer",
+    description:
+      "Contact Pandey Computer in Pokhara for gaming laptops, PC accessories, and custom builds.",
+    type: "website",
+    url: "/contact",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Us - Pandey Computer",
+    description:
+      "Contact Pandey Computer in Pokhara for gaming laptops, PC accessories, and custom builds.",
+    images: [defaultOgImage.url],
+  },
 };
 
 export default function ContactUsPage() {

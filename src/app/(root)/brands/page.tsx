@@ -1,16 +1,31 @@
+import type { Metadata } from "next";
 import { IBrand } from "@/lib/models/Brand";
 import dbConnect from "@/lib/mongoose";
 import Brand from "@/lib/models/Brand";
 import { BrandsClient } from "@/components/reusable/brands/brands-client";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Computer & Gaming Brands",
   description:
     "Explore our extensive collection of premium computer and gaming brands. Shop from top brands like ASUS, MSI, Corsair, Logitech, and more at Pandey Computer.",
+  alternates: {
+    canonical: "/brands",
+  },
   openGraph: {
     title: "Computer & Gaming Brands | Pandey Computer",
     description:
       "Explore our extensive collection of premium computer and gaming brands.",
+    type: "website",
+    url: "/brands",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Computer & Gaming Brands | Pandey Computer",
+    description:
+      "Explore our extensive collection of premium computer and gaming brands.",
+    images: [defaultOgImage.url],
   },
 };
 

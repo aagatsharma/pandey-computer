@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import dbConnect from "@/lib/mongoose";
 import Blog from "@/lib/models/Blog";
 import { IBlog } from "@/lib/models/Blog";
+import { defaultOgImage } from "@/lib/seo";
 
 async function getBlog(slug: string): Promise<IBlog | null> {
   await dbConnect();
@@ -15,14 +17,24 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const blog = await getBlog(slug);
 
-  if (!blog) return { title: "Blog Not Found" };
+  if (!blog) {
+    return {
+      title: "Blog Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 
   // Extract plain text from HTML content for description
   const description = blog.content.replace(/<[^>]*>/g, "").slice(0, 160);
+
+  const primaryImage = blog.image || defaultOgImage.url;
 
   return {
     title: blog.title,
@@ -33,15 +45,23 @@ export async function generateMetadata({
       title: blog.title,
       description: description.slice(0, 200),
       type: "article",
-      publishedTime: blog.createdAt,
-      modifiedTime: blog.updatedAt,
+      publishedTime: new Date(blog.createdAt).toISOString(),
+      modifiedTime: new Date(blog.updatedAt).toISOString(),
       authors: ["Pandey Computer"],
       siteName: "Pandey Computer",
+      url: `/blogs/${slug}`,
+      images: [
+        {
+          url: primaryImage,
+          alt: blog.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: blog.title,
       description: description.slice(0, 200),
+      images: [primaryImage],
     },
     alternates: {
       canonical: `/blogs/${slug}`,

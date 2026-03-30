@@ -1,5 +1,31 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { defaultOgImage } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description:
+    "Read the terms and conditions for shopping at Pandey Computer, including orders, delivery, pricing, and website usage policies.",
+  alternates: {
+    canonical: "/terms",
+  },
+  openGraph: {
+    title: "Terms & Conditions | Pandey Computer",
+    description:
+      "Read the terms and conditions for shopping at Pandey Computer.",
+    type: "website",
+    url: "/terms",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms & Conditions | Pandey Computer",
+    description:
+      "Read the terms and conditions for shopping at Pandey Computer.",
+    images: [defaultOgImage.url],
+  },
+};
 
 export default function TermsAndConditions() {
   return (

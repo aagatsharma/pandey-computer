@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ShopClient } from "@/components/shop/shop-client";
 import { Suspense } from "react";
 import dbConnect from "@/lib/mongoose";
@@ -5,15 +6,29 @@ import Category from "@/lib/models/Category";
 import SubCategory from "@/lib/models/SubCategory";
 import Brand from "@/lib/models/Brand";
 import SubBrand from "@/lib/models/SubBrand";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Shop Computer & Gaming Products",
   description:
     "Browse our complete collection of gaming laptops, PC components, peripherals, and accessories. Best prices on computer hardware in Pokhara, Nepal.",
+  alternates: {
+    canonical: "/shop",
+  },
   openGraph: {
     title: "Shop Computer & Gaming Products | Pandey Computer",
     description:
       "Browse our complete collection of gaming laptops, PC components, and accessories.",
+    type: "website",
+    url: "/shop",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shop Computer & Gaming Products | Pandey Computer",
+    description:
+      "Browse our complete collection of gaming laptops, PC components, and accessories.",
+    images: [defaultOgImage.url],
   },
 };
 

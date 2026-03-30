@@ -1,18 +1,33 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ICategory } from "@/lib/models/Category";
 import dbConnect from "@/lib/mongoose";
 import Category from "@/lib/models/Category";
 import { CategoriesClient } from "@/components/reusable/categories/categories-client";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Computer & Gaming Categories",
   description:
     "Explore our extensive collection of computer and technology categories. Find gaming laptops, PC components, peripherals, and more at Pandey Computer.",
+  alternates: {
+    canonical: "/categories",
+  },
   openGraph: {
     title: "Computer & Gaming Categories | Pandey Computer",
     description:
       "Explore our extensive collection of computer and technology categories.",
+    type: "website",
+    url: "/categories",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Computer & Gaming Categories | Pandey Computer",
+    description:
+      "Explore our extensive collection of computer and technology categories.",
+    images: [defaultOgImage.url],
   },
 };
 

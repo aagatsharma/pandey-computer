@@ -1,16 +1,31 @@
+import type { Metadata } from "next";
 import { BlogCard } from "@/components/blog/blog-card";
 import { IBlog } from "@/lib/models/Blog";
 import dbConnect from "@/lib/mongoose";
 import Blog from "@/lib/models/Blog";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Tech Blogs & News",
   description:
     "Stay updated with the latest tech news, guides, and insights from our experts. Read about gaming laptops, PC builds, hardware reviews and more.",
+  alternates: {
+    canonical: "/blogs",
+  },
   openGraph: {
     title: "Tech Blogs & News | Pandey Computer",
     description:
       "Stay updated with the latest tech news, guides, and insights from our experts.",
+    type: "website",
+    url: "/blogs",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tech Blogs & News | Pandey Computer",
+    description:
+      "Stay updated with the latest tech news, guides, and insights from our experts.",
+    images: [defaultOgImage.url],
   },
 };
 

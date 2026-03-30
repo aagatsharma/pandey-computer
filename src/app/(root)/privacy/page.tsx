@@ -1,5 +1,31 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { defaultOgImage } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Read Pandey Computer's privacy policy to understand how we collect, use, and protect your personal information.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy | Pandey Computer",
+    description:
+      "Read Pandey Computer's privacy policy to understand how your data is handled.",
+    type: "website",
+    url: "/privacy",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy | Pandey Computer",
+    description:
+      "Read Pandey Computer's privacy policy to understand how your data is handled.",
+    images: [defaultOgImage.url],
+  },
+};
 
 export default function PrivacyPolicy() {
   return (
@@ -207,7 +233,7 @@ export default function PrivacyPolicy() {
             </p>
             <div className="mt-4 text-zinc-600">
               <p>Email: pandeycomputer7@gmail.com</p>
-              <p>Phone:  061-585498 / 9856035498</p>
+              <p>Phone: 061-585498 / 9856035498</p>
               <p>Address: Newroad, Pokhara</p>
             </div>
           </section>

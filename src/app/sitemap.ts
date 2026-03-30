@@ -2,14 +2,13 @@ import { MetadataRoute } from "next";
 import dbConnect from "@/lib/mongoose";
 import Product from "@/lib/models/Product";
 import Blog from "@/lib/models/Blog";
+import { getSiteUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 86400; // 24 hours
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
-
-  await dbConnect();
+  const baseUrl = getSiteUrl();
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -75,23 +74,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Dynamic product pages
-  const products = await Product.find({}, { slug: 1, updatedAt: 1 }).lean();
-  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${baseUrl}/product/${product.slug}`,
-    lastModified: product.updatedAt || new Date(),
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  let productPages: MetadataRoute.Sitemap = [];
+  let blogPages: MetadataRoute.Sitemap = [];
 
-  // Dynamic blog pages
-  const blogs = await Blog.find({}, { slug: 1, updatedAt: 1 }).lean();
-  const blogPages: MetadataRoute.Sitemap = blogs.map((blog) => ({
-    url: `${baseUrl}/blogs/${blog.slug}`,
-    lastModified: blog.updatedAt || new Date(),
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
+  try {
+    await dbConnect();
+
+    const products = await Product.find({}, { slug: 1, updatedAt: 1 }).lean();
+    productPages = products.map((product) => ({
+      url: `${baseUrl}/product/${product.slug}`,
+      lastModified: product.updatedAt || new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
+
+    const blogs = await Blog.find({}, { slug: 1, updatedAt: 1 }).lean();
+    blogPages = blogs.map((blog) => ({
+      url: `${baseUrl}/blogs/${blog.slug}`,
+      lastModified: blog.updatedAt || new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }));
+  } catch (error) {
+    console.error("Error generating dynamic sitemap entries:", error);
+  }
 
   return [...staticPages, ...productPages, ...blogPages];
 }

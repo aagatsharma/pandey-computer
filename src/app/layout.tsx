@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 
 import Providers from "@/components/providers";
+import { defaultOgImage, getSiteUrlObject } from "@/lib/seo";
 
 const univiaPro = localFont({
   src: [
@@ -101,11 +102,12 @@ const univiaPro = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
+  metadataBase: getSiteUrlObject(),
   title: {
     default: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
     template: "%s | Pandey Computer",
   },
+  applicationName: "Pandey Computer",
   description:
     "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware. Best prices and expert service in Pokhara, Nepal.",
   keywords: [
@@ -140,21 +142,14 @@ export const metadata: Metadata = {
     description:
       "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware.",
     siteName: "Pandey Computer",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Pandey Computer - Gaming and PC Store",
-      },
-    ],
+    images: [defaultOgImage],
   },
   twitter: {
     card: "summary_large_image",
     title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
     description:
       "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware.",
-    images: ["/og-image.jpg"],
+    images: [defaultOgImage.url],
   },
   robots: {
     index: true,
@@ -170,6 +165,15 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({

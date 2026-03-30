@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { notFound } from "next/navigation";
@@ -16,6 +17,7 @@ import "@/lib/models/SubBrand";
 import { Types } from "mongoose";
 import { GoDotFill } from "react-icons/go";
 import { FaWhatsapp, FaFacebook } from "react-icons/fa";
+import { defaultOgImage, getSiteUrl } from "@/lib/seo";
 
 async function getProduct(slug: string) {
   await dbConnect();
@@ -52,10 +54,18 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
-  if (!product) return { title: "Product Not Found" };
+  if (!product) {
+    return {
+      title: "Product Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 
   const description = product.specs
     ? `${product.name} - ${Object.values(product.specs).slice(0, 3).join(", ")}. Available at Pandey Computer, Pokhara.`
@@ -69,7 +79,9 @@ export async function generateMetadata({
     "nepal",
     "computer store",
     "gaming",
-  ].filter(Boolean);
+  ].filter(Boolean) as string[];
+
+  const primaryImage = product.images?.[0] || defaultOgImage.url;
 
   return {
     title: product.name,
@@ -80,11 +92,19 @@ export async function generateMetadata({
       description: description.slice(0, 200),
       type: "website",
       siteName: "Pandey Computer",
+      url: `/product/${slug}`,
+      images: [
+        {
+          url: primaryImage,
+          alt: product.name,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: product.name,
       description: description.slice(0, 200),
+      images: [primaryImage],
     },
     alternates: {
       canonical: `/product/${slug}`,
@@ -133,7 +153,7 @@ export default async function ProductPage({
       : undefined,
     offers: {
       "@type": "Offer",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/product/${slug}`,
+      url: `${getSiteUrl()}/product/${slug}`,
       priceCurrency: "NPR",
       price: product.price,
       availability: product.stock

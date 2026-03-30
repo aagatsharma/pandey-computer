@@ -1,9 +1,29 @@
+import type { Metadata } from "next";
 import { FaShieldAlt, FaTag, FaUserTie, FaHeadset } from "react-icons/fa";
+import { defaultOgImage } from "@/lib/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "About Us - Pandey Computer | Best Computer Store in Pokhara",
   description:
     "Learn about Pandey Computer, Pokhara's trusted destination for gaming laptops, PC accessories, and custom builds. Our story, mission, and commitment to excellence.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Us - Pandey Computer",
+    description:
+      "Learn about Pandey Computer, Pokhara's trusted destination for gaming laptops, PC accessories, and custom builds.",
+    type: "website",
+    url: "/about",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us - Pandey Computer",
+    description:
+      "Learn about Pandey Computer, Pokhara's trusted destination for gaming laptops, PC accessories, and custom builds.",
+    images: [defaultOgImage.url],
+  },
 };
 
 export default function AboutUsPage() {
