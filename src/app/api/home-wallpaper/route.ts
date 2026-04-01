@@ -24,14 +24,20 @@ export async function POST(req: NextRequest) {
     await dbConnect();
 
     const body = await req.json();
-    const { title, image, route, order, gridSpan } = body;
+    const {
+      // title,
+      image,
+      // route,
+      order,
+      // gridSpan
+    } = body;
 
-    if (!title) {
-      return NextResponse.json(
-        { message: "Title is required" },
-        { status: 400 },
-      );
-    }
+    // if (!title) {
+    //   return NextResponse.json(
+    //     { message: "Title is required" },
+    //     { status: 400 },
+    //   );
+    // }
 
     if (!image) {
       return NextResponse.json(
@@ -40,19 +46,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!route) {
-      return NextResponse.json(
-        { message: "Route is required" },
-        { status: 400 },
-      );
-    }
+    // if (!route) {
+    //   return NextResponse.json(
+    //     { message: "Route is required" },
+    //     { status: 400 },
+    //   );
+    // }
 
     const wallpaper = await HomeWallpaper.create({
-      title,
+      // title,
       image,
-      route,
+      // route,
       order: order || 1,
-      gridSpan: gridSpan || { cols: 1, rows: 1 },
+      // gridSpan: gridSpan || { cols: 1, rows: 1 },
     });
 
     // Revalidate home page
@@ -79,7 +85,14 @@ export async function PUT(req: NextRequest) {
     await dbConnect();
 
     const body = await req.json();
-    const { id, title, image, route, order, gridSpan } = body;
+    const {
+      id,
+      // title,
+      image,
+      // route,
+      order,
+      // gridSpan
+    } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -88,12 +101,12 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (!title) {
-      return NextResponse.json(
-        { message: "Title is required" },
-        { status: 400 },
-      );
-    }
+    // if (!title) {
+    //   return NextResponse.json(
+    //     { message: "Title is required" },
+    //     { status: 400 },
+    //   );
+    // }
 
     if (!image) {
       return NextResponse.json(
@@ -102,21 +115,21 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (!route) {
-      return NextResponse.json(
-        { message: "Route is required" },
-        { status: 400 },
-      );
-    }
+    // if (!route) {
+    //   return NextResponse.json(
+    //     { message: "Route is required" },
+    //     { status: 400 },
+    //   );
+    // }
 
     const wallpaper = await HomeWallpaper.findByIdAndUpdate(
       id,
       {
-        title,
+        // title,
         image,
-        route,
+        // route,
         order: order || 1,
-        gridSpan: gridSpan || { cols: 1, rows: 1 },
+        // gridSpan: gridSpan || { cols: 1, rows: 1 },
       },
       { new: true },
     );

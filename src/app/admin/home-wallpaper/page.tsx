@@ -56,13 +56,6 @@ export default function HomeWallpaperPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [imageInputType, setImageInputType] = useState<"url" | "upload">("url");
   const [isUploading, setIsUploading] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    image: "",
-    route: "",
-    order: 1,
-    gridSpan: { cols: 1, rows: 1 },
-  });
 
   const { data, mutate, isLoading, error } = useSWR(
     "/api/home-wallpaper",
@@ -70,6 +63,14 @@ export default function HomeWallpaperPage() {
   );
 
   const wallpapers = data?.data || [];
+
+  const [formData, setFormData] = useState({
+    // title: "",
+    image: "",
+    // route: "",
+    order: 1,
+    // gridSpan: { cols: 1, rows: 1 },
+  });
 
   const { trigger: createWallpaper } = useSWRMutation(
     "/api/home-wallpaper",
@@ -113,11 +114,11 @@ export default function HomeWallpaperPage() {
   const handleEdit = (wallpaper: IHomeWallpaper) => {
     setEditData(wallpaper);
     setFormData({
-      title: wallpaper.title,
+      // title: wallpaper.title,
       image: wallpaper.image,
-      route: wallpaper.route,
+      // route: wallpaper.route,
       order: wallpaper.order,
-      gridSpan: wallpaper.gridSpan || { cols: 1, rows: 1 },
+      // gridSpan: wallpaper.gridSpan || { cols: 1, rows: 1 },
     });
     setImageInputType(wallpaper.image.startsWith("data:") ? "upload" : "url");
     setIsModalOpen(true);
@@ -129,11 +130,11 @@ export default function HomeWallpaperPage() {
     setImageInputType("url");
     setIsUploading(false);
     setFormData({
-      title: "",
+      // title: "",
       image: "",
-      route: "",
+      // route: "",
       order: 1,
-      gridSpan: { cols: 1, rows: 1 },
+      // gridSpan: { cols: 1, rows: 1 },
     });
   };
 
@@ -175,34 +176,34 @@ export default function HomeWallpaperPage() {
       accessorKey: "image",
       header: "Image",
       cell: ({ row }) => (
-        <div className="relative w-20 h-20">
+        <div className="relative size-40">
           <Image
             src={row.original.image}
-            alt={row.original.title}
+            alt={row.original.image}
             fill
             className="object-cover rounded"
           />
         </div>
       ),
     },
-    {
-      accessorKey: "title",
-      header: "Title",
-    },
-    {
-      accessorKey: "route",
-      header: "Route",
-    },
-    {
-      accessorKey: "gridSpan",
-      header: "Grid Size",
-      cell: ({ row }) => (
-        <span>
-          {row.original.gridSpan?.cols || 1} ×{" "}
-          {row.original.gridSpan?.rows || 1}
-        </span>
-      ),
-    },
+    // {
+    //   accessorKey: "title",
+    //   header: "Title",
+    // },
+    // {
+    //   accessorKey: "route",
+    //   header: "Route",
+    // },
+    // {
+    //   accessorKey: "gridSpan",
+    //   header: "Grid Size",
+    //   cell: ({ row }) => (
+    //     <span>
+    //       {row.original.gridSpan?.cols || 1} ×{" "}
+    //       {row.original.gridSpan?.rows || 1}
+    //     </span>
+    //   ),
+    // },
     {
       id: "actions",
       cell: ({ row }) => (
@@ -268,7 +269,7 @@ export default function HomeWallpaperPage() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+            {/* <div>
               <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
@@ -278,7 +279,7 @@ export default function HomeWallpaperPage() {
                 }
                 required
               />
-            </div>
+            </div> */}
 
             <div>
               <Label>Image</Label>
@@ -348,7 +349,7 @@ export default function HomeWallpaperPage() {
               )}
             </div>
 
-            <div>
+            {/* <div>
               <Label htmlFor="route">Route</Label>
               <Input
                 id="route"
@@ -359,9 +360,9 @@ export default function HomeWallpaperPage() {
                 placeholder="/shop"
                 required
               />
-            </div>
+            </div> */}
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="cols">Grid Columns (1-4)</Label>
                 <Input
@@ -402,7 +403,7 @@ export default function HomeWallpaperPage() {
                   required
                 />
               </div>
-            </div>
+            </div> */}
 
             <div>
               <Label htmlFor="order">Display Order</Label>

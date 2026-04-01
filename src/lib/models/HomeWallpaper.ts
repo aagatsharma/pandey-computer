@@ -1,53 +1,53 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IHomeWallpaper extends Document {
-  title: string;
+  // title: string;
   image: string;
-  route: string;
+  // route: string;
   order: number;
-  gridSpan?: {
-    cols: number;
-    rows: number;
-  };
+  // gridSpan?: {
+  //   cols: number;
+  //   rows: number;
+  // };
   createdAt: Date;
   updatedAt: Date;
 }
 
 const HomeWallpaperSchema = new Schema<IHomeWallpaper>(
   {
-    title: {
-      type: String,
-      required: [true, "Title is required"],
-      trim: true,
-    },
+    // title: {
+    //   type: String,
+    //   required: [true, "Title is required"],
+    //   trim: true,
+    // },
     image: {
       type: String,
       required: [true, "Image URL is required"],
     },
-    route: {
-      type: String,
-      required: [true, "Route is required"],
-      trim: true,
-    },
+    // route: {
+    //   type: String,
+    //   required: [true, "Route is required"],
+    //   trim: true,
+    // },
     order: {
       type: Number,
       required: true,
       default: 1,
     },
-    gridSpan: {
-      cols: {
-        type: Number,
-        default: 1,
-        min: 1,
-        max: 4,
-      },
-      rows: {
-        type: Number,
-        default: 1,
-        min: 1,
-        max: 2,
-      },
-    },
+    // gridSpan: {
+    //   cols: {
+    //     type: Number,
+    //     default: 1,
+    //     min: 1,
+    //     max: 4,
+    //   },
+    //   rows: {
+    //     type: Number,
+    //     default: 1,
+    //     min: 1,
+    //     max: 2,
+    //   },
+    // },
   },
   { timestamps: true },
 );
