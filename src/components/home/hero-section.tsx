@@ -32,21 +32,7 @@ export default async function HeroSection() {
   const wallpapers = await getWallpapers();
 
   if (wallpapers.length === 0) {
-    return (
-      <section className="w-full py-6 md:py-8">
-        <div className="relative w-full overflow-hidden">
-          <div className="relative block h-[220px] w-full sm:h-80 lg:h-[420px]">
-            <Image
-              src="/home/carousel-1.jpg"
-              alt="Featured"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
