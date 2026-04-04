@@ -28,7 +28,7 @@ const formSchema = z.object({
   name: z
     .string()
     .min(2, "Name must be at least 2 characters")
-    .max(200, "Name cannot exceed 200 characters"),
+    .max(500, "Name cannot exceed 500 characters"),
   keyFeatures: z.string().optional(),
   price: z.number().min(0, "Price must be positive"),
   originalPrice: z
