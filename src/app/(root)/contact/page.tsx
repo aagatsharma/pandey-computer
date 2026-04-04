@@ -116,10 +116,10 @@ export default function ContactUsPage() {
                     Email Us
                   </h3>
                   <a
-                    href="mailto:pandeycomputer7@gmail.com"
+                    href="mailto:info@pandeycomputers.com.np"
                     className="text-primary hover:opacity-80 transition-opacity"
                   >
-                    pandeycomputer7@gmail.com
+                    info@pandeycomputers.com.np
                   </a>
                 </div>
               </div>

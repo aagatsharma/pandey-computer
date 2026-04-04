@@ -132,10 +132,10 @@ export default function Footer() {
                 />
                 <div>
                   <a
-                    href="mailto:pandeycomputer7@gmail.com"
+                    href="mailto:info@pandeycomputers.com.np"
                     className="text-sm  hover:text-primary transition-colors break-all"
                   >
-                    pandeycomputer7@gmail.com
+                    info@pandeycomputers.com.np
                   </a>
                 </div>
               </div>

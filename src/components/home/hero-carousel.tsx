@@ -77,7 +77,7 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="relative h-[220px] w-full sm:h-80 lg:h-[420px]">
+      <div className="relative h-55 w-full sm:h-80 lg:h-105">
         {wallpapers.map((wallpaper, index) => (
           <div
             key={wallpaper._id}
@@ -89,9 +89,10 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
           >
             <Image
               src={wallpaper.image}
-              alt={wallpaper.image}
+              alt={wallpaper.title || "Hero wallpaper"}
               fill
-              className="object-cover"
+              className="bg-black object-contain object-center sm:object-cover"
+              sizes="100vw"
               priority={index === 0}
             />
           </div>

@@ -41,7 +41,7 @@ export default function Home() {
     "@id": process.env.NEXT_PUBLIC_BASE_URL,
     url: process.env.NEXT_PUBLIC_BASE_URL,
     telephone: ["061-585498", "+977-9856035498"],
-    email: "pandeycomputer7@gmail.com",
+    email: "info@pandeycomputers.com.np",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Newroad",

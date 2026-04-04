@@ -13,7 +13,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     >
       <NextProgress />
       {children}
-      <Toaster richColors position="top-center" />
+      <Toaster richColors position="bottom-left" />
     </SWRConfig>
   );
 };
