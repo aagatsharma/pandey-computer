@@ -49,10 +49,10 @@ export default function AboutUsPage() {
             Who We Are
           </h2>
           <p className="text-muted-foreground mb-4 leading-relaxed">
-            Pandey Computer is Pokhara&apos;s premier destination for gaming
-            laptops, PC accessories, and custom builds. Located in Newroad,
-            Pokhara, we&apos;ve been serving the local community with passion
-            and dedication.
+            Pandey Computer is your trusted partner for the latest computer
+            products and technology solutions. Located in Newroad, Pokhara,
+            we&apos;ve been serving the local community with passion and
+            dedication.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             We specialize in providing authentic products from top brands,

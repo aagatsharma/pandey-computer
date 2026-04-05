@@ -10,22 +10,22 @@ import TopSelling from "@/components/home/top-selling";
 import { defaultOgImage } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+  title: "Pandey Computer - Best Computer & IT Store in Pokhara",
   description:
-    "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware. Best prices and expert service in Pokhara, Nepal.",
+    "Your trusted partner for the latest computer products and technology solutions.",
   openGraph: {
-    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    title: "Pandey Computer - Best Computer & IT Store in Pokhara",
     description:
-      "Pokhara's premier destination for gaming laptops, PC accessories, and custom builds.",
+      "Your trusted partner for the latest computer products and technology solutions.",
     type: "website",
     url: "/",
     images: [defaultOgImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    title: "Pandey Computer - Best Computer & IT Store in Pokhara",
     description:
-      "Pokhara's premier destination for gaming laptops, PC accessories, and custom builds.",
+      "Your trusted partner for the latest computer products and technology solutions.",
     images: [defaultOgImage.url],
   },
   alternates: {

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   applicationName: "Pandey Computer",
   description:
-    "Pandey Computer is your trusted partner for the latest computer products and technology solutions. Best prices and expert service in Pokhara, Nepal.",
+    "Your trusted partner for the latest computer products and technology solutions.",
   keywords: [
     "computer store pokhara",
     "gaming laptop pokhara",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     url: "/",
     title: "Pandey Computer - Best Computer & IT Store in Pokhara",
     description:
-      "Pandey Computer is your trusted partner for the latest computer products and technology solutions.",
+      "Your trusted partner for the latest computer products and technology solutions.",
     siteName: "Pandey Computer",
     images: [defaultOgImage],
   },
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Pandey Computer - Best Computer & IT Store in Pokhara",
     description:
-      "Pandey Computer is your trusted partner for the latest computer products and technology solutions.",
+      "Your trusted partner for the latest computer products and technology solutions.",
     images: [defaultOgImage.url],
   },
   robots: {
