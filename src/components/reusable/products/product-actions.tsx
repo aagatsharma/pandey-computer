@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2, RefreshCw, Heart } from "lucide-react";
+import { ShoppingCart, RefreshCw, Heart } from "lucide-react";
 import { IProduct } from "@/lib/models/Product";
 import { useCartStore } from "@/store/cart-store";
 import { useWishlistStore } from "@/store/wishlist-store";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ProductActionsProps {
   product: IProduct;
@@ -14,7 +15,8 @@ interface ProductActionsProps {
 
 export function ProductActions({ product }: ProductActionsProps) {
   const [quantity, setQuantity] = useState(1);
-  const { cart, addToCart, removeFromCart, updateQuantity } = useCartStore();
+  const router = useRouter();
+  const { cart, addToCart, updateQuantity } = useCartStore();
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlistStore();
 
   const { price, stock: inStock } = product;
@@ -38,10 +40,7 @@ export function ProductActions({ product }: ProductActionsProps) {
   const handleAction = () => {
     if (isInCart) {
       if (quantity === cartQuantity) {
-        // Remove from cart
-        removeFromCart(String(product._id));
-        toast.error("Removed from cart");
-        // setQuantity(1); // Quantity will be reset by useEffect due to cartQuantity becoming 0
+        router.push("/cart");
       } else {
         // Update quantity
         updateQuantity(String(product._id), quantity);
@@ -96,8 +95,8 @@ export function ProductActions({ product }: ProductActionsProps) {
         };
       }
       return {
-        text: "Remove from Cart",
-        icon: Trash2,
+        text: "Go to Cart",
+        icon: ShoppingCart,
         variant: "default" as const,
         disabled: false,
       };

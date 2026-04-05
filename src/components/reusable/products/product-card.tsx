@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { IProduct } from "@/lib/models/Product";
 import { useCartStore } from "@/store/cart-store";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: IProduct }) {
@@ -103,11 +103,7 @@ export function ProductCard({ product }: { product: IProduct }) {
               onClick={handleToggleCart}
               className="h-7 w-7 md:h-8 md:w-8 p-0"
             >
-              {isInCart ? (
-                <X className="h-3 w-3 md:h-4 md:w-4" />
-              ) : (
-                <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
-              )}
+              <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
             </Button>
           ) : (
             <Button

@@ -15,12 +15,12 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   metadataBase: getSiteUrlObject(),
   title: {
-    default: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    default: "Pandey Computer - Best Computer & IT Store in Pokhara",
     template: "%s | Pandey Computer",
   },
   applicationName: "Pandey Computer",
   description:
-    "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware. Best prices and expert service in Pokhara, Nepal.",
+    "Pandey Computer is your trusted partner for the latest computer products and technology solutions. Best prices and expert service in Pokhara, Nepal.",
   keywords: [
     "computer store pokhara",
     "gaming laptop pokhara",
@@ -49,17 +49,17 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "/",
-    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    title: "Pandey Computer - Best Computer & IT Store in Pokhara",
     description:
-      "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware.",
+      "Pandey Computer is your trusted partner for the latest computer products and technology solutions.",
     siteName: "Pandey Computer",
     images: [defaultOgImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pandey Computer - Best Computer & Gaming Store in Pokhara",
+    title: "Pandey Computer - Best Computer & IT Store in Pokhara",
     description:
-      "Pandey Computer is Pokhara's premier destination for gaming laptops, PC accessories, custom builds, and computer hardware.",
+      "Pandey Computer is your trusted partner for the latest computer products and technology solutions.",
     images: [defaultOgImage.url],
   },
   robots: {

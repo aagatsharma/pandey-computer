@@ -37,7 +37,7 @@ fi
 
 echo "🗜️ Zipping..."
 cd deploy
-zip -r ../deploy.zip ./*
+zip -r ../deploy.zip .
 cd ..
 
 echo "✅ Done"
