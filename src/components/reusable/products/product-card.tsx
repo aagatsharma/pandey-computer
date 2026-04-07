@@ -59,6 +59,7 @@ export function ProductCard({ product }: { product: IProduct }) {
           src={image}
           alt={name}
           fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
           className="object-contain transition-transform duration-300 group-hover:scale-105"
         />
         {discount > 0 && (

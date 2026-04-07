@@ -5,7 +5,6 @@ import "@/lib/models/Category";
 import "@/lib/models/SubCategory";
 import "@/lib/models/Brand";
 import "@/lib/models/SubBrand";
-import { shuffleArray } from "@/lib/utils";
 import { ProductsCarousel } from "./products-carousel";
 
 async function getProduct(): Promise<IProduct[]> {
@@ -18,7 +17,7 @@ async function getProduct(): Promise<IProduct[]> {
       .limit(10)
       .lean();
 
-    return shuffleArray(JSON.parse(JSON.stringify(products)));
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
@@ -41,7 +40,7 @@ export default async function TopSelling() {
       </div>
       <Link
         href="/shop"
-        className="text-sm mb-2 block text-right w-full text-primary hover:underline font-medium px-4"
+        className="text-sm mb-2 block w-fit ml-auto text-primary hover:underline font-medium px-4"
       >
         View all
       </Link>

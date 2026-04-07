@@ -32,7 +32,7 @@ export default async function LatestBlogs() {
       </div>
       <Link
         href="/blogs"
-        className="text-sm mb-2 block text-right w-full text-primary hover:underline font-medium px-4"
+        className="text-sm mb-2 block w-fit ml-auto text-primary hover:underline font-medium px-4"
       >
         View all
       </Link>

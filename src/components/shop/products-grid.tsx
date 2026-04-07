@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { ProductCard } from "@/components/reusable/products/product-card";
 import { ProductSkeleton } from "@/components/reusable/products/product-skeleton";
 import { Button } from "@/components/ui/button";
 import { IProduct } from "@/lib/models/Product";
+import { shuffleArray } from "@/lib/utils";
 
 interface ProductsGridProps {
   products: IProduct[];
@@ -16,7 +18,27 @@ export function ProductsGrid({
   isLoading,
   clearFilters,
 }: ProductsGridProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsMounted(true), 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const randomizedProducts = useMemo(() => shuffleArray(products), [products]);
+
   if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <ProductSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
+
+  if (!isMounted) {
     return (
       <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
         {Array.from({ length: 12 }).map((_, index) => (
@@ -39,7 +61,7 @@ export function ProductsGrid({
 
   return (
     <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
-      {products.map((product) => (
+      {randomizedProducts.map((product) => (
         <ProductCard key={product.slug} product={product} />
       ))}
     </div>

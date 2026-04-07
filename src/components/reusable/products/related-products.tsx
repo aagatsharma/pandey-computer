@@ -25,7 +25,7 @@ export function RelatedProducts({
         <h2 className="text-2xl sm:text-3xl font-bold">Similar Products</h2>
         <Link
           href="/shop"
-          className="text-primary hover:underline text-sm font-semibold"
+          className="text-sm mb-2 block w-fit ml-auto text-primary hover:underline font-medium px-4"
         >
           View All
         </Link>
