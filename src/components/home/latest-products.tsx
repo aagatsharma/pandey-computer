@@ -5,6 +5,7 @@ import "@/lib/models/Category";
 import "@/lib/models/SubCategory";
 import "@/lib/models/Brand";
 import "@/lib/models/SubBrand";
+import { shuffleArray } from "@/lib/utils";
 import { ProductsCarousel } from "./products-carousel";
 
 async function getLatestProducts(): Promise<IProduct[]> {
@@ -17,7 +18,7 @@ async function getLatestProducts(): Promise<IProduct[]> {
       .limit(10)
       .lean();
 
-    return JSON.parse(JSON.stringify(products));
+    return shuffleArray(JSON.parse(JSON.stringify(products)));
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];

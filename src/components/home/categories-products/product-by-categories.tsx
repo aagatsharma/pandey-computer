@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/mongoose";
 import Category, { ICategory } from "@/lib/models/Category";
+import { shuffleArray } from "@/lib/utils";
 import CategoryProducts from "./category-products";
 
 async function getHomePageCategories(): Promise<ICategory[]> {
@@ -8,7 +9,7 @@ async function getHomePageCategories(): Promise<ICategory[]> {
 
     const products = await Category.find({ showInHomepage: true });
 
-    return JSON.parse(JSON.stringify(products));
+    return shuffleArray(JSON.parse(JSON.stringify(products)));
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];

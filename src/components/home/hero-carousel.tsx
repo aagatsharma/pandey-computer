@@ -37,7 +37,6 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
 
   useEffect(() => {
     if (totalSlides <= 1 || !isPlaying) {
-      if (!isPlaying) setProgress(0);
       return;
     }
 
@@ -77,7 +76,7 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="relative h-55 w-full sm:h-80 lg:h-105">
+      <div className="relative aspect-video w-full sm:aspect-auto sm:h-80 lg:h-105">
         {wallpapers.map((wallpaper, index) => (
           <div
             key={wallpaper._id}
@@ -91,7 +90,7 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
               src={wallpaper.image}
               alt={wallpaper.title || "Hero wallpaper"}
               fill
-              className="bg-black object-contain object-center sm:object-cover"
+              className="object-cover object-center"
               sizes="100vw"
               priority={index === 0}
             />
