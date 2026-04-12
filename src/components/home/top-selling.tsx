@@ -11,7 +11,7 @@ async function getProduct(): Promise<IProduct[]> {
   try {
     await dbConnect();
 
-    const products = await Product.find({ topSelling: true })
+    const products = await Product.find({ topSelling: true, stock: true })
       .populate("brand")
       .sort({ createdAt: -1 })
       .limit(10)

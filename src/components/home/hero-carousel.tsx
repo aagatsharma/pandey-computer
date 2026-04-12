@@ -76,25 +76,20 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
 
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="relative aspect-video w-full sm:aspect-auto sm:h-80 lg:h-105">
+      <div className="relative w-full h-65 sm:h-75 md:h-90 lg:h-105">
         {wallpapers.map((wallpaper, index) => (
-          <div
+          <Image
             key={wallpaper._id}
-            className={`absolute inset-0 transition-opacity ${
-              index === activeIndex ? "z-10 opacity-100" : "z-0 opacity-0"
-            }`}
+            src={wallpaper.image}
+            alt={wallpaper.title || "Hero wallpaper"}
+            fill
             style={{ transitionDuration: `${TRANSITION_DURATION_MS}ms` }}
+            className={`absolute h-full w-full object-cover object-center
+              ${index === activeIndex ? "z-10 opacity-100" : "z-0 opacity-0"}`}
+            sizes="100vw"
+            priority={index === 0}
             aria-hidden={index !== activeIndex}
-          >
-            <Image
-              src={wallpaper.image}
-              alt={wallpaper.title || "Hero wallpaper"}
-              fill
-              className="object-cover object-center"
-              sizes="100vw"
-              priority={index === 0}
-            />
-          </div>
+          />
         ))}
       </div>
 

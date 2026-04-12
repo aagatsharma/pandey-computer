@@ -11,12 +11,11 @@ async function getLatestProducts(): Promise<IProduct[]> {
   try {
     await dbConnect();
 
-    const products = await Product.find()
+    const products = await Product.find({ stock: true })
       .populate("brand")
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
-
     return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Error fetching products:", error);

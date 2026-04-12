@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, X, Filter } from "lucide-react";
+import { Search, X, Filter, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import {
   Sheet,
@@ -169,7 +169,7 @@ export function ShopClient({ initialFilterData }: ShopClientProps) {
       total: number;
       totalPages: number;
     };
-  }>(`/api/products?${queryParams}`, fetcher);
+  }>(`/api/products/search?${queryParams}`, fetcher);
 
   const products = useMemo(() => data?.data || [], [data]);
   const pagination = data?.pagination;
@@ -238,6 +238,46 @@ export function ShopClient({ initialFilterData }: ShopClientProps) {
     selectedSubBrand,
     debouncedMinPrice,
     debouncedMaxPrice,
+  ]);
+
+  const activeFilterBreadcrumbs = useMemo(() => {
+    const categoryName = selectedCategory
+      ? filterData?.data?.categories.find(
+          (cat) => cat.slug === selectedCategory,
+        )?.name
+      : "";
+    const subCategoryName = selectedSubCategory
+      ? filterData?.data?.subCategories.find(
+          (subCat) => subCat.slug === selectedSubCategory,
+        )?.name
+      : "";
+    const brandName = selectedBrand
+      ? filterData?.data?.brands.find((brand) => brand.slug === selectedBrand)
+          ?.name
+      : "";
+    const subBrandName = selectedSubBrand
+      ? filterData?.data?.subBrands.find(
+          (subBrand) => subBrand.slug === selectedSubBrand,
+        )?.name
+      : "";
+    const categoryTrail = [categoryName, subCategoryName].filter(Boolean);
+    const brandTrail = [brandName, subBrandName].filter(Boolean);
+
+    return [
+      { label: "Shop", trail: [] as string[] },
+      ...(categoryTrail.length > 0
+        ? [{ label: "Category:", trail: categoryTrail }]
+        : []),
+      ...(brandTrail.length > 0
+        ? [{ label: "Brand:", trail: brandTrail }]
+        : []),
+    ];
+  }, [
+    filterData,
+    selectedCategory,
+    selectedSubCategory,
+    selectedBrand,
+    selectedSubBrand,
   ]);
 
   const filterContent = (
@@ -466,6 +506,26 @@ export function ShopClient({ initialFilterData }: ShopClientProps) {
 
         {/* Products Grid */}
         <div className="flex-1 min-w-0">
+          {activeFilterBreadcrumbs.length > 1 && (
+            <div className="mb-4 rounded-lg bg-muted/30 px-1 pb-3">
+              <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                {activeFilterBreadcrumbs.map((crumb, index) => (
+                  <div key={crumb.label} className="flex items-center gap-2">
+                    {index > 0 && <ChevronRight className="h-4 w-4" />}
+                    <span className="font-medium text-foreground">
+                      {crumb.label}
+                    </span>
+                    {crumb.trail.length > 0 && (
+                      <span className="text-muted-foreground">
+                        {crumb.trail.join(" - ")}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <ProductsGrid
             products={products}
             isLoading={isLoading}

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import dbConnect from "@/lib/mongoose";
 import HomeWallpaper from "@/lib/models/HomeWallpaper";
 import { HeroCarousel } from "./hero-carousel";

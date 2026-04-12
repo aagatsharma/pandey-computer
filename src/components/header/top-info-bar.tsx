@@ -10,7 +10,7 @@ export default function TopInfoBar() {
           <div className="flex shrink-0 items-center gap-2 md:gap-4">
             <Link
               href="tel:061-585498"
-              className="flex items-center gap-1 whitespace-nowrap transition-opacity hover:opacity-80"
+              className="flex items-center gap-1 whitespace-nowrap transition-colors hover:text-primary"
             >
               <Phone size={14} />
               <span>061-585498</span>
@@ -21,7 +21,7 @@ export default function TopInfoBar() {
             />
             <Link
               href="mailto:info@pandeycomputers.com.np"
-              className="hidden items-center gap-1.5 hover:opacity-80 transition-opacity md:flex"
+              className="hidden items-center gap-1.5 transition-colors hover:text-primary md:flex"
             >
               <Mail size={14} />
               <span>info@pandeycomputers.com.np</span>
@@ -33,7 +33,7 @@ export default function TopInfoBar() {
               href="https://maps.app.goo.gl/QVgnB6DGFTp8SfQB8"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-w-0 items-center gap-1 whitespace-nowrap transition-opacity hover:opacity-80"
+              className="flex min-w-0 items-center gap-1 whitespace-nowrap transition-colors hover:text-primary"
             >
               <MapPin size={14} />
               <span className="truncate">Newroad , Pokhara</span>
@@ -47,27 +47,27 @@ export default function TopInfoBar() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-full border hover:opacity-80 transition-opacity"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors hover:border-primary hover:text-primary"
             >
-              <FaFacebookF size={12} className="text-primary" />
+              <FaFacebookF size={12} />
             </Link>
             <Link
               href="https://www.instagram.com/pandey.computer/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-full border hover:opacity-80 transition-opacity"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors hover:border-primary hover:text-primary"
             >
-              <FaInstagram size={12} className="text-primary" />
+              <FaInstagram size={12} />
             </Link>
             <Link
               href="https://api.whatsapp.com/send?phone=9779802803711"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="WhatsApp"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-full border hover:opacity-80 transition-opacity"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors hover:border-primary hover:text-primary"
             >
-              <FaWhatsapp size={12} className="text-primary" />
+              <FaWhatsapp size={12} />
             </Link>
           </div>
         </div>
