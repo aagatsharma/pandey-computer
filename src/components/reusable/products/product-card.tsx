@@ -23,9 +23,10 @@ export function ProductCard({ product }: { product: IProduct }) {
   const cartItem = cart.find((item) => item._id === String(product._id));
   const isInCart = !!cartItem;
 
-  const discount = originalPrice
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : 0;
+  const discount =
+    originalPrice && originalPrice > price
+      ? Math.round(((originalPrice - price) / originalPrice) * 100)
+      : 0;
 
   const handleToggleCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,7 +91,7 @@ export function ProductCard({ product }: { product: IProduct }) {
             <span className="text-sm md:text-xl font-bold text-primary">
               Rs.{price.toLocaleString()}
             </span>
-            {originalPrice && (
+            {originalPrice !== undefined && originalPrice > price && (
               <span className="text-[10px] md:text-xs text-muted-foreground line-through md:ml-2">
                 Rs.{originalPrice.toLocaleString()}
               </span>

@@ -129,11 +129,13 @@ export default async function ProductPage({
         )
       : [];
 
-  const discount = product.originalPrice
-    ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100,
-      )
-    : 0;
+  const discount =
+    product.originalPrice && product.originalPrice > product.price
+      ? Math.round(
+          ((product.originalPrice - product.price) / product.originalPrice) *
+            100,
+        )
+      : 0;
 
   const specsArray = product.specs
     ? Object.entries(product.specs).map(([k, v]) => `${k}: ${v}`)
@@ -225,11 +227,12 @@ export default async function ProductPage({
               <span className="text-xl text-primary font-medium">
                 Rs.{product.price.toLocaleString()}
               </span>
-              {product.originalPrice && (
-                <span className="text-lg text-muted-foreground line-through">
-                  Rs.{product.originalPrice.toLocaleString()}
-                </span>
-              )}
+              {product.originalPrice !== undefined &&
+                product.originalPrice > product.price && (
+                  <span className="text-lg text-muted-foreground line-through">
+                    Rs.{product.originalPrice.toLocaleString()}
+                  </span>
+                )}
             </div>
 
             {/* Stock */}
@@ -260,10 +263,9 @@ export default async function ProductPage({
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
+                className="flex items-center justify-center p-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
               >
                 <FaWhatsapp className="size-4" />
-                <span className="text-xs font-medium">WhatsApp</span>
               </a>
               <a
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
@@ -271,10 +273,9 @@ export default async function ProductPage({
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                className="flex items-center justify-center p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
               >
                 <FaFacebook className="size-4" />
-                <span className="text-xs font-medium">Facebook</span>
               </a>
             </div>
 
