@@ -267,7 +267,8 @@ export default function ProductForm({
               .filter((f) => f.length > 0)
           : [],
         price: data.price,
-        originalPrice: data.originalPrice || undefined,
+        originalPrice:
+          data.originalPrice !== undefined ? data.originalPrice : undefined,
         categories:
           data.categories && data.categories.length > 0
             ? data.categories
