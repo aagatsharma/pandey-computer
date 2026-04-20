@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Check, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -69,7 +69,7 @@ interface IOrderWithSearch extends IOrder {
   searchable: string;
 }
 
-export default function AdminOrdersPage() {
+function AdminOrdersPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -537,5 +537,13 @@ export default function AdminOrdersPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+export default function AdminOrdersPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <AdminOrdersPageContent />
+    </Suspense>
   );
 }
