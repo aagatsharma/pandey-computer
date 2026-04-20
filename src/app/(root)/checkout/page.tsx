@@ -12,15 +12,23 @@ import { sendRequest } from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { districtData } from "@/lib/district-data";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  address: z.string().min(5, "Address must be at least 5 characters"),
-  city: z.string().min(2, "City must be at least 2 characters"),
+  province: z.string().min(1, "Province is required"),
+  district: z.string().min(1, "District is required"),
+  street: z.string().min(3, "Street must be at least 3 characters"),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -37,10 +45,16 @@ export default function CheckoutPage() {
       fullName: "",
       email: "",
       phone: "",
-      address: "",
-      city: "",
+      province: "",
+      district: "",
+      street: "",
     },
   });
+
+  const selectedProvince = form.watch("province");
+  const selectedProvinceData = districtData.find(
+    (item) => item.province === selectedProvince,
+  );
 
   const onSubmit = async (data: CheckoutFormValues) => {
     if (cart.length === 0) {
@@ -51,7 +65,17 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
     try {
       const orderData = {
-        customerDetails: data,
+        customerDetails: {
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          province: data.province,
+          district: data.district,
+          street: data.street,
+          // Keep legacy fields for older admin views/documents.
+          address: data.street,
+          city: data.district,
+        },
         orderItems: cart.map((item) => ({
           productId: item._id,
           name: item.name,
@@ -126,21 +150,71 @@ export default function CheckoutPage() {
             </div>
 
             <div>
-              <Label htmlFor="address">Address</Label>
-              <Textarea id="address" {...form.register("address")} />
-              {form.formState.errors.address && (
+              <Label htmlFor="province">Province</Label>
+              <Select
+                value={form.watch("province")}
+                onValueChange={(value) => {
+                  form.setValue("province", value, { shouldValidate: true });
+                  form.setValue("district", "", { shouldValidate: true });
+                }}
+              >
+                <SelectTrigger id="province">
+                  <SelectValue placeholder="Select province" />
+                </SelectTrigger>
+                <SelectContent>
+                  {districtData.map((item) => (
+                    <SelectItem key={item.province} value={item.province}>
+                      {item.province}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.province && (
                 <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.address.message}
+                  {form.formState.errors.province.message}
                 </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="city">City</Label>
-              <Input id="city" {...form.register("city")} />
-              {form.formState.errors.city && (
+              <Label htmlFor="district">District</Label>
+              <Select
+                value={form.watch("district")}
+                onValueChange={(value) => {
+                  form.setValue("district", value, { shouldValidate: true });
+                }}
+                disabled={!selectedProvinceData}
+              >
+                <SelectTrigger id="district">
+                  <SelectValue
+                    placeholder={
+                      selectedProvinceData
+                        ? "Select district"
+                        : "Select province first"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedProvinceData?.districts.map((district) => (
+                    <SelectItem key={district} value={district}>
+                      {district}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.district && (
                 <p className="text-red-500 text-sm mt-1">
-                  {form.formState.errors.city.message}
+                  {form.formState.errors.district.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="street">Street</Label>
+              <Input id="street" {...form.register("street")} />
+              {form.formState.errors.street && (
+                <p className="text-red-500 text-sm mt-1">
+                  {form.formState.errors.street.message}
                 </p>
               )}
             </div>

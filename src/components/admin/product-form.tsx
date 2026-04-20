@@ -2,7 +2,7 @@
 "use client";
 
 import { FileDown, Loader2, Plus, Trash2, Upload } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { uploadToCloudinary } from "@/lib/image-base64";
 import { useForm } from "react-hook-form";
@@ -68,13 +68,20 @@ interface ProductFormProps {
   editData?: IProduct | null;
 }
 
+type ProductImageItem = {
+  id: string;
+  preview: string;
+  existingUrl?: string;
+  file?: File;
+};
+
 export default function ProductForm({
   onSubmit,
   onCancel,
   editData,
 }: ProductFormProps) {
-  const [previews, setPreviews] = useState<string[]>([]);
-  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [imageItems, setImageItems] = useState<ProductImageItem[]>([]);
+  const [draggedImageId, setDraggedImageId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImportingSpecs, setIsImportingSpecs] = useState(false);
   const [isDownloadingSpecSample, setIsDownloadingSpecSample] = useState(false);
@@ -186,8 +193,13 @@ export default function ProductForm({
         specs: "",
         images: undefined,
       });
-      setPreviews(editData.images || []);
-      setNewImageFiles([]);
+      setImageItems(
+        (editData.images || []).map((imageUrl) => ({
+          id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          preview: imageUrl,
+          existingUrl: imageUrl,
+        })),
+      );
     } else {
       setSpecs([{ key: "", value: "" }]);
       form.reset({
@@ -206,49 +218,59 @@ export default function ProductForm({
         stock: false,
         specs: "",
       });
-      setPreviews([]);
-      setNewImageFiles([]);
+      setImageItems([]);
     }
   }, [editData, form]);
 
   const makePrimaryImage = (index: number) => {
-    setPreviews((prev) => {
+    setImageItems((prev) => {
       if (index === 0) return prev;
 
-      const newPreviews = [...prev];
-      const [selected] = newPreviews.splice(index, 1);
-      newPreviews.unshift(selected);
+      const newItems = [...prev];
+      const [selected] = newItems.splice(index, 1);
+      newItems.unshift(selected);
 
-      return newPreviews;
+      return newItems;
     });
   };
 
-  // Number of existing (already-uploaded) previews so we can map index → File
-  const existingPreviewCount = previews.length - newImageFiles.length;
+  const readFileAsDataUrl = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Failed to read image file"));
+      reader.readAsDataURL(file);
+    });
 
   const deleteImage = (index: number) => {
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
-    // If this preview corresponds to a newly added file, remove that file too
-    const fileIndex = index - existingPreviewCount;
-    if (fileIndex >= 0) {
-      setNewImageFiles((prev) => prev.filter((_, i) => i !== fileIndex));
-    }
+    setImageItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return;
+
+    setImageItems((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
   };
 
   const handleSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      // Start with existing (already-uploaded) URLs
-      const existingUrls = previews.slice(0, existingPreviewCount);
-      let imageUrls: string[] = existingUrls;
-
-      if (newImageFiles.length > 0) {
-        const uploadPromises = newImageFiles.map((file) =>
-          uploadToCloudinary(file, "pandey-computer/products"),
-        );
-        const uploadedUrls = await Promise.all(uploadPromises);
-        imageUrls = [...existingUrls, ...uploadedUrls];
-      }
+      const imageUrls = (
+        await Promise.all(
+          imageItems.map(async (item) => {
+            if (item.existingUrl) return item.existingUrl;
+            if (item.file) {
+              return uploadToCloudinary(item.file, "pandey-computer/products");
+            }
+            return "";
+          }),
+        )
+      ).filter(Boolean);
 
       // Parse specs from the state array
       const specsObject: Record<string, string> = {};
@@ -287,8 +309,7 @@ export default function ProductForm({
       });
 
       form.reset();
-      setPreviews([]);
-      setNewImageFiles([]);
+      setImageItems([]);
       setSpecs([{ key: "", value: "" }]);
     } catch (error) {
       console.error("Error saving product:", error);
@@ -807,21 +828,28 @@ export default function ProductForm({
                       type="file"
                       accept="image/*"
                       multiple
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const files = e.target.files;
                         if (files && files.length > 0) {
                           const addedFiles = Array.from(files);
-                          setNewImageFiles((prev) => [...prev, ...addedFiles]);
-                          addedFiles.forEach((file) => {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setPreviews((prev) => [
-                                ...prev,
-                                reader.result as string,
-                              ]);
-                            };
-                            reader.readAsDataURL(file);
-                          });
+                          try {
+                            const addedPreviews = await Promise.all(
+                              addedFiles.map((file) => readFileAsDataUrl(file)),
+                            );
+
+                            setImageItems((prev) => [
+                              ...prev,
+                              ...addedFiles.map((file, index) => ({
+                                id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                                file,
+                                preview: addedPreviews[index],
+                              })),
+                            ]);
+                          } catch (error) {
+                            console.error("Error reading image files:", error);
+                            toast.error("Failed to load one or more images");
+                          }
+
                           // Reset input so the same file can be re-added if needed
                           e.target.value = "";
                           onChange(undefined);
@@ -830,44 +858,73 @@ export default function ProductForm({
                       {...field}
                       value={undefined}
                     />
-                    {previews.length > 0 && (
-                      <div className="grid grid-cols-4 gap-2">
-                        {previews.map((preview, index) => (
-                          <div
-                            key={index}
-                            className={cn(
-                              "relative w-full aspect-square rounded-lg overflow-hidden border",
-                              index === 0
-                                ? "ring-2 ring-primary"
-                                : "hover:ring-2 hover:ring-gray-300",
-                            )}
-                          >
-                            <Image
-                              src={preview}
-                              alt={`Preview ${index + 1}`}
-                              fill
-                              sizes="(max-width: 768px) 50vw, 25vw"
-                              className="object-cover cursor-pointer"
-                              onClick={() => makePrimaryImage(index)}
-                            />
-                            {index === 0 && (
-                              <div className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded pointer-events-none">
-                                Primary
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteImage(index);
+                    {imageItems.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-gray-500">
+                          Drag images to reorder. First image will be used as
+                          primary.
+                        </p>
+                        <div className="grid grid-cols-4 gap-2">
+                          {imageItems.map((item, index) => (
+                            <div
+                              key={item.id}
+                              draggable
+                              onDragStart={() => setDraggedImageId(item.id)}
+                              onDragOver={(e) => e.preventDefault()}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                if (
+                                  !draggedImageId ||
+                                  draggedImageId === item.id
+                                )
+                                  return;
+
+                                const fromIndex = imageItems.findIndex(
+                                  (image) => image.id === draggedImageId,
+                                );
+                                const toIndex = imageItems.findIndex(
+                                  (image) => image.id === item.id,
+                                );
+
+                                moveImage(fromIndex, toIndex);
+                                setDraggedImageId(null);
                               }}
-                              className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5"
-                              title="Remove image"
+                              onDragEnd={() => setDraggedImageId(null)}
+                              className={cn(
+                                "relative w-full aspect-square rounded-lg overflow-hidden border cursor-move",
+                                index === 0
+                                  ? "ring-2 ring-primary"
+                                  : "hover:ring-2 hover:ring-gray-300",
+                                draggedImageId === item.id && "opacity-70",
+                              )}
                             >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
+                              <Image
+                                src={item.preview}
+                                alt={`Preview ${index + 1}`}
+                                fill
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                                className="object-cover cursor-pointer"
+                                onClick={() => makePrimaryImage(index)}
+                              />
+                              {index === 0 && (
+                                <div className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-0.5 rounded pointer-events-none">
+                                  Primary
+                                </div>
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteImage(index);
+                                }}
+                                className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5"
+                                title="Remove image"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

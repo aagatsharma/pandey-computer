@@ -12,6 +12,15 @@ export default function EditProductPage() {
   const params = useParams() as { id: string };
   const id = params.id as string;
 
+  const handleCancel = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/admin/products");
+  };
+
   const { data, isLoading } = useSWR(`/api/products?id=${id}`, fetcher);
   const product = data?.data?.[0];
 
@@ -65,7 +74,7 @@ export default function EditProductPage() {
       <ProductForm
         editData={product}
         onSubmit={handleSubmit}
-        onCancel={() => router.push("/admin/products")}
+        onCancel={handleCancel}
       />
     </div>
   );

@@ -7,6 +7,15 @@ import ProductForm from "@/components/admin/product-form";
 
 export default function AddProductPage() {
   const router = useRouter();
+  const handleCancel = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/admin/products");
+  };
+
   const { trigger: createProduct } = useSWRMutation(
     "/api/products",
     sendRequest,
@@ -41,10 +50,7 @@ export default function AddProductPage() {
         <h1 className="text-3xl font-bold">Add Product</h1>
         <p className="text-gray-500 mt-1">Create a new product</p>
       </div>
-      <ProductForm
-        onSubmit={handleSubmit}
-        onCancel={() => router.push("/admin/products")}
-      />
+      <ProductForm onSubmit={handleSubmit} onCancel={handleCancel} />
     </div>
   );
 }

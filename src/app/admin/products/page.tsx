@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MoreHorizontal,
   Pencil,
@@ -9,7 +9,7 @@ import {
   Upload,
   FileDown,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { fetcher, deleteRequest } from "@/lib/fetcher";
 import axios from "axios";
@@ -50,6 +50,8 @@ import { toast } from "sonner";
 
 export default function ProductsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -65,15 +67,76 @@ export default function ProductsPage() {
     fetcher,
   );
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(() => {
+    const pageParam = Number(searchParams.get("page"));
+    return Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+  });
   const limit = 10;
 
   // filters
-  const [filters, setFilters] = useState({
-    name: "",
-    category: "",
-    brand: "",
-  });
+  const [filters, setFilters] = useState(() => ({
+    name: searchParams.get("name") ?? "",
+    category: searchParams.get("category") ?? "",
+    brand: searchParams.get("brand") ?? "",
+  }));
+
+  useEffect(() => {
+    const nextFilters = {
+      name: searchParams.get("name") ?? "",
+      category: searchParams.get("category") ?? "",
+      brand: searchParams.get("brand") ?? "",
+    };
+
+    setFilters((prev) =>
+      prev.name === nextFilters.name &&
+      prev.category === nextFilters.category &&
+      prev.brand === nextFilters.brand
+        ? prev
+        : nextFilters,
+    );
+
+    const nextPageParam = Number(searchParams.get("page"));
+    const nextPage =
+      Number.isFinite(nextPageParam) && nextPageParam > 0 ? nextPageParam : 1;
+    setPage((prev) => (prev === nextPage ? prev : nextPage));
+  }, [searchParams]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (filters.name) {
+      params.set("name", filters.name);
+    } else {
+      params.delete("name");
+    }
+
+    if (filters.category) {
+      params.set("category", filters.category);
+    } else {
+      params.delete("category");
+    }
+
+    if (filters.brand) {
+      params.set("brand", filters.brand);
+    } else {
+      params.delete("brand");
+    }
+
+    if (page > 1) {
+      params.set("page", page.toString());
+    } else {
+      params.delete("page");
+    }
+
+    const nextQuery = params.toString();
+    const currentQuery = searchParams.toString();
+
+    if (nextQuery !== currentQuery) {
+      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
+        scroll: false,
+      });
+    }
+  }, [filters, page, pathname, router, searchParams]);
 
   const debouncedFilters = useDebounce(filters, 500);
 
