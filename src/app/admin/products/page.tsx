@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
   MoreHorizontal,
   Pencil,
@@ -48,7 +48,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -578,5 +578,13 @@ export default function ProductsPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <ProductsPageContent />
+    </Suspense>
   );
 }
