@@ -7,13 +7,18 @@ import ProductForm from "@/components/admin/product-form";
 
 export default function AddProductPage() {
   const router = useRouter();
-  const handleCancel = () => {
+
+  const navigateToProductsList = () => {
     if (window.history.length > 1) {
       router.back();
       return;
     }
 
     router.push("/admin/products");
+  };
+
+  const handleCancel = () => {
+    navigateToProductsList();
   };
 
   const { trigger: createProduct } = useSWRMutation(
@@ -37,7 +42,7 @@ export default function AddProductPage() {
   }) => {
     try {
       await createProduct(formData);
-      router.push("/admin/products");
+      navigateToProductsList();
     } catch (error) {
       console.error("Error creating product:", error);
       throw error;

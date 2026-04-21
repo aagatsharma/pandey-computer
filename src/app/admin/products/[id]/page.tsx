@@ -12,13 +12,17 @@ export default function EditProductPage() {
   const params = useParams() as { id: string };
   const id = params.id as string;
 
-  const handleCancel = () => {
+  const navigateToProductsList = () => {
     if (window.history.length > 1) {
       router.back();
       return;
     }
 
     router.push("/admin/products");
+  };
+
+  const handleCancel = () => {
+    navigateToProductsList();
   };
 
   const { data, isLoading } = useSWR(`/api/products?id=${id}`, fetcher);
@@ -46,7 +50,7 @@ export default function EditProductPage() {
   }) => {
     try {
       await updateProduct({ ...formData, id });
-      router.push("/admin/products");
+      navigateToProductsList();
     } catch (error) {
       console.error("Error updating product:", error);
       throw error;
