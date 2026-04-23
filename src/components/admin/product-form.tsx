@@ -970,6 +970,7 @@ export default function ProductForm({
             )}
           />
 
+          {/*
           <FormField
             control={form.control}
             name="topSelling"
@@ -987,6 +988,7 @@ export default function ProductForm({
               </FormItem>
             )}
           />
+          */}
 
           <div className="flex justify-end gap-3">
             <Button

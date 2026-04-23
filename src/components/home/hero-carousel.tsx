@@ -75,8 +75,8 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
   }
 
   return (
-    <div className="relative w-full overflow-hidden">
-      <div className="relative w-full aspect-video min-h-55 max-h-[70vh] sm:min-h-70 md:min-h-90 lg:min-h-110 xl:min-h-130">
+    <div className="relative w-full overflow-hidden bg-neutral-900">
+      <div className="relative w-full aspect-video lg:aspect-26/10 xl:aspect-28/10 2xl:aspect-32/10">
         {wallpapers.map((wallpaper, index) => (
           <Image
             key={wallpaper._id}
@@ -84,13 +84,15 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
             alt={wallpaper.title || "Hero wallpaper"}
             fill
             style={{ transitionDuration: `${TRANSITION_DURATION_MS}ms` }}
-            className={`absolute h-full w-full object-cover object-center
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700
               ${index === activeIndex ? "z-10 opacity-100" : "z-0 opacity-0"}`}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+            sizes="100vw"
             priority={index === 0}
             aria-hidden={index !== activeIndex}
           />
         ))}
+
+        <div className="pointer-events-none absolute inset-0 z-10 bg-linear-to-t from-black/35 via-transparent to-black/15" />
       </div>
 
       {totalSlides > 1 && (
@@ -98,7 +100,7 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
           <button
             type="button"
             onClick={goToPrevious}
-            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/45 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
+            className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/45 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
             aria-label="Previous wallpaper"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -106,13 +108,13 @@ export function HeroCarousel({ wallpapers }: HeroCarouselProps) {
           <button
             type="button"
             onClick={goToNext}
-            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/45 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
+            className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/45 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
             aria-label="Next wallpaper"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
 
-          <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 rounded-full bg-black/45 px-3 py-2 text-white backdrop-blur-sm">
+          <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full bg-black/45 px-3 py-2 text-white backdrop-blur-sm">
             <div className="flex items-center gap-1.5">
               {wallpapers.map((wallpaper, index) => (
                 <button

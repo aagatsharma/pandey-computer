@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import HeroSection from "@/components/home/hero-section";
 // import LatestBlogs from "@/components/home/latest-blogs";
-import LatestProducts from "@/components/home/latest-products";
+// import LatestProducts from "@/components/home/latest-products";
 import LatestCategories from "@/components/home/latest-categories";
 import PopularBrandsSection from "@/components/home/popular-brands-section";
 import ProductByCategories from "@/components/home/categories-products/product-by-categories";
 import HotDeals from "@/components/home/hot-deals";
-import TopSelling from "@/components/home/top-selling";
+// import TopSelling from "@/components/home/top-selling";
 import { defaultOgImage } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -85,9 +85,9 @@ export default function Home() {
 
       <HeroSection />
       <HotDeals />
-      <TopSelling />
+      {/* <TopSelling /> */}
       <PopularBrandsSection />
-      <LatestProducts />
+      {/* <LatestProducts /> */}
       <ProductByCategories />
       <LatestCategories />
       {/* <LatestBlogs /> */}
